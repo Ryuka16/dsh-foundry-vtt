@@ -18,6 +18,18 @@ import { promises as fs, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { registerExtraTools } from './tools-extra.js'
+
+/** 注入系统提示的工作铁律：强制 AI 先查模板/样本/真源，再写 JSON。每个新对话 AI 自动看到。 */
+const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须遵守）
+1. 先查后写，严禁凭记忆手搓 dnd5e JSON：
+- 结构模板 → foundry_reference（主题：weapon/save-activity/effect/creature/feat/spell/status-list/bonuses/midi-over-time/midi-flags/item-macro/aura/dae/conditions/enchant/optional/trigger/overtime-activity/iron-rules/pitfalls），模板秒回，照抄改数值。
+- 真实样本 → foundry_knowledge topic:"samples" 列索引找同类实体（怪物卡/武器/状态与中毒/持续伤害OverTime/光环/物品宏/DAE特殊时长/法术特性/装备/奇物），file 读样本（大文件先 query 关键词再 offset 翻页）。0 实例的键名禁止写进文档。
+- 图标路径 → foundry_knowledge topic:"icons" grep 确认真源，禁止猜路径。
+- CPR 宏 identifier → foundry_knowledge topic:"cpr-mapping" 查映射表，禁止瞎编。
+- 深层问题（光环/陷阱/物品宏/复杂 flags）→ foundry_knowledge 对应主题（item-macro/aura/traps/iron-rules/pitfalls 等）。
+2. 世界包有现成怪：foundry_search 搜（SRD 在 package:dnd5e.monsters，汉化包中英文都搜）→ foundry_import_entity → foundry_place_token，禁止新建替代导入。
+3. 写操作落库后按工具说明回读验证；工具返回 isError 时先看 note/verified 字段判定是否模块回读误报，再决定重试。
+4. 拿不准的键名/参数/路径：先查，查不到就明说不知道并问用户，禁止臆造。`
 import { summarizeDoc } from './summarize.js'
 import { registerReferenceTools } from './reference.js'
 import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } from './knowledge.js'
@@ -341,6 +353,14 @@ export function apply(ctx: any): void {
   if (!tools) return
 
   const REG = (t: ReturnType<typeof makeTool>) => tools.register(t)
+
+  // 0. 工作铁律：注入系统提示段落（每个新对话的 AI 自动看到），强制「先查模板/样本再写」。
+  try {
+    if (ctx.systemPrompt?.section) {
+      const dispose = ctx.systemPrompt.section({ name: 'dsh-foundry-vtt:workflow', order: 150, text: WORKFLOW_PROMPT })
+      ctx.effect?.(() => dispose)
+    }
+  } catch { /* 旧环境无 systemPrompt service 时静默降级 */ }
 
   // 1. foundry_list_worlds —— 列出连接 relay 的世界/客户端，含在线状态、系统、版本。
   REG(makeTool(
