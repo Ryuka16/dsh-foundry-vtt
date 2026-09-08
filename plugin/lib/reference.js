@@ -60,11 +60,12 @@ const REFERENCE = {
   "effects": [],
   "flags": {}
 }
-要点：attack.ability 用 str/dex 等缩写；attack.bonus 写总加值字符串（如 "3"）或留 "" 让系统算；range.value 5 = 近战 5 尺。带毒版本见 save-activity。`,
-    'save-activity': `【5.3.3 豁免活动模板 · 已验证（尸毒案例）】
-攻击命中后目标过豁免、失败中状态。放在 weapon.system.activities 里与 attack 活动并列；
-并把 attack 活动的 "otherActivityId" 设为 "dnd5eactivity100" 指向它：
+要点：attack.ability 用 str/dex 等缩写；attack.bonus 写总加值字符串（如 "3"）或留 "" 让系统算；range.value 5 = 近战 5 尺。带毒版本三件套：attack 设 "otherActivityId":"dnd5eactivity100" + save 活动（见 save-activity）+ 物品顶层 effects 放毒 ActiveEffect（见 effect）——缺一不可，详情见 save-activity 的层级铁律。`,
+    'save-activity': `【5.3.3 豁免活动模板 · 已验证（僵尸啃咬尸毒实测正常 + 多多剑翻车案例修正）】
+攻击命中后目标过豁免、失败中状态。三件套缺一不可：
 
+① attack 活动必须设 "otherActivityId": "dnd5eactivity100" 指向 save 活动（漏了 = 攻击不触发豁免，多多剑翻车点之一）
+② save 活动本体：
 {
   "dnd5eactivity100": {
     "type": "save",
@@ -80,21 +81,19 @@ const REFERENCE = {
       "scaling": { "mode": "none", "formula": "", "bonus": "" }
     },
     "damage": { "critical": { "bonus": "" }, "includeBase": false, "parts": [] },
-    "effects": [
-      { "_id": "d23QTwP434lw72W2", "onSave": false, "target": "",
-        "duration": { "type": "seconds", "value": 3600 }, "label": "中毒",
-        "formula": "", "count": null, "prompt": false,
-        "statuses": ["poisoned"], "icon": "", "sort": 0 }
-    ],
+    "effects": [ { "_id": "d23QTwP434lw72W2", "onSave": false } ],
     "consumption": { "scaling": { "allowed": false, "max": "" }, "targets": [] },
     "uses": { "spent": 0, "max": null, "recovery": [] },
     "properties": [],
     "_id": "dnd5eactivity100"
   }
 }
-要点：dc.formula 写固定数字字符串（如 "11"）；effects[].onSave:false = 豁免失败才生效（true=成功才生效，如火球半伤）；duration.type 常用 seconds/turns/rounds；statuses 用状态 id（见 status-list）；_id 随便 16 位 hex。`,
-    effect: `【物品 ActiveEffect 自动化模板 · 已验证】
-放进物品/特性的 effects 数组；或直接用 foundry_add_effect{uuid, statusId:"poisoned"} 给 actor 挂现成状态（最简单，推荐优先）。
+③ 真正的中毒效果挂【物品级 effects 数组】（ActiveEffect 结构），不是 activity.effects！
+
+⚠️ 层级铁律（多多剑翻车根因）：save activity 的 effects 是【空壳】{_id, onSave:false}——往里面塞 name/statuses/duration 会被 5.3.3 清洗成空（实测：statuses 全丢）。挂状态（poisoned 等）必须写在物品顶层 effects 数组（ActiveEffect 结构，见 effect 主题）。僵尸啃咬 = 本模板 + 物品级「尸毒」ActiveEffect，用户实测正常；照抄勿改。
+要点：dc.formula 写固定数字字符串（如 "11"）；onSave:false = 豁免失败才生效。`,
+    effect: `【物品 ActiveEffect 自动化模板 · 已验证（僵尸啃咬尸毒实测正常）】
+放进物品/特性顶层的 effects 数组（注意：不是 activity 的 effects！层级见 save-activity 铁律）。或直接用 foundry_add_effect{uuid, statusId:"poisoned"} 给 actor 挂现成状态（最简单，推荐优先）。
 
 {
   "name": "尸毒",
@@ -110,9 +109,9 @@ const REFERENCE = {
   "origin": null
 }
 要点：
-- statuses 放状态 id（poisoned/prone 等，见 status-list）→ FVTT 自动挂状态图标与核心效果
+- statuses 放状态 id（poisoned/prone 等，见 status-list）→ 命中后目标被挂对应状态（与 save activity 配合：豁免失败才触发）
 - changes 是附加自动化：常用 key "flags.midi-qol.disadvantage.attack.all"（攻击劣势）、"flags.midi-qol.disadvantage.check.all"（检定劣势）——需要 midi-qol 模块；mode 0=覆盖 2=加 5=减
-- 伤害易伤/免疫写怪物数值（见 creature），不写这里`,
+- 完整「命中→豁免→失败中毒」链路 = weapon 的 attack 活动 + otherActivityId 指向 save 活动 + 本模板（见 save-activity）`,
     creature: `【dnd5e 5.3.3 NPC 数值骨架 · 核心字段已验证】
 建议先 foundry_get_entity(uuid, summary:true) 读一个现成同类怪拿准确字段路径再改；手写参考此骨架（僵尸，已验证数值）：
 
