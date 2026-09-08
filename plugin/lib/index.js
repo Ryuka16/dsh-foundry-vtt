@@ -14,12 +14,13 @@
  * 配置优先读 ~/.dsh/dsh-foundry-vtt/config.json（可手改、持久、重启仍在），
  * 兜底环境变量 FOUNDRY_RELAY_URL / FOUNDRY_API_KEY / FOUNDRY_CLIENT_ID，再兜底默认值。
  */
-import { promises as fs } from 'node:fs';
+import { promises as fs, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { registerExtraTools } from './tools-extra.js';
 import { summarizeDoc } from './summarize.js';
 import { registerReferenceTools } from './reference.js';
+import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR } from './knowledge.js';
 const name = '@dsh-external/dsh-foundry-vtt';
 const inject = ['tools'];
 /** 配置目录与文件（~/.dsh 下，与 DSH 用户数据同域，重装 DSH 不丢）。 */
@@ -38,6 +39,7 @@ async function getCfg() {
         relayUrl: fileCfg.relayUrl || process.env.FOUNDRY_RELAY_URL || 'http://localhost:3010',
         apiKey: fileCfg.apiKey || process.env.FOUNDRY_API_KEY || '',
         clientId: fileCfg.clientId || process.env.FOUNDRY_CLIENT_ID || '',
+        knowledgeDir: fileCfg.knowledgeDir || process.env.FOUNDRY_KNOWLEDGE_DIR || DEFAULT_KNOWLEDGE_DIR,
     };
 }
 // ── 工具 JSON 文本渲染 + 原始 ToolDefinition 构造 ──────────────
@@ -791,7 +793,20 @@ export function apply(ctx) {
     registerExtraTools({ makeTool, callRelay, asObject, targetingQuery }, REG);
     // 87. 内置结构参考库（本地模板，省 token）。
     registerReferenceTools(REG);
-    ctx.logger?.info?.('[' + name + '] FVTT 控制工具已就绪（relay + 87 工具）。配置：' + CONFIG_FILE);
+    // 88. 按需读用户本地 FVTT 资料库（血泪教训/数据字典/图标真源）。
+    registerKnowledgeTools(REG, () => {
+        try {
+            const raw = readFileSync(CONFIG_FILE, 'utf8').replace(/^\uFEFF/, '');
+            const c = JSON.parse(raw);
+            if (c.knowledgeDir)
+                return c.knowledgeDir;
+        }
+        catch {
+            // 无文件/损坏：走 env + 默认。
+        }
+        return process.env.FOUNDRY_KNOWLEDGE_DIR || DEFAULT_KNOWLEDGE_DIR;
+    });
+    ctx.logger?.info?.('[' + name + '] FVTT 控制工具已就绪（relay + 88 工具）。配置：' + CONFIG_FILE);
 }
 export { name, inject };
 //# sourceMappingURL=index.js.map

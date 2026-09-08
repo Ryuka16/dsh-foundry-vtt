@@ -14,12 +14,13 @@
  * 配置优先读 ~/.dsh/dsh-foundry-vtt/config.json（可手改、持久、重启仍在），
  * 兜底环境变量 FOUNDRY_RELAY_URL / FOUNDRY_API_KEY / FOUNDRY_CLIENT_ID，再兜底默认值。
  */
-import { promises as fs } from 'node:fs'
+import { promises as fs, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { registerExtraTools } from './tools-extra.js'
 import { summarizeDoc } from './summarize.js'
 import { registerReferenceTools } from './reference.js'
+import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR } from './knowledge.js'
 
 const name = '@dsh-external/dsh-foundry-vtt'
 const inject = ['tools']
@@ -32,11 +33,13 @@ interface Cfg {
   relayUrl?: string
   apiKey?: string
   clientId?: string
+  knowledgeDir?: string
 }
 interface ResolvedCfg {
   relayUrl: string
   apiKey: string
   clientId: string
+  knowledgeDir: string
 }
 
 async function getCfg(): Promise<ResolvedCfg> {
@@ -51,6 +54,7 @@ async function getCfg(): Promise<ResolvedCfg> {
     relayUrl: fileCfg.relayUrl || process.env.FOUNDRY_RELAY_URL || 'http://localhost:3010',
     apiKey: fileCfg.apiKey || process.env.FOUNDRY_API_KEY || '',
     clientId: fileCfg.clientId || process.env.FOUNDRY_CLIENT_ID || '',
+    knowledgeDir: fileCfg.knowledgeDir || process.env.FOUNDRY_KNOWLEDGE_DIR || DEFAULT_KNOWLEDGE_DIR,
   }
 }
 
@@ -870,7 +874,19 @@ export function apply(ctx: any): void {
   // 87. 内置结构参考库（本地模板，省 token）。
   registerReferenceTools(REG as (t: { name: string }) => void)
 
-  ctx.logger?.info?.('[' + name + '] FVTT 控制工具已就绪（relay + 87 工具）。配置：' + CONFIG_FILE)
+  // 88. 按需读用户本地 FVTT 资料库（血泪教训/数据字典/图标真源）。
+  registerKnowledgeTools(REG as (t: { name: string }) => void, () => {
+    try {
+      const raw = readFileSync(CONFIG_FILE, 'utf8').replace(/^\uFEFF/, '')
+      const c = JSON.parse(raw) as { knowledgeDir?: string }
+      if (c.knowledgeDir) return c.knowledgeDir
+    } catch {
+      // 无文件/损坏：走 env + 默认。
+    }
+    return process.env.FOUNDRY_KNOWLEDGE_DIR || DEFAULT_KNOWLEDGE_DIR
+  })
+
+  ctx.logger?.info?.('[' + name + '] FVTT 控制工具已就绪（relay + 88 工具）。配置：' + CONFIG_FILE)
 }
 
 export { name, inject }
