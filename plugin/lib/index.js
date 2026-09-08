@@ -449,7 +449,7 @@ export function apply(ctx) {
         return callRelay('DELETE', '/delete', { query: q });
     }));
     // 7. foundry_modify_actor —— 给/移除物品、增减数值、击杀。
-    REG(makeTool('foundry_modify_actor', '对 actor 做操作：give 给物品（toUuid 收件人 + itemUuid/itemName）、remove 移除物品（actorUuid/selected + itemUuid/itemName）、increase/decrease 增减属性（uuid/selected + attribute 点号路径 + amount）、kill 击杀（hp 归 0）。', {
+    REG(makeTool('foundry_modify_actor', '对 actor 做操作：give 给物品（toUuid 收件人 + itemUuid/itemName）、remove 移除物品（actorUuid/selected + itemUuid/itemName）、increase/decrease 增减属性（uuid/selected + attribute 点号路径 + amount）、kill 击杀（hp 归 0）。**remove 移除 actor 身上的嵌入物品（compendium 导入怪自带的武器等）时，itemUuid 必须用内嵌形式 Actor.<actorId>.Item.<itemId>（传 Item.<id> 会报 Item not found，因为嵌入物品不在世界物品目录）。**', {
         action: { type: 'string', enum: ['give', 'remove', 'increase', 'decrease', 'kill'], description: '操作类型' },
         toUuid: { type: 'string', description: '[give] 收件 actor 的 uuid' },
         fromUuid: { type: 'string', description: '[give] 来源 actor 的 uuid' },
@@ -699,7 +699,14 @@ export function apply(ctx) {
         if (args.folder)
             body.folder = args.folder;
         const created = await callRelay('POST', '/create', { query: targetingQuery(args), body });
-        return args.summary === true ? summarizeDoc(created) : created;
+        if (args.summary === true) {
+            // relay /create 返回 {uuid, entity:{...}} 信封；摘要要对 entity 内层做，并附带新 uuid（防 undefined 字段被 DSH 拒收）
+            const createdObj = created;
+            const inner = (createdObj.entity ?? createdObj);
+            const sum = summarizeDoc(inner);
+            return { uuid: createdObj.uuid ?? null, ...sum };
+        }
+        return created;
     }));
     // 18. foundry_place_token —— 把世界内 Actor 作为 token 放到场景地图坐标（POST /canvas/tokens）。
     REG(makeTool('foundry_place_token', '把一个世界内 Actor 作为 token 放到指定场景的地图坐标上（POST /canvas/tokens，token 数据用 actor.prototypeToken 展开 + 覆盖 x/y）。用于"把怪放到地图上"。**场景规则（重要）：用户说"放地图上/放我激活的地图"且未指定场景名 → 不要传 sceneId（默认=当前激活场景）；先调 foundry_get_scene(active=true) 拿激活场景的 grid.size/width/height，x/y 取 grid.size 整数倍并保证在场景尺寸内。只有用户明确说放到某张具体地图时才传 sceneId。**可用 foundry_move_token 移 token（/move-token）。', {

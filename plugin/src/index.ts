@@ -496,7 +496,7 @@ export function apply(ctx: any): void {
   // 7. foundry_modify_actor —— 给/移除物品、增减数值、击杀。
   REG(makeTool(
     'foundry_modify_actor',
-    '对 actor 做操作：give 给物品（toUuid 收件人 + itemUuid/itemName）、remove 移除物品（actorUuid/selected + itemUuid/itemName）、increase/decrease 增减属性（uuid/selected + attribute 点号路径 + amount）、kill 击杀（hp 归 0）。',
+    '对 actor 做操作：give 给物品（toUuid 收件人 + itemUuid/itemName）、remove 移除物品（actorUuid/selected + itemUuid/itemName）、increase/decrease 增减属性（uuid/selected + attribute 点号路径 + amount）、kill 击杀（hp 归 0）。**remove 移除 actor 身上的嵌入物品（compendium 导入怪自带的武器等）时，itemUuid 必须用内嵌形式 Actor.<actorId>.Item.<itemId>（传 Item.<id> 会报 Item not found，因为嵌入物品不在世界物品目录）。**',
     {
       action: { type: 'string', enum: ['give', 'remove', 'increase', 'decrease', 'kill'], description: '操作类型' },
       toUuid: { type: 'string', description: '[give] 收件 actor 的 uuid' },
@@ -772,7 +772,14 @@ export function apply(ctx: any): void {
       const body: Record<string, unknown> = { entityType, data: doc }
       if (args.folder) body.folder = args.folder
       const created = await callRelay('POST', '/create', { query: targetingQuery(args), body })
-      return args.summary === true ? summarizeDoc(created) : created
+      if (args.summary === true) {
+        // relay /create 返回 {uuid, entity:{...}} 信封；摘要要对 entity 内层做，并附带新 uuid（防 undefined 字段被 DSH 拒收）
+        const createdObj = created as Record<string, unknown>
+        const inner = (createdObj.entity ?? createdObj) as Record<string, unknown>
+        const sum = summarizeDoc(inner) as Record<string, unknown>
+        return { uuid: createdObj.uuid ?? null, ...sum }
+      }
+      return created
     },
   ))
 
