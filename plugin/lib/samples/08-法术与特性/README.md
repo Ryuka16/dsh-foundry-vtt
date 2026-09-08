@@ -8,3 +8,5 @@
 - 特性里的 effects（被动增益）
 
 **典型样本**：从世界包导入的法术/特性（foundry_search 搜到后 get 照抄也行）
+
+**数据表**：`dnd5e_classpack-cpr-mapping.json`（82KB，477 条）——CPR（Chris's Premades）引用 classpack 内容的映射速查表，每条 {collection,id,name,identifier,version}。AI 做 CPR 宏/自动化要写 identifier 时先 query 搜条目名（如 query:"巨人打击" 或 query:"strikeOfTheGiants"）拿 identifier 和 id。分布：spell 156 / extra-ability 152 / class-abilityphb 104 / itempack 41 / racial-traits 10 / feats-all 10。
