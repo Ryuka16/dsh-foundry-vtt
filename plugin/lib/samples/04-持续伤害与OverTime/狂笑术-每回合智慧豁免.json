@@ -1,0 +1,71 @@
+{
+  "_id": "laughEf000000001",
+  "name": "狂笑术 Hideous Laughter",
+  "img": "icons/svg/falling.svg",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [
+    {
+      "key": "flags.midi-qol.grants.advantage.attack.mwak",
+      "mode": 0,
+      "value": "1",
+      "priority": 0
+    },
+    {
+      "key": "flags.midi-qol.grants.advantage.attack.msak",
+      "mode": 0,
+      "value": "1",
+      "priority": 0
+    },
+    {
+      "key": "flags.midi-qol.disadvantage.attack.all",
+      "mode": 0,
+      "value": "1",
+      "priority": 0
+    },
+    {
+      "key": "system.attributes.movement.all",
+      "mode": 0,
+      "value": "*0.5",
+      "priority": 5
+    },
+    {
+      "key": "flags.midi-qol.OverTime",
+      "mode": 5,
+      "value": "turn=end,saveAbility=wis,saveDC=@attributes.spelldc,saveMagic=true,label=狂笑术,saveCount=1-",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": 60,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>目标倒地且失能：近战对其有优势、其攻击检定劣势、移速减半。每回合结束可重复进行智慧豁免（DC=施法者法术 DC），成功即解除，最长 1 分钟。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": ["prone", "incapacitated"],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": [],
+      "stackable": "noneName"
+    }
+  }
+}

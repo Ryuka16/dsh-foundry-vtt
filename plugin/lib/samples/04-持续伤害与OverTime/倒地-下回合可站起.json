@@ -1,0 +1,40 @@
+{
+  "_id": "proneEf00000001",
+  "name": "倒地 Prone",
+  "img": "icons/svg/falling.svg",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>目标倒地：攻击检定劣势、移动受限。目标可在其回合开始时花一半移动力站起（dnd5e 倒地规则），无需豁免。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": ["prone"],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": [],
+      "stackable": "noneName"
+    }
+  }
+}

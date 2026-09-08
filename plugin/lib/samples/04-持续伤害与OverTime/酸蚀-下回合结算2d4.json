@@ -1,0 +1,47 @@
+{
+  "_id": "acidOT0000000001",
+  "name": "酸蚀 Acid Arrow",
+  "img": "icons/magic/acid/dissolve-drip-droplet-smoke.webp",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [
+    {
+      "key": "flags.midi-qol.OverTime",
+      "mode": 2,
+      "value": "turn=end,removeCondition=true,damageRoll=2d4,damageType=acid,label=强酸箭",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": 60,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>目标下回合结束时受到 2d4 酸蚀伤害，随后效果自动解除（removeCondition=true，一次性结算）。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": [],
+      "stackable": "noneName"
+    }
+  }
+}

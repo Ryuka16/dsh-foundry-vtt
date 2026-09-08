@@ -1,0 +1,47 @@
+{
+  "_id": "burnOT0000000001",
+  "name": "灼烧 Burning",
+  "img": "icons/magic/fire/flame-burning-hand-orange.webp",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [
+    {
+      "key": "flags.midi-qol.OverTime",
+      "mode": 5,
+      "value": "turn=start,damageRoll=1d4,damageType=fire,label=灼烧,saveCount=1-",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": 60,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>每回合开始受到 1d4 火焰伤害。每回合结束可重复进行体质豁免（DC 由挂载处指定），成功即熄灭。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": [],
+      "stackable": "noneName"
+    }
+  }
+}
