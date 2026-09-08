@@ -22,7 +22,7 @@ DSH 原生 FVTT 控制工具包：把 Foundry VTT 的操控能力做成 **88 个
 | 聊天 4 | `chat_send` · `chat_get` · `chat_clear` · `chat_delete` |
 | 用户·宏·文件 11 | `user_list` · `user_get` · `user_create` · `user_update` · `user_delete` · `macro_list` · `macro_execute` · `execute_js` · `structure` · `file_system` · `file_upload` |
 | 声音·世界 10 | `playlist_list` · `playlist_play` · `playlist_stop` · `playlist_next` · `playlist_volume` · `play_sound` · `stop_sound` · `world_info` · `get_folder` · `player_list` |
-| 本地知识 2 | `foundry_reference`（内置 dnd5e 5.3.3 结构模板+效应配方，14 主题，零 HTTP 秒回省 token）· `foundry_knowledge`（按需读你本地 FVTT 资料库：血泪教训/data-dict/图标真源/世界宏金标准，query 定位+分页） |
+| 本地知识 2 | `foundry_reference`（内置 dnd5e 5.3.3 结构模板+效应配方，20 主题：武器/豁免/效果/怪物 + 加伤/OverTime/物品宏/光环/DAE/激活条件/附魔/Optional/触发路由/行动版OverTime/铁律/坑速查，零 HTTP 秒回省 token）· `foundry_knowledge`（按需读你本地 FVTT 资料库 36 文件：血泪教训/data-dict/图标真源/世界宏金标准/飞书宏篇，query 定位+分页） |
 
 每条工具的中文 `description` 就是 AI 调用时看到的说明书，里面写进了实测踩坑总结的死规则：
 

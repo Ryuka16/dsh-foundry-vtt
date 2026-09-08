@@ -319,6 +319,68 @@ ActiveEffect 关键字段：
 8. 术语对照：necrotic=暗蚀 / psychic=心灵 / radiant=光耀 / bludgeoning=钝击 / piercing=穿刺 / slashing=挥砍。
 9. 卡面描述必须有对应真实机制（无机制的纯风味文字=坑，用户会问「这怎么触发」）。
 10. 汉化：系统自带 5e_chn 翻译模块（world-info 已确认 5.3.0），实体名可直接写中文。`,
+
+  dae: `【DAE/AE 主动效果机制核心 · 出自用户资料库 data-dict §25/§26/§27】
+ActiveEffect 本身就是 DAE 体系（DAE=Dynamic Active Effects 模块），effects[].changes 之外的进阶能力：
+- 表达式「为假则移除 / 为真则禁用」：changes 外、效果上的 JS 表达式字段，仅支持角色掷骰数据（如 attributes.hp.value < 50 → HP≥50 移除；!!attributes.ac.equippedArmor → 着甲禁用）
+- 持续时间：duration.seconds 自动换算轮数（60秒=10轮）；可填掷骰公式（@abilities.int.mod+2d4 单位秒）；「特殊持续时间」=移动时结束/一次攻击后结束/来源或目标下回合开始等
+- 变更模式（含默认优先级）：0 CUSTOM(0)/1 MULTIPLY(10)/2 ADD(20)/3 DOWNGRADE(30)/4 UPGRADE(40)/5 OVERRIDE(50)；同键多更改按优先级低→高应用
+- @/## 评估：非转移效果 @字段 在【使用者】身上查；##字段 不求值、施加目标时替成 @字段（力量18者打力量10目标：@abilities.str.mod→18，##abilities.str.mod 在目标算 10）；[[1d8]] 强制引用掷骰数据
+- 特殊键（mode 自定义）：macro.execute "宏名" 参数（效果创建/删除/每回合执行世界宏）/ macro.itemMacro（执行来源物品宏）/ macro.createItem 值=物品UUID（效果创建给目标建物品、移除自动删）/ macro.createItemRunMacro / macro.actorUpdate（改常规键改不了的字段且随效果撤销）/ flags.dae.deleteUuid（效果删除时删 value 指向实体）
+- DAE 宏 args[0]：'on'(创建)/'off'(删除)/'each'(每回合重复)；'off'/'each' 时 actor/token 未初始化 → 用 lastArg=args[args.length-1]（含 effectId/origin/actorUuid/tokenUuid，取角色优先 uuid）
+- 角色侧 change-key 配方精选：优势 abilities.[abl].save.roll.mode 加 1；AC attributes.ac.bonus；法术DC bonuses.spell.dc；临时HP attributes.hp.tempmax；免疫 traits.di.value 加伤害类型；忽略困难地形 attributes.movement.ignoredDifficultTerrain
+- ⚠ HP 铁律：切勿 AE 改 hp.value/.max/.temp（用 attributes.hp.tempmax / hp.bonuses.overall / hp.bonuses.level）
+出处：data-dict §25/§26/§27 逐字坐实，用户世界在用。`,
+
+  conditions: `【激活条件全集 · 出自用户资料库 data-dict §29 · 条件化自动化核心】
+适用于：midi「使用条件/激活效果条件」、触发行动「触发条件」、DAE「为真禁用/为假移除」、Optional .activation/.force。
+运算符：&& 与 · || 或 · ?? · ! · ==/=== · < <= > >=
+高频变量：damageTypes.fire（本次伤害类型）；target.saved/.failedSave/.isHit/.raceOrType/.attributes.hp.value；workflow.diceRoll==20（攻击掷出20）/.isCritical/.attackMode/.saveDC/.castData.castLevel==4；raceOrType.includes("undead")（目标不死生物）；item.itemType=="spell"/"weapon"/"feat"；workflow.item.system.properties.has("mgc")；combatRound/combatTurn；isAttuned/isDeathSave
+就地函数：computeDistance(tokenUuid,targetUuid)<=10；checkNearby(CONST.TOKEN_DISPOSITIONS.HOSTILE,tokenUuid,5)（5尺内有敌）；findNearbyCount(...)
+逐字示例（直接抄改）：target.attributes.hp.value < target.attributes.hp.max/2（半血以下）；["lg","med","sm","tiny"].includes(target.traits.size)；target.statuses.frightened（目标被恐慌）；target.attributes.hp.value != target.attributes.hp.max（已损血）；target.items.some(i => i.name=="某物品")；["shortbow","longbow"].includes(workflow.item.system.type?.baseItem)
+⚠ 怪物「在某条件下才……」的能力几乎都靠这层。`,
+
+  enchant: `【附魔键值 · 改物品/行动本身 · 出自用户资料库 data-dict §28】
+附魔=特殊主动效果，改【物品】而非角色（与 dae 主题的角色侧键不互通）。格式 activities[<类型>].<路径>（类型=attack/save/heal/damage/utility；base 表通用）或 system.*。
+- 行动通用：activation.type/value；consumption.spellSlot(仅法术)/targets；duration.concentration；target.affects.count/.type/.special(-self 排除自身)；uses.max/spent/recovery；range.units/.value
+- 攻击：attack.ability 覆盖；attack.bonus 加；attack.critical.threshold（降级=覆盖阈值/加=增减）；attack.flat（固定命中）；attack.type.classification/value
+- 豁免：save.ability；save.dc.calculation（""=自定义/spellcasting/str…）/.formula/.bonus；damage.onSave（none/half/full）
+- 治疗：healing.bonus/.custom.enabled+formula/.denomination/.number/.types
+- 系统（改 Item）：system.attuned(布尔)/system.attunement(""/required/optional)/system.damage.parts([["formula","type"]])/system.properties 武器属性缩写（ada精金 amm弹药 fin灵巧 foc法器 hvy重型 lgt轻型 lod装填 mgc魔法 rch长触及 rel重新装填 ret回旋 sil银质 thr投掷 two双手 ver多用）/system.uses{max,spent,recovery}
+- 充能恢复 uses.recovery.period：recharge/sr短休/lr长休/day每日/dawn黎明/dusk黄昏/initiative先攻时/turnStart/turnEnd/turn
+- 名/图/描述：name 覆盖（{} 保留原名→"短剑, +1"）；img 覆盖路径；system.description.value 覆盖（{} 保留原描述）
+⚠ 附魔场景（改现有魔法物品）才用这些；新建物品用 weapon 主题模板。`,
+
+  optional: `【Optional 可选加值全集 · 出自用户资料库 data-dict §30C】
+flags.midi-qol.optional.<NAME>.*（mode 0 自定义），NAME=唯一串（建议同效果/物品名）。条件型加值/幸运重骰/把失败豁免转成功。
+- 触发：activation（条件真则弹窗供选）/ force（条件真则强制生效不弹窗）/ label（弹窗标题）
+- 目标键：damage.{all|mwak|rwak|msak|rsak} / skill.{all|per|prc…} / attack.{all…} / check.{all|str…} / save.{all|str…} / save.fail.{all|str…}（失败时加；save.fail.dex 配值 success 可把失败豁免转成功）/ ac（给目标AC）/ criticalDamage（true=伤害加值随重击翻倍）/ rollMode
+- 次数 count：every(每次)/reaction(耗反应)/数字/turn(本回合一次)/each-turn/each-round/@field(>0可用用后递减)/ItemUses.<identifier|名称>.<值>/ActivityUses.<…>；countAlt=附加须同时可用的计数
+- 值可填：骰子表达式 / 数字（配 activation/force 用运算符如 +2）/ reroll、reroll-max/-min/-kh/-kl/-query、reroll-withBonus +1d4 / success（确保成功）/ fail / replace <公式>（如 replace 4d20kh）/ ItemMacro.<itemUUID>（宏返回上述类型之一）
+出处：data-dict §30C；经典用法见 bonuses 主题的 optional 摘要。`,
+
+  trigger: `【自动化路由速查 + 反应触发/触发行动 · 出自用户资料库 data-dict §24/§30】
+需求→用什么机制（先查有没有预制菜 CPR/系统自带）：
+- 物品只在特定条件下可用 → 行动 midi「使用条件」（conditions 主题）
+- 一连串操作（攻击后强制豁免等）→ 触发行动（两个独立工作流）
+- 改掷骰方式（优势/伤害减免/射程）→ DAE 效果 + midi flags
+- 条件加值/优势/重骰 → Optional（optional 主题）
+- 固定间隔重复（回合开始/结束）→ OverTime（midi-over-time 主题）
+- 光环/区域效果 → auraeffects（aura 主题）
+- 特殊持续时间（一次攻击后失效）→ DAE「特殊持续时间」（dae 主题）
+- 应用/移除效果时执行操作 → DAE 宏 macro.execute/itemMacro
+反应触发条件（反应行动 midi「使用条件」填 reaction==='...'）：preAttack(被攻击前)/isAttacked/isMissed/isHit/isDamaged/isHealed/isSave/isSaveSuccess/isSaveFail/"false"(仅手动)，可与 conditions 组合。
+「使用其他行动」（同一工作流，能用的行动有限）vs「触发行动」（独立工作流，可触发所有 midi 行动）二选一；触发行动四键：触发行动/触发条件（主工作流结束后评估）/触发目标/掷骰（视同谁掷）。
+挂宏位置：物品宏=物品标题栏 DIME；行动宏=行动标题栏「行动宏编辑器」或 midi 页底；世界宏=右侧栏 </>；角色使用宏=效果 flags.midi-qol.onUseMacroName "<A>,<B>"（A=ItemMacro/ActivityMacro/ActivityMacro.<标识符|uuid|名称>/世界宏名；B=传参）。`,
+
+  'overtime-activity': `【行动版 OverTime · v13 新机制 · 出自用户资料库 data-dict §23 · ⚠ 键名未坐实】
+效果 changes 挂 flags.midi-qol.ActivityOverTime，value 指一个【行动】：identifier（如 bleeding-save，跨世界稳，优先）或 uuid（合集内稳，跨世界会变）。
+比经典版（midi-over-time 主题）灵活：可每轮召唤/每轮逼一次检定/含 AoE。
+配方（流血：每回合掉血、过豁免移除）：
+1. 建豁免行动（体质 DC12、1d4 黯蚀、目标类型留空让 midi 覆盖）；该行动 midi 页设「Overtime 行动=true」+「回合开始」+「豁免移除」
+2. 攻击行动上指定要应用的效果，效果里挂 ActivityOverTime，value 填 bleeding-save（或该行动 uuid）
+规则：调用前检查 attributes.hp.value>0；同一效果可多条按 回合开始→回合结束→优先级（低先）执行；沿用原始施法环数缩放；依赖行动应目标自身，含 AoE 选「光环/光环-半径·无模板」。
+⚠ 键名大小写源文档自相矛盾（ActivityOverTime vs ActivityOvertime vs overTime），用户世界 0 实例——精确键名落 JSON 前必须实测或找样本确认，勿按本节直接写死。绝大多数持续伤害需求用经典版 OverTime 即可，需要每轮召唤/每轮检定/AoE 才上行动版。`,
 }
 
 /**
@@ -332,7 +394,7 @@ export function registerReferenceTools(REG: (t: { name: string }) => void) {
   const tool: { name: string } & Record<string, unknown> = {
     name: 'foundry_reference',
     description:
-      '内置 dnd5e 5.3.3 结构参考库（本地模板，零 HTTP 延迟，秒回省 token）。**建物品/加自动化/写怪物前先查这里，别再 search+get_entity 拉完整样本怪照抄（一次几十 KB 白花钱）。** 结构模板：weapon=武器物品（伤害骰放 damage.base 铁律）；save-activity=豁免活动（咬中过豁免中状态）；effect=ActiveEffect 自动化（statuses+changes）；creature=NPC 数值骨架（僵尸样例）；feat=被动特性物品；spell=法术物品；status-list=常用状态 id。效应配方：bonuses=加伤/减益/改动键速查；midi-over-time=持续伤害 OverTime；midi-flags=midi-qol 常用 flags+macroPass 表；item-macro=物品宏三件套+宏体骨架；aura=光环效果。工作纪律：iron-rules=开工七铁律（先查证再动手）；pitfalls=高频坑速查（effects 层级/DC 两说/图标 404 等）。',
+      '内置 dnd5e 5.3.3 结构参考库（本地模板，零 HTTP 延迟，秒回省 token）。**建物品/加自动化/写怪物前先查这里，别再 search+get_entity 拉完整样本怪照抄（一次几十 KB 白花钱）。** 结构模板：weapon=武器物品（伤害骰放 damage.base 铁律）；save-activity=豁免活动（咬中过豁免中状态）；effect=ActiveEffect 自动化（statuses+changes）；creature=NPC 数值骨架（僵尸样例）；feat=被动特性物品；spell=法术物品；status-list=常用状态 id。效应配方：bonuses=加伤/减益/改动键速查；midi-over-time=持续伤害 OverTime；midi-flags=midi-qol 常用 flags+macroPass 表；item-macro=物品宏三件套+宏体骨架；aura=光环效果；dae=DAE 主动效果机制（特殊时长/macro.execute/change-key 配方）；conditions=激活条件全集（运算符/变量/示例）；enchant=附魔键值（改物品/行动）；optional=Optional 可选加值全集；trigger=自动化路由+反应触发/触发行动；overtime-activity=行动版 OverTime（⚠键名未坐实）。工作纪律：iron-rules=开工七铁律（先查证再动手）；pitfalls=高频坑速查（effects 层级/DC 两说/图标 404 等）。',
     parameters: {
       type: 'object',
       properties: {

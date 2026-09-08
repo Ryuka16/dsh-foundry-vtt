@@ -45,6 +45,14 @@ const TOPICS: Record<string, { file: string; desc: string }> = {
   'feishu-auto-core': { file: '飞书知识库\\42-自动化核心.md', desc: '自动化核心概念' },
   'feishu-dnd53': { file: '飞书知识库\\29-DND5e v5.x.x.md', desc: 'DND5e v5.x.x 系统说明（Line 84 有宏存放位置）' },
   'feishu-exhaustion': { file: '飞书知识库\\34-力竭.md', desc: '力竭机制（macroPass 判别范本）' },
+  'feishu-macro': { file: '飞书知识库\\16-宏相关.md', desc: '宏相关（挂宏/宏类型总览）' },
+  'feishu-macro-basics': { file: '飞书知识库\\39-宏基础入门教程.md', desc: '宏基础入门教程' },
+  'feishu-cpr-macro': { file: '飞书知识库\\47-CPR自定义宏制作.md', desc: 'CPR 自定义宏制作（fork 官方宏流程）' },
+  'feishu-syntax': { file: '飞书知识库\\45-语法.md', desc: 'CPR 宏语法' },
+  'feishu-other-actions': { file: '飞书知识库\\49-使用其他行动.md', desc: '使用其他行动（多行动联动）' },
+  'feishu-reaction': { file: '飞书知识库\\52-MIDI反应自动化.md', desc: 'MIDI 反应自动化' },
+  'feishu-multi-save': { file: '飞书知识库\\53-midi多属性豁免.md', desc: 'midi 多属性豁免' },
+  'feishu-self-target': { file: '飞书知识库\\54-特殊目标-self.md', desc: '特殊目标 self（自我施法目标）' },
 }
 
 /** 默认资料库根目录（可用 config.json 的 knowledgeDir 覆盖）。 */
