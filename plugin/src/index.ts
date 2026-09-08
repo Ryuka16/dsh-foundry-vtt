@@ -36,6 +36,7 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 import { summarizeDoc } from './summarize.js'
 import { registerReferenceTools } from './reference.js'
 import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } from './knowledge.js'
+import { registerMinimalTools } from './minimal.js'
 
 /** dnd5e 文档 _id 铁律：恰好 16 位字母数字。超长/非法 id 会被 5.3.3 拒绝创建。 */
 const ID_RE = /^[A-Za-z0-9]{16}$/
@@ -51,6 +52,15 @@ function randomId16(): string {
  * ③ 缺失 _id：effects 数组元素补随机、activities 活动对象补键名；
  * ④ 同旧值引用（otherActivityId / effects[]._id 指向物品级效果等）同步替换，引用不断链。
  */
+/**
+ * 'Folder.xxx' → 'xxx'（MidiActor 的 folder 字段只收纯 16 位字母数字 ID，带前缀实测报
+ * DataModelValidationError: folder: must be a valid 16-character alphanumeric ID）。
+ */
+function stripFolderPrefix(v: unknown): unknown {
+  if (typeof v === 'string' && /^Folder\.([A-Za-z0-9]{16})$/.test(v)) return v.slice(7)
+  return v
+}
+
 function normalizeDocIds(doc: unknown): { doc: unknown; renamed: string[] } {
   const map = new Map<string, string>()
   const fresh = () => {
@@ -89,6 +99,10 @@ function normalizeDocIds(doc: unknown): { doc: unknown; renamed: string[] } {
       // _id 字段特判（放循环后，避免被循环覆盖）：非字符串或非法字符串 → 换映射值或现生成
       if (src._id !== undefined && !(typeof src._id === 'string' && ID_RE.test(src._id))) {
         o._id = map.get(String(src._id)) ?? fresh()
+      }
+      // folder 字段特判：剥 'Folder.' 前缀（MidiActor 只收纯 16 位 ID）
+      if (typeof src.folder === 'string' && /^Folder\./.test(src.folder)) {
+        o.folder = src.folder.replace(/^Folder\./, '')
       }
       // ③ 缺失补齐：effects 数组元素缺 _id → 补随机
       if (Array.isArray(o.effects)) {
@@ -580,7 +594,7 @@ export function apply(ctx: any): void {
     {
       entityType: { type: 'string', enum: ['Actor', 'Item', 'Scene', 'JournalEntry', 'RollTable', 'Cards', 'Macro', 'Playlist'], description: '文档类' },
       data: { type: 'object', description: '原始 Foundry 文档' },
-      folder: { type: 'string', description: '归档到的文件夹 uuid' },
+      folder: { type: 'string', description: '归档到的文件夹 id（传纯 16 位 ID 或 Folder.xxx 均可，自动剥前缀）' },
       keepId: { type: 'boolean', description: '保留传入的 _id' },
       override: { type: 'boolean', description: '用相同 _id 覆盖已有实体' },
     },
@@ -588,7 +602,7 @@ export function apply(ctx: any): void {
     async (args) => {
       const { doc: data, renamed } = normalizeDocIds(args.data)
       const body: Record<string, unknown> = { entityType: args.entityType, data }
-      if (args.folder) body.folder = args.folder
+      if (args.folder) body.folder = stripFolderPrefix(args.folder)
       if (args.keepId !== undefined) body.keepId = args.keepId
       if (args.override !== undefined) body.override = args.override
       const raw = await callRelay('POST', '/create', { query: targetingQuery(args), body })
@@ -772,8 +786,8 @@ export function apply(ctx: any): void {
       action: { type: 'string', enum: ['create', 'delete'], description: 'create 或 delete' },
       name: { type: 'string', description: '[create] 文件夹名' },
       folderType: { type: 'string', enum: ['Actor', 'Item', 'Scene', 'JournalEntry', 'RollTable', 'Cards', 'Macro', 'Playlist'], description: '[create] 文档类' },
-      parentFolderId: { type: 'string', description: '[create] 父文件夹 uuid' },
-      folderId: { type: 'string', description: '[delete] 文件夹 uuid/id' },
+      parentFolderId: { type: 'string', description: '[create] 父文件夹 id（传纯 16 位 ID 或 Folder.xxx 均可，自动剥前缀）' },
+      folderId: { type: 'string', description: '[delete] 文件夹 id（传纯 16 位 ID 或 Folder.xxx 均可，自动剥前缀）' },
       deleteAll: { type: 'boolean', description: '[delete] true 则连带删除内部实体（不可逆）' },
     },
     ['action'],
@@ -784,11 +798,11 @@ export function apply(ctx: any): void {
         if (!args.folderType) missing('create requires folderType')
         q.name = args.name
         q.folderType = args.folderType
-        if (args.parentFolderId) q.parentFolderId = args.parentFolderId
+        if (args.parentFolderId) q.parentFolderId = stripFolderPrefix(args.parentFolderId)
         return callRelay('POST', '/create-folder', { query: q })
       }
       if (!args.folderId) missing('delete requires folderId')
-      q.folderId = args.folderId
+      q.folderId = stripFolderPrefix(args.folderId)
       if (args.deleteAll !== undefined) q.deleteAll = args.deleteAll
       return callRelay('DELETE', '/delete-folder', { query: q })
     },
@@ -934,7 +948,7 @@ export function apply(ctx: any): void {
     '从 compendium（世界包）导入一个实体到当前世界：先 GET /get 读 compendium 完整文档，清洗 compendium 特有字段（_id/_stats/compendiumSource），再 POST /create 在世界创建副本，返回新世界实体 uuid 与文档。**用户要"把世界包里的怪放到地图上"时必须用本工具导入现成怪，禁止自己新建（新建会丢汉化/数值/特性）。配合 foundry_place_token 完成放地图。**',
     {
       uuid: { type: 'string', description: 'compendium 实体 uuid，如 Compendium.dnd5e.monsters.Actor.NAISFPoNNgUCsEyW' },
-      folder: { type: 'string', description: '可选，归档文件夹 uuid' },
+      folder: { type: 'string', description: '可选，归档文件夹 id（传纯 16 位 ID 或 Folder.xxx 均可，自动剥前缀；推荐不传 folder，导入后用 foundry_update_entity 把 folder 改成目标文件夹纯 ID——两步法最稳）' },
       name: { type: 'string', description: '可选，覆盖副本名字' },
       summary: { type: 'boolean', description: 'true 返回精简摘要（含新实体 uuid），省 token；默认 false 返回完整文档' },
     },
@@ -946,11 +960,11 @@ export function apply(ctx: any): void {
       delete doc._stats
       delete doc.compendiumSource
       if (args.name) doc.name = args.name
-      if (args.folder) doc.folder = args.folder
+      if (args.folder) doc.folder = stripFolderPrefix(args.folder)
       const segs = String(args.uuid).split('.')
       const entityType = segs.length >= 2 ? segs[segs.length - 2] : 'Actor'
       const body: Record<string, unknown> = { entityType, data: doc }
-      if (args.folder) body.folder = args.folder
+      if (args.folder) body.folder = stripFolderPrefix(args.folder)
       const created = await callRelay('POST', '/create', { query: targetingQuery(args), body })
       if (args.summary === true) {
         // relay /create 返回 {uuid, entity:{...}} 信封；摘要要对 entity 内层做，并附带新 uuid（防 undefined 字段被 DSH 拒收）
@@ -1082,7 +1096,10 @@ export function apply(ctx: any): void {
     return process.env.FOUNDRY_SAMPLE_DIR || DEFAULT_SAMPLE_DIR
   })
 
-  ctx.logger?.info?.('[' + name + '] FVTT 控制工具已就绪（relay + 88 工具）。配置：' + CONFIG_FILE)
+  // 89. 省 token 快速建武器：AI 只给关键字段，插件本地组装实测完整结构一次 create。
+  registerMinimalTools({ makeTool, callRelay, asObject, normalizeDocIds, targetingQuery }, REG as (t: { name: string }) => void)
+
+  ctx.logger?.info?.('[' + name + '] FVTT 控制工具已就绪（relay + 89 工具）。配置：' + CONFIG_FILE)
 }
 
 export { name, inject }
