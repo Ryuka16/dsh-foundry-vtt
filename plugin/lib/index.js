@@ -20,7 +20,7 @@ import { join } from 'node:path';
 import { registerExtraTools } from './tools-extra.js';
 import { summarizeDoc } from './summarize.js';
 import { registerReferenceTools } from './reference.js';
-import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR } from './knowledge.js';
+import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } from './knowledge.js';
 const name = '@dsh-external/dsh-foundry-vtt';
 const inject = ['tools'];
 /** 配置目录与文件（~/.dsh 下，与 DSH 用户数据同域，重装 DSH 不丢）。 */
@@ -800,7 +800,7 @@ export function apply(ctx) {
     registerExtraTools({ makeTool, callRelay, asObject, targetingQuery }, REG);
     // 87. 内置结构参考库（本地模板，省 token）。
     registerReferenceTools(REG);
-    // 88. 按需读用户本地 FVTT 资料库（血泪教训/数据字典/图标真源）。
+    // 88. 按需读用户本地 FVTT 资料库（血泪教训/数据字典/图标真源）+ 本地样本库（真实配置实体 JSON 抄改）。
     registerKnowledgeTools(REG, () => {
         try {
             const raw = readFileSync(CONFIG_FILE, 'utf8').replace(/^\uFEFF/, '');
@@ -812,6 +812,17 @@ export function apply(ctx) {
             // 无文件/损坏：走 env + 默认。
         }
         return process.env.FOUNDRY_KNOWLEDGE_DIR || DEFAULT_KNOWLEDGE_DIR;
+    }, () => {
+        try {
+            const raw = readFileSync(CONFIG_FILE, 'utf8').replace(/^\uFEFF/, '');
+            const c = JSON.parse(raw);
+            if (c.sampleDir)
+                return c.sampleDir;
+        }
+        catch {
+            // 无文件/损坏：走 env + 默认。
+        }
+        return process.env.FOUNDRY_SAMPLE_DIR || DEFAULT_SAMPLE_DIR;
     });
     ctx.logger?.info?.('[' + name + '] FVTT 控制工具已就绪（relay + 88 工具）。配置：' + CONFIG_FILE);
 }

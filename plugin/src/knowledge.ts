@@ -8,10 +8,9 @@
  * - offset 分页：每页 ≤ PAGE_SIZE 字符，避免大文件整份灌进上下文。
  */
 
-import { readFile } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
-import { join, resolve } from 'node:path'
-import { dirname } from 'node:path'
+import { basename, join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const PAGE_SIZE = 4000
@@ -76,6 +75,19 @@ const TOPICS: Record<string, { file: string; desc: string }> = {
 /** 默认资料库根目录（可用 config.json 的 knowledgeDir 覆盖）。 */
 const DEFAULT_KNOWLEDGE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团工具\\FVTT技术资料'
 
+/** 默认样本库目录（可用 config.json 的 sampleDir 覆盖）：世界导出的真实配置实体 JSON。 */
+const DEFAULT_SAMPLE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团工具\\怪物与物品卡'
+
+/** 样本库已知金标准标签（按文件名关键词匹配，用于索引展示；其余样本用文件名+大小）。 */
+const SAMPLE_LABELS: Array<{ key: string; label: string }> = [
+  { key: '磁轭手铳', label: '★物品宏金标准（onUseMacroName+dae.macro 三件套完整实例）' },
+  { key: '妄质百变腕甲', label: '★复杂活动结构/变身物品（140KB 完整字段实例）' },
+  { key: '金属龙吐息武器', label: '★武器自动化版（活动+豁免+效果全配置实例）' },
+  { key: '秘法魔剑士', label: '高等级 NPC 完整卡（法术+物品+特性 112KB）' },
+  { key: '唯死之舞', label: '带战斗自动化机制的 NPC（67KB）' },
+  { key: '巴哈姆特', label: '传奇生物完整卡（32KB）' },
+]
+
 /**
  * 注册 foundry_knowledge 工具。
  * @param REG 工具注册函数（与 registerReferenceTools 同签名）
@@ -84,6 +96,7 @@ const DEFAULT_KNOWLEDGE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团�
 export function registerKnowledgeTools(
   REG: (t: { name: string }) => void,
   getKnowledgeDir: () => string,
+  getSampleDir: () => string,
 ) {
   const topics = Object.keys(TOPICS)
   const builtinTopics = Object.keys(BUILTIN_TOPICS)
@@ -91,11 +104,12 @@ export function registerKnowledgeTools(
   const tool: { name: string } & Record<string, unknown> = {
     name: 'foundry_knowledge',
     description:
-      '按需读 FVTT 技术知识。两级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 用户本机资料库（血泪教训/数据字典/图标真源/世界宏金标准，若配置了 knowledgeDir 才有，主题：' + topics.join('/') + '）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① 大文件先传 query 关键词 grep 定位（返回匹配行+行号）；② 再传 offset 读原文页（每页 ' + PAGE_SIZE + ' 字符）。',
+      '按需读 FVTT 技术知识。三级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 本机资料库（血泪教训/数据字典/图标真源/世界宏金标准，若配置了 knowledgeDir 才有，主题：' + topics.join('/') + '）；③ 本地样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"samples" 不带 file 参数 = 列出样本目录索引（文件名+大小+标签）；② 带 file 参数（索引里的文件名）= 读该样本（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
     parameters: {
       type: 'object',
       properties: {
-        topic: { type: 'string', description: '知识主题（内置：' + builtinTopics.join(' / ') + '；本机资料库：' + topics.join(' / ') + '）' },
+        topic: { type: 'string', description: '知识主题。内置：' + builtinTopics.join(' / ') + '；本机资料库：' + topics.join(' / ') + '；本地样本库："samples"（世界导出的真实配置实体，抄改首选）' },
+        file: { type: 'string', description: '可选：样本文件名（仅 topic:"samples" 时用，文件名从 samples 索引拿）' },
         query: { type: 'string', description: '可选：按行搜索关键词（如 "OverTime"/"光环"/"图标"），返回最多 40 行匹配（含行号）。大文件先 query 定位再 offset 读原文。' },
         offset: { type: 'number', description: '可选：从第几个字符开始读原文（无 query 时生效，默认 0）。返回值里有 nextOffset 与 hasMore 用于翻页。' },
       },
@@ -128,6 +142,55 @@ export function registerKnowledgeTools(
           return { topic, file: entry.file, error: '内置文档读取失败：' + (e instanceof Error ? e.message : String(e)) }
         }
         return servePage(args, topic, entry.file, entry.desc, text)
+      }
+
+      // 本地样本库：世界导出的真实配置实体（抄改首选）。topic="samples"。
+      if (topic === 'samples') {
+        const root = getSampleDir()
+        if (!root || !existsSync(root)) {
+          return {
+            topic,
+            error: '样本库目录未找到（sampleDir 指向「' + root + '」不存在）。可在 config.json 加 "sampleDir" 指向你导出 FVTT 实体 JSON 的目录，或设环境变量 FOUNDRY_SAMPLE_DIR。',
+          }
+        }
+        const fileName = args.file === undefined ? '' : String(args.file)
+        if (!fileName) {
+          // 无 file：列目录索引。
+          try {
+            const names = (await readdir(root)).filter((n) => n.toLowerCase().endsWith('.json')).sort()
+            if (names.length === 0) {
+              return { topic, dir: root, total: 0, content: '样本库目录为空（' + root + '）。把 FVTT 导出的实体 JSON 放进该目录即可（AI 会先查索引再按需读）。' }
+            }
+            const stats = await Promise.all(names.map(async (n) => {
+              const size = (await readFile(join(root, n))).length
+              const label = SAMPLE_LABELS.find((s) => n.includes(s.key))
+              return { name: n, KB: Math.round(size / 1024), note: label ? label.label : '' }
+            }))
+            return {
+              topic, dir: root, total: names.length,
+              content:
+                '【本地样本库索引】目录：' + root + '\n共 ' + names.length + ' 个样本（真实配置过的实体，建东西前优先来这找同类样本：读它的结构→照抄→改数值）：\n' +
+                stats.map((s, i) => (i + 1) + '. ' + s.name + '（' + s.KB + 'KB）' + (s.note ? '\n   ↳ ' + s.note : '')).join('\n') +
+                '\n\n用法：foundry_knowledge{topic:"samples", file:"<上面某个文件名>"} 读样本；大文件先加 query 关键词 grep 定位（如 query:"OverTime"/"activities"/"effects"），再 offset 翻页。',
+            }
+          } catch (e) {
+            return { topic, dir: root, error: '样本目录读取失败：' + (e instanceof Error ? e.message : String(e)) }
+          }
+        }
+        // 有 file：防目录逃逸后读样本。
+        const target = resolve(join(root, fileName))
+        const rootResolved = resolve(root)
+        if (!target.startsWith(rootResolved + '\\') && !target.startsWith(rootResolved + '/') && target !== rootResolved) {
+          return { topic, file: fileName, error: '样本文件不在样本库目录内（file 只能用索引里列出的文件名）。' }
+        }
+        let text: string
+        try {
+          text = (await readFile(target, 'utf8')).replace(/^\uFEFF/, '')
+        } catch (e) {
+          return { topic, file: fileName, error: '样本读取失败：' + (e instanceof Error ? e.message : String(e)) + '。file 请用 samples 索引里的完整文件名。' }
+        }
+        const label = SAMPLE_LABELS.find((s) => fileName.includes(s.key))
+        return servePage(args, topic, fileName, (label ? label.label + '；' : '') + '世界导出的真实配置实体 JSON，结构可照抄（改 name/数值/描述）。', text)
       }
 
       // 本机资料库主题：依赖用户环境的 knowledgeDir
@@ -199,4 +262,4 @@ async function servePage(args: Record<string, unknown>, topic: string, fileName:
   }
 }
 
-export { DEFAULT_KNOWLEDGE_DIR, TOPICS }
+export { DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR, TOPICS }
