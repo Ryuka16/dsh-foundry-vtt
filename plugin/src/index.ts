@@ -32,7 +32,8 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 - **dnd5e 5.3.3 文档内所有 _id 必须恰好 16 位字母数字**（如 "dnd5eactivity000"、"bleedOT000000001"）；超 16 位（如 "poisonOT000000001" 17 位）会被系统拒绝创建，报 "Failed to create entity"。activity 引用（otherActivityId/otherActivityUuid）与 effects[]._id 指向的 id 也要遵守并保持一致。生成 id 时数清楚位数；插件会自动把超长 _id 规范成合法 16 位（同值引用同步替换）。
 2. 世界包有现成怪：foundry_search 搜（SRD 在 package:dnd5e.monsters，汉化包中英文都搜）→ foundry_import_entity → foundry_place_token，禁止新建替代导入。
 3. 写操作落库后按工具说明回读验证；工具返回 isError 时先看 note/verified 字段判定是否模块回读误报，再决定重试。
-4. 拿不准的键名/参数/路径：先查，查不到就明说不知道并问用户，禁止臆造。`
+4. 拿不准的键名/参数/路径：先查，查不到就明说不知道并问用户，禁止臆造。
+5. 多世界路由：所有工具自动作用于「当前唯一在线」的世界（用户浏览器开着的那个）。动手前先 foundry_list_worlds 确认在线世界名；若报 "Multiple clients connected"，让用户关掉多余的世界页面再重试，不要瞎猜世界。`
 import { summarizeDoc } from './summarize.js'
 import { registerReferenceTools } from './reference.js'
 import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } from './knowledge.js'
@@ -532,10 +533,21 @@ export function apply(ctx: any): void {
   // 1. foundry_list_worlds —— 列出连接 relay 的世界/客户端，含在线状态、系统、版本。
   REG(makeTool(
     'foundry_list_worlds',
-    '列出连接 relay 的所有 Foundry 世界/客户端（含在线状态、systemId、systemVersion、foundryVersion）。第一步确认哪个世界在线、dnd5e 版本。',
+    '列出连接 relay 的所有 Foundry 世界/客户端（含在线状态、系统、版本）。第一步确认哪个世界在线、dnd5e 版本。**online=true 的世界会被所有工具自动路由（插件不传 clientId，relay 自动选唯一在线世界）**；若有多个世界同时在线，relay 会报 "Multiple clients connected"，此时请让用户关掉多余的世界页面（一次只开一个世界页），或用户说清要操作哪个世界后再重试。',
     {}, [], async () => {
       const data = (await callRelay('GET', '/clients', { rawEnvelope: true })) as { clients?: unknown[]; total?: number }
-      const clients = data.clients ?? []
+      const clients = (data.clients ?? []).map((c) => {
+        const x = c as Record<string, unknown>
+        return {
+          clientId: x.clientId,
+          worldId: x.worldId,
+          worldTitle: x.worldTitle,
+          systemId: x.systemId,
+          systemVersion: x.systemVersion,
+          foundryVersion: x.foundryVersion,
+          online: x.connectedSince != null && String(x.connectedSince) !== '' && Number(x.connectedSince) > 0,
+        }
+      })
       return { clients, total: data.total ?? clients.length }
     },
   ))
