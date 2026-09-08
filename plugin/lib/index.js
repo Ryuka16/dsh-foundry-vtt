@@ -26,12 +26,57 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 - 图标路径 → foundry_knowledge topic:"icons" grep 确认真源，禁止猜路径。
 - CPR 宏 identifier → foundry_knowledge topic:"cpr-mapping" 查映射表，禁止瞎编。
 - 深层问题（光环/陷阱/物品宏/复杂 flags）→ foundry_knowledge 对应主题（item-macro/aura/traps/iron-rules/pitfalls 等）。
+- **dnd5e 5.3.3 文档内所有 _id 必须恰好 16 位字母数字**（如 "dnd5eactivity000"、"bleedOT000000001"）；超 16 位（如 "poisonOT000000001" 17 位）会被系统拒绝创建，报 "Failed to create entity"。activity 引用（otherActivityId/otherActivityUuid）与 effects[]._id 指向的 id 也要遵守并保持一致。生成 id 时数清楚位数；插件会自动把超长 _id 规范成合法 16 位（同值引用同步替换）。
 2. 世界包有现成怪：foundry_search 搜（SRD 在 package:dnd5e.monsters，汉化包中英文都搜）→ foundry_import_entity → foundry_place_token，禁止新建替代导入。
 3. 写操作落库后按工具说明回读验证；工具返回 isError 时先看 note/verified 字段判定是否模块回读误报，再决定重试。
 4. 拿不准的键名/参数/路径：先查，查不到就明说不知道并问用户，禁止臆造。`;
 import { summarizeDoc } from './summarize.js';
 import { registerReferenceTools } from './reference.js';
 import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } from './knowledge.js';
+/** dnd5e 文档 _id 铁律：恰好 16 位字母数字。超长/非法 id 会被 5.3.3 拒绝创建。 */
+const ID_RE = /^[A-Za-z0-9]{16}$/;
+const ID_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+function randomId16() {
+    let s = '';
+    for (let i = 0; i < 16; i++)
+        s += ID_CHARS[Math.floor(Math.random() * ID_CHARS.length)];
+    return s;
+}
+/** 把文档里所有非法 _id 换成合法 16 位 id；同旧值引用（otherActivityId/effects[]._id 等）同步替换保持一致性。 */
+function normalizeDocIds(doc) {
+    const map = new Map();
+    const collect = (v) => {
+        if (Array.isArray(v)) {
+            for (const x of v)
+                collect(x);
+            return;
+        }
+        if (v && typeof v === 'object') {
+            const o = v;
+            if (typeof o._id === 'string' && !ID_RE.test(o._id) && !map.has(o._id))
+                map.set(o._id, randomId16());
+            for (const k of Object.keys(o))
+                collect(o[k]);
+        }
+    };
+    collect(doc);
+    if (map.size === 0)
+        return { doc, renamed: [] };
+    const rewrite = (v) => {
+        if (typeof v === 'string')
+            return map.get(v) ?? v;
+        if (Array.isArray(v))
+            return v.map(rewrite);
+        if (v && typeof v === 'object') {
+            const o = {};
+            for (const k of Object.keys(v))
+                o[k] = rewrite(v[k]);
+            return o;
+        }
+        return v;
+    };
+    return { doc: rewrite(doc), renamed: [...map.keys()] };
+}
 const name = '@dsh-external/dsh-foundry-vtt';
 const inject = ['tools'];
 /** 配置目录与文件（~/.dsh 下，与 DSH 用户数据同域，重装 DSH 不丢）。 */
@@ -383,21 +428,27 @@ export function apply(ctx) {
         return args.summary === true ? summarizeDoc(raw) : raw;
     }));
     // 4. foundry_create_entity —— 用 raw Foundry 文档创建实体，返回新 uuid 与文档。
-    REG(makeTool('foundry_create_entity', '用原始 Foundry 文档创建一个实体（entityType: Actor|Item|Scene|JournalEntry|RollTable|Cards|Macro|Playlist），data 为该类型文档（name/type/system/items 等）。返回新实体 uuid 与文档。**建结构先查内置参考库 foundry_reference（weapon/save-activity/effect/creature/feat/spell 模板），别再 search+get_entity 拉样本怪照抄。** 警告：dnd5e 5.3.3 会丢弃旧版字段——武器伤害骰必须放 item.system.damage.base{number,denomination,bonus,types}，activities 的 damage.parts 必须留空数组并设 includeBase:true；在 parts[].formula 写骰子会被系统清洗成空，导致怪物没有伤害。', {
+    REG(makeTool('foundry_create_entity', '用原始 Foundry 文档创建一个实体（entityType: Actor|Item|Scene|JournalEntry|RollTable|Cards|Macro|Playlist），data 为该类型文档（name/type/system/items 等）。返回新实体 uuid 与文档。**建结构先查内置参考库 foundry_reference（weapon/save-activity/effect/creature/feat/spell 模板），别再 search+get_entity 拉样本怪照抄。** 警告：dnd5e 5.3.3 会丢弃旧版字段——武器伤害骰必须放 item.system.damage.base{number,denomination,bonus,types}，activities 的 damage.parts 必须留空数组并设 includeBase:true；在 parts[].formula 写骰子会被系统清洗成空，导致怪物没有伤害。文档内所有 _id 必须恰好 16 位字母数字（超长会自动规范化并附 note）。', {
         entityType: { type: 'string', enum: ['Actor', 'Item', 'Scene', 'JournalEntry', 'RollTable', 'Cards', 'Macro', 'Playlist'], description: '文档类' },
         data: { type: 'object', description: '原始 Foundry 文档' },
         folder: { type: 'string', description: '归档到的文件夹 uuid' },
         keepId: { type: 'boolean', description: '保留传入的 _id' },
         override: { type: 'boolean', description: '用相同 _id 覆盖已有实体' },
     }, ['entityType', 'data'], async (args) => {
-        const body = { entityType: args.entityType, data: args.data };
+        const { doc: data, renamed } = normalizeDocIds(args.data);
+        const body = { entityType: args.entityType, data };
         if (args.folder)
             body.folder = args.folder;
         if (args.keepId !== undefined)
             body.keepId = args.keepId;
         if (args.override !== undefined)
             body.override = args.override;
-        return callRelay('POST', '/create', { query: targetingQuery(args), body });
+        const raw = await callRelay('POST', '/create', { query: targetingQuery(args), body });
+        if (renamed.length > 0) {
+            const out = asObject(raw);
+            return { ...out, note: `_id 规范化：${renamed.length} 个超长/非法 _id 已自动替换为合法 16 位（如 ${renamed[0]}）。` };
+        }
+        return raw;
     }));
     // 5. foundry_update_entity —— 按 uuid/选中更新；带回读确认（模块 fromUuid 间歇误报兜底）。
     REG(makeTool('foundry_update_entity', '更新一个已存在实体（uuid 或 selected=true），data 只传要改的字段（partial 文档），如 {"name":"...","system":{"attributes":{"hp":{"value":15,"max":15}}}}。**uuid 支持内嵌物品形式 Actor.<actorId>.Item.<itemId>：给 actor 身上的物品加效果/豁免自动化时，直接用内嵌 uuid 传 {system:{...},effects:[...]}，无需整数组替换、无需 execute_js。**写入成功后默认返回 {mutation,verified:true,changed} 精简确认（省 token）；需要读回新值时再用 foundry_get_entity(summary:true)；detail:"full" 才返回完整实体。若模块回读误报会返回 verified:true（真实已生效）。', {
@@ -559,7 +610,7 @@ export function apply(ctx) {
         features: { type: 'array', items: { type: 'object' }, description: '[{name,description}]' },
         folder: { type: 'string', description: '归档文件夹 uuid' },
     }, ['name', 'size', 'type', 'cr', 'ac', 'hp', 'abilities'], async (args) => {
-        const npcDoc = buildNpcDocument(args);
+        const { doc: npcDoc } = normalizeDocIds(buildNpcDocument(args));
         return callRelay('POST', '/create', {
             query: targetingQuery(args),
             body: { entityType: 'Actor', data: npcDoc },

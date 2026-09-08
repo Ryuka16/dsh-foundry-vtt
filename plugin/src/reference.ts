@@ -162,7 +162,7 @@ const REFERENCE: Record<string, string> = {
 ③ 真正的中毒/流血效果挂【物品级 effects 数组】（ActiveEffect 结构），不是 activity.effects！
 
 ⚠️ 层级铁律（多多剑翻车根因）：save activity 的 effects 是【空壳】[{_id, level:{}, onSave:false}]——往里面塞 name/statuses/duration 会被 5.3.3 清洗成空（实测：statuses 全丢）。挂状态（poisoned 等）/OverTime 必须写在物品顶层 effects 数组（完整 ActiveEffect 模板见 effect 主题）。锯肉刀 = 本模板 + 物品级「流血」ActiveEffect（changes 写 OverTime），实测正常；照抄勿改。
-要点：dc.formula 写固定数字字符串（如 "11"）；onSave:false = 豁免失败才生效；save.ability 数组如 ["con"]；_id 必须 16 位字母数字。`,
+要点：dc.formula 写固定数字字符串（如 "11"）；onSave:false = 豁免失败才生效；save.ability 数组如 ["con"]；_id 必须【恰好】16 位字母数字（如 "bleedOT000000001"=16 位；17 位如 "poisonOT000000001" 会被 5.3.3 拒绝创建报 "Failed to create entity"——实测翻车点，生成后数一遍位数）。`,
 
   effect: `【物品 ActiveEffect 完整模板 · 实测成功（锯肉刀流血 OverTime）】
 放进物品/特性顶层的 effects 数组（注意：不是 activity 的 effects！层级见 save-activity 铁律）。照抄勿精简——特别是 img（不是 icon！写 icon 会被 5.3.3 丢弃）。最简情况可用 foundry_add_effect{uuid, statusId:"poisoned"} 给 actor 挂现成状态。
