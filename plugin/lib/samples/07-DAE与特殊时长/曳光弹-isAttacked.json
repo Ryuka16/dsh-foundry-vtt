@@ -1,0 +1,47 @@
+{
+  "_id": "guidBolt00000001",
+  "name": "曳光弹 Guiding Bolt",
+  "img": "icons/svg/aura.svg",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [
+    {
+      "key": "flags.midi-qol.grants.advantage.attack.all",
+      "mode": 0,
+      "value": "1",
+      "priority": 0
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": 6,
+    "combat": null,
+    "rounds": null,
+    "turns": 1,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>下一个攻击该目标的攻击者具有优势。该目标被攻击一次后效果消失（specialDuration isAttacked）。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": ["isAttacked"],
+      "stackable": "noneName"
+    }
+  }
+}

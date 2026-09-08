@@ -1,0 +1,47 @@
+{
+  "_id": "parryEf000000001",
+  "name": "格挡 Parry",
+  "img": "icons/svg/shield.svg",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [
+    {
+      "key": "system.attributes.ac.bonus",
+      "mode": 2,
+      "value": "+2",
+      "priority": 20
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": 6,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>AC 获得 +2 加值，持续到自己下回合开始（specialDuration turnStart 自动移除）。骑士格挡类反应防御的标准写法。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": ["turnStart"],
+      "stackable": "noneName"
+    }
+  }
+}

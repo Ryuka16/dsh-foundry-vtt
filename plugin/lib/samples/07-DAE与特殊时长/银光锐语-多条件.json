@@ -1,0 +1,47 @@
+{
+  "_id": "silvBarb00000001",
+  "name": "银光锐语 Silvery Barbs",
+  "img": "icons/svg/upgrade.svg",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [
+    {
+      "key": "flags.midi-qol.advantage.all",
+      "mode": 5,
+      "value": "1",
+      "priority": 50
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>第一次攻击检定、属性检定或豁免检定中具有优势，之后效果消失。多条件特殊时长：specialDuration [\"1Action\",\"isSave\",\"isCheck\",\"isSkill\"]。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": ["1Action", "isSave", "isCheck", "isSkill"],
+      "stackable": "noneName"
+    }
+  }
+}

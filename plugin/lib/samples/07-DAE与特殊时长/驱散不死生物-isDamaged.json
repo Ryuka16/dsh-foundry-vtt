@@ -1,0 +1,40 @@
+{
+  "_id": "turnUnd000000001",
+  "name": "驱散不死生物 Turn Undead",
+  "img": "icons/magic/holy/barrier-shield-winged-cross.webp",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": 60,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>持续 1 分钟，受到伤害即解除（specialDuration isDamaged 自动移除）。「受伤即灭」类效果的写法。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": ["isDamaged"],
+      "stackable": "noneName"
+    }
+  }
+}

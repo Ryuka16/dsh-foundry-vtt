@@ -1,0 +1,40 @@
+{
+  "_id": "absorbEf00000001",
+  "name": "吸收元素 Absorb Elements",
+  "img": "icons/magic/holy/barrier-shield-winged-blue.webp",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": null,
+    "combat": null,
+    "rounds": null,
+    "turns": null,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>对触发法术的伤害类型具有抗力，直到来源的回合结束（specialDuration turnEndSource 自动移除）。变化本身由宏/触发系统处理时，changes 可为空壳。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": ["turnEndSource"],
+      "stackable": "noneName"
+    }
+  }
+}

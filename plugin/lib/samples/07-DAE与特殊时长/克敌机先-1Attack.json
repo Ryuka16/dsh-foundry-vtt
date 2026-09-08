@@ -1,0 +1,47 @@
+{
+  "_id": "trueStr000000001",
+  "name": "克敌机先 True Strike",
+  "img": "icons/svg/target.svg",
+  "origin": null,
+  "type": "base",
+  "system": {},
+  "changes": [
+    {
+      "key": "flags.midi-qol.advantage.attack.all",
+      "mode": 0,
+      "value": "1",
+      "priority": 0
+    }
+  ],
+  "disabled": false,
+  "duration": {
+    "startTime": null,
+    "seconds": 6,
+    "combat": null,
+    "rounds": null,
+    "turns": 1,
+    "startRound": null,
+    "startTurn": null
+  },
+  "description": "<p>下一次攻击检定具有优势。攻击后或下回合结束时效果消失（specialDuration 1Attack 自动消耗）。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": {
+      "disableCondition": "",
+      "disableIncapacitated": false,
+      "dontApply": false,
+      "durationExpression": "",
+      "enableCondition": "",
+      "macroRepeat": "none",
+      "selfTarget": false,
+      "selfTargetAlways": false,
+      "showIcon": false,
+      "specialDuration": ["1Attack"],
+      "stackable": "noneName"
+    }
+  }
+}
