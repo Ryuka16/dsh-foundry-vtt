@@ -15,6 +15,7 @@
  * 兜底环境变量 FOUNDRY_RELAY_URL / FOUNDRY_API_KEY / FOUNDRY_CLIENT_ID，再兜底默认值。
  */
 import { promises as fs, readFileSync } from 'node:fs'
+import { randomBytes } from 'node:crypto'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { registerExtraTools } from './tools-extra.js'
@@ -37,37 +38,80 @@ import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } fro
 
 /** dnd5e 文档 _id 铁律：恰好 16 位字母数字。超长/非法 id 会被 5.3.3 拒绝创建。 */
 const ID_RE = /^[A-Za-z0-9]{16}$/
-const ID_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+/** 加密级纯随机 16 位（crypto.randomBytes → hex，均匀分布，Node 内置零依赖）。 */
 function randomId16(): string {
-  let s = ''
-  for (let i = 0; i < 16; i++) s += ID_CHARS[Math.floor(Math.random() * ID_CHARS.length)]
-  return s
+  return randomBytes(8).toString('hex')
 }
 
-/** 把文档里所有非法 _id 换成合法 16 位 id；同旧值引用（otherActivityId/effects[]._id 等）同步替换保持一致性。 */
+/**
+ * 根治版文档 id 规范化：不管 AI 写什么，落库必为合法 16 位加密级随机。
+ * ① 所有 _id 字段值：非法（非字符串/超长/带特殊字符/长度不对）→ 换随机 16 位；
+ * ② activities 的键名（键名本身就是 id，是 otherActivityId 的引用锚点）：非法键 → 换随机并同步引用；
+ * ③ 缺失 _id：effects 数组元素补随机、activities 活动对象补键名；
+ * ④ 同旧值引用（otherActivityId / effects[]._id 指向物品级效果等）同步替换，引用不断链。
+ */
 function normalizeDocIds(doc: unknown): { doc: unknown; renamed: string[] } {
   const map = new Map<string, string>()
+  const fresh = () => {
+    let s = randomId16()
+    while (map.has(s)) s = randomId16()
+    return s
+  }
   const collect = (v: unknown): void => {
     if (Array.isArray(v)) { for (const x of v) collect(x); return }
     if (v && typeof v === 'object') {
       const o = v as Record<string, unknown>
-      if (typeof o._id === 'string' && !ID_RE.test(o._id) && !map.has(o._id)) map.set(o._id, randomId16())
+      // ① _id 字段：非 16 位字母数字的字符串，或压根不是字符串
+      if (o._id !== undefined && !(typeof o._id === 'string' && ID_RE.test(o._id)) && !map.has(String(o._id))) {
+        map.set(String(o._id), fresh())
+      }
+      // ② activities 键名（键名即 id）
+      const acts = (o as Record<string, unknown>).activities
+      if (acts && typeof acts === 'object' && !Array.isArray(acts)) {
+        for (const k of Object.keys(acts as Record<string, unknown>)) {
+          if (!ID_RE.test(k) && !map.has(k)) map.set(k, fresh())
+        }
+      }
       for (const k of Object.keys(o)) collect(o[k])
     }
   }
   collect(doc)
-  if (map.size === 0) return { doc, renamed: [] }
   const rewrite = (v: unknown): unknown => {
     if (typeof v === 'string') return map.get(v) ?? v
     if (Array.isArray(v)) return v.map(rewrite)
     if (v && typeof v === 'object') {
+      const src = v as Record<string, unknown>
       const o: Record<string, unknown> = {}
-      for (const k of Object.keys(v as Record<string, unknown>)) o[k] = rewrite((v as Record<string, unknown>)[k])
+      for (const k of Object.keys(src)) {
+        o[map.get(k) ?? k] = rewrite(src[k])
+      }
+      // _id 字段特判（放循环后，避免被循环覆盖）：非字符串或非法字符串 → 换映射值或现生成
+      if (src._id !== undefined && !(typeof src._id === 'string' && ID_RE.test(src._id))) {
+        o._id = map.get(String(src._id)) ?? fresh()
+      }
+      // ③ 缺失补齐：effects 数组元素缺 _id → 补随机
+      if (Array.isArray(o.effects)) {
+        for (const e of o.effects) {
+          if (e && typeof e === 'object' && (e as Record<string, unknown>)._id === undefined) {
+            ;(e as Record<string, unknown>)._id = fresh()
+          }
+        }
+      }
+      // activities：活动对象 _id 无条件同步为键名（键名才是引用锚点，两者必须一致）
+      const acts = o.activities
+      if (acts && typeof acts === 'object' && !Array.isArray(acts)) {
+        for (const [k, av] of Object.entries(acts as Record<string, unknown>)) {
+          if (av && typeof av === 'object') {
+            ;(av as Record<string, unknown>)._id = k
+          }
+        }
+      }
       return o
     }
     return v
   }
-  return { doc: rewrite(doc), renamed: [...map.keys()] }
+  const rewritten = rewrite(doc)
+  return { doc: rewritten, renamed: [...map.keys()] }
 }
 
 const name = '@dsh-external/dsh-foundry-vtt'
@@ -503,7 +547,8 @@ export function apply(ctx: any): void {
       if (args.actor) q.actor = args.actor
       const wantFull = args.detail === 'full'
       try {
-        const raw = await callRelay('PUT', '/update', { query: q, body: { data: args.data } })
+        const { doc: data } = normalizeDocIds(args.data)
+        const raw = await callRelay('PUT', '/update', { query: q, body: { data } })
         if (wantFull) return raw
         return {
           mutation: 'update',
