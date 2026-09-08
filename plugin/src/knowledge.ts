@@ -24,6 +24,9 @@ const MAX_LINE_CHARS = 400
  */
 const BUILTIN_KB_DIR = join(dirname(fileURLToPath(import.meta.url)), 'knowledge-docs')
 
+/** 内置样本库目录（随插件包发布）：<插件包>/lib/samples，分类文件夹 + 用户拖入的真实配置实体 JSON。 */
+const BUILTIN_SAMPLES_DIR = join(dirname(fileURLToPath(import.meta.url)), 'samples')
+
 /** 内置主题：topic → 内置文档文件名 + 描述。 */
 const BUILTIN_TOPICS: Record<string, { file: string; desc: string }> = {
   'kb-structure': { file: '01-结构模板.md', desc: 'dnd5e 5.3.x 结构模板：武器（damage.base 铁律）/豁免三件套+层级铁律/ActiveEffect/NPC 骨架/feat+spell/状态 id 全集' },
@@ -144,53 +147,75 @@ export function registerKnowledgeTools(
         return servePage(args, topic, entry.file, entry.desc, text)
       }
 
-      // 本地样本库：世界导出的真实配置实体（抄改首选）。topic="samples"。
+      // 样本库：内置（随 git 发布的分类样本库）+ 本机扩展目录。topic="samples"。
       if (topic === 'samples') {
-        const root = getSampleDir()
-        if (!root || !existsSync(root)) {
-          return {
-            topic,
-            error: '样本库目录未找到（sampleDir 指向「' + root + '」不存在）。可在 config.json 加 "sampleDir" 指向你导出 FVTT 实体 JSON 的目录，或设环境变量 FOUNDRY_SAMPLE_DIR。',
-          }
+        const roots: Array<{ root: string; label: string }> = [{ root: BUILTIN_SAMPLES_DIR, label: '内置样本库（随 git 发布）' }]
+        const localRoot = getSampleDir()
+        if (localRoot && existsSync(localRoot) && resolve(localRoot) !== resolve(BUILTIN_SAMPLES_DIR)) {
+          roots.push({ root: localRoot, label: '本机扩展' })
         }
         const fileName = args.file === undefined ? '' : String(args.file)
         if (!fileName) {
-          // 无 file：列目录索引。
-          try {
-            const names = (await readdir(root)).filter((n) => n.toLowerCase().endsWith('.json')).sort()
-            if (names.length === 0) {
-              return { topic, dir: root, total: 0, content: '样本库目录为空（' + root + '）。把 FVTT 导出的实体 JSON 放进该目录即可（AI 会先查索引再按需读）。' }
+          // 无 file：列分类树索引。
+          const parts: string[] = []
+          let totalFiles = 0
+          for (const r of roots) {
+            if (!existsSync(r.root)) continue
+            try {
+              const files = (await walkTree(r.root)).sort((a, b) => a.rel.localeCompare(b.rel))
+              totalFiles += files.filter((f) => f.rel.toLowerCase().endsWith('.json')).length
+              // 按顶层文件夹分组成树
+              const tree = new Map<string, Array<{ rel: string; KB: number }>>()
+              for (const f of files) {
+                const slash = f.rel.indexOf('/')
+                const top = slash > 0 ? f.rel.slice(0, slash) : f.rel
+                const rest = slash > 0 ? f.rel.slice(slash + 1) : ''
+                if (!tree.has(top)) tree.set(top, [])
+                tree.get(top)!.push({ rel: rest, KB: Math.round(f.size / 1024) })
+              }
+              const lines = ['■ ' + r.label + '：' + r.root]
+              for (const [top, items] of tree) {
+                if (items.length === 1 && items[0].rel === '') {
+                  lines.push('  ' + top + '（' + items[0].KB + 'KB）')
+                } else {
+                  lines.push('  ' + top + '/')
+                  for (const it of items) lines.push('    ' + it.rel + '（' + it.KB + 'KB）')
+                }
+              }
+              parts.push(lines.join('\n'))
+            } catch (e) {
+              parts.push('■ ' + r.label + '：' + r.root + '（读取失败：' + (e instanceof Error ? e.message : String(e)) + '）')
             }
-            const stats = await Promise.all(names.map(async (n) => {
-              const size = (await readFile(join(root, n))).length
-              const label = SAMPLE_LABELS.find((s) => n.includes(s.key))
-              return { name: n, KB: Math.round(size / 1024), note: label ? label.label : '' }
-            }))
-            return {
-              topic, dir: root, total: names.length,
-              content:
-                '【本地样本库索引】目录：' + root + '\n共 ' + names.length + ' 个样本（真实配置过的实体，建东西前优先来这找同类样本：读它的结构→照抄→改数值）：\n' +
-                stats.map((s, i) => (i + 1) + '. ' + s.name + '（' + s.KB + 'KB）' + (s.note ? '\n   ↳ ' + s.note : '')).join('\n') +
-                '\n\n用法：foundry_knowledge{topic:"samples", file:"<上面某个文件名>"} 读样本；大文件先加 query 关键词 grep 定位（如 query:"OverTime"/"activities"/"effects"），再 offset 翻页。',
-            }
-          } catch (e) {
-            return { topic, dir: root, error: '样本目录读取失败：' + (e instanceof Error ? e.message : String(e)) }
+          }
+          if (parts.length === 0) {
+            return { topic, error: '样本库不可用：内置样本目录与 sampleDir 均不存在。' }
+          }
+          return {
+            topic,
+            total: totalFiles,
+            content:
+              '【样本库索引】共 ' + totalFiles + ' 个样本 JSON（世界导出的真实配置实体——建东西前先来这找同类样本：读它的结构→照抄→改数值，一次过）：\n' +
+              parts.join('\n') +
+              '\n\n用法：foundry_knowledge{topic:"samples", file:"<分类文件夹>/<文件名>"} 读样本（内置样本需带分类子路径，如 "01-武器与攻击/xxx.json"）；每个分类文件夹里有 README 说明放什么。大文件先加 query 关键词 grep 定位（如 "OverTime"/"onUseMacroName"/"activities"），再 offset 翻页。',
           }
         }
-        // 有 file：防目录逃逸后读样本。
-        const target = resolve(join(root, fileName))
-        const rootResolved = resolve(root)
-        if (!target.startsWith(rootResolved + '\\') && !target.startsWith(rootResolved + '/') && target !== rootResolved) {
-          return { topic, file: fileName, error: '样本文件不在样本库目录内（file 只能用索引里列出的文件名）。' }
+        // 有 file：先查内置样本树，再查本机扩展。防目录逃逸。
+        for (const r of roots) {
+          if (!existsSync(r.root)) continue
+          const rootResolved = resolve(r.root)
+          const target = resolve(join(r.root, fileName))
+          if ((target.startsWith(rootResolved + '\\') || target.startsWith(rootResolved + '/')) && existsSync(target)) {
+            let text: string
+            try {
+              text = (await readFile(target, 'utf8')).replace(/^\uFEFF/, '')
+            } catch (e) {
+              return { topic, file: fileName, error: '样本读取失败：' + (e instanceof Error ? e.message : String(e)) }
+            }
+            const label = SAMPLE_LABELS.find((s) => fileName.includes(s.key))
+            return servePage(args, topic, fileName, (label ? label.label + '；' : '') + '世界导出的真实配置实体 JSON，结构可照抄（改 name/数值/描述）。', text)
+          }
         }
-        let text: string
-        try {
-          text = (await readFile(target, 'utf8')).replace(/^\uFEFF/, '')
-        } catch (e) {
-          return { topic, file: fileName, error: '样本读取失败：' + (e instanceof Error ? e.message : String(e)) + '。file 请用 samples 索引里的完整文件名。' }
-        }
-        const label = SAMPLE_LABELS.find((s) => fileName.includes(s.key))
-        return servePage(args, topic, fileName, (label ? label.label + '；' : '') + '世界导出的真实配置实体 JSON，结构可照抄（改 name/数值/描述）。', text)
+        return { topic, file: fileName, error: '样本文件未找到：「' + fileName + '」。file 请用 samples 索引里列出的路径（内置样本带分类文件夹前缀）。' }
       }
 
       // 本机资料库主题：依赖用户环境的 knowledgeDir
@@ -221,6 +246,27 @@ export function registerKnowledgeTools(
     },
   }
   REG(tool)
+}
+
+/** 递归列目录下所有文件（相对路径 + 字节数）。 */
+async function walkTree(dir: string, prefix = ''): Promise<Array<{ rel: string; size: number }>> {
+  const out: Array<{ rel: string; size: number }> = []
+  let entries
+  try {
+    entries = await readdir(dir, { withFileTypes: true })
+  } catch {
+    return out
+  }
+  for (const e of entries) {
+    const rel = prefix ? prefix + '/' + e.name : e.name
+    const full = join(dir, e.name)
+    if (e.isDirectory()) {
+      out.push(...(await walkTree(full, rel)))
+    } else {
+      out.push({ rel, size: (await readFile(full)).length })
+    }
+  }
+  return out
 }
 
 /** 分页/检索服务：query 走行 grep，否则 offset 分页。 */
