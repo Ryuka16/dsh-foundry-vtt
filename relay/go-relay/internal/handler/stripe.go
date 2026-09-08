@@ -1,0 +1,501 @@
+package handler
+
+import (
+	"context"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"sync"
+	"time"
+
+	"github.com/ThreeHats/foundryvtt-rest-api-relay/go-relay/internal/alerts"
+	"github.com/ThreeHats/foundryvtt-rest-api-relay/go-relay/internal/config"
+	"github.com/ThreeHats/foundryvtt-rest-api-relay/go-relay/internal/database"
+	"github.com/ThreeHats/foundryvtt-rest-api-relay/go-relay/internal/handler/helpers"
+	"github.com/ThreeHats/foundryvtt-rest-api-relay/go-relay/internal/model"
+	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog/log"
+	"github.com/stripe/stripe-go/v78"
+	checkoutSession "github.com/stripe/stripe-go/v78/checkout/session"
+	stripeCustomer "github.com/stripe/stripe-go/v78/customer"
+	"github.com/stripe/stripe-go/v78/webhook"
+)
+
+// statusPriority maps subscription statuses to a priority value.
+// Higher values = more "active" states. When processing events for the SAME
+// subscription ID, we skip updates that would downgrade to a lower-priority status
+// (prevents race conditions from out-of-order webhook delivery).
+// A NEW subscription ID always overrides regardless of priority.
+//
+// The ordering allows natural degradation: active(3) -> canceled(2) -> past_due(1)
+// but prevents: canceled(2) -> past_due(1) since a canceled sub shouldn't go back to past_due.
+var statusPriority = map[string]int{
+	"incomplete":         0,
+	"incomplete_expired": 0,
+	"past_due":           1,
+	"canceled":           2,
+	"active":             3,
+}
+
+// processedEvents tracks recently processed Stripe webhook event IDs to prevent
+// duplicate processing when Stripe retries deliveries.
+var (
+	processedEventsMu sync.Mutex
+	processedEvents   = make(map[string]time.Time)
+)
+
+func init() {
+	// Cleanup old event IDs every hour
+	go func() {
+		ticker := time.NewTicker(1 * time.Hour)
+		defer ticker.Stop()
+		for range ticker.C {
+			processedEventsMu.Lock()
+			cutoff := time.Now().Add(-24 * time.Hour)
+			for id, ts := range processedEvents {
+				if ts.Before(cutoff) {
+					delete(processedEvents, id)
+				}
+			}
+			processedEventsMu.Unlock()
+		}
+	}()
+}
+
+// markEventProcessed returns true if the event was already processed.
+func markEventProcessed(eventID string) bool {
+	processedEventsMu.Lock()
+	defer processedEventsMu.Unlock()
+	if _, exists := processedEvents[eventID]; exists {
+		return true
+	}
+	processedEvents[eventID] = time.Now()
+	return false
+}
+
+// StripeRouter creates Stripe subscription management routes.
+// Stripe integration is disabled in local (sqlite) mode.
+func StripeRouter(db *database.DB, cfg *config.Config) chi.Router {
+	r := chi.NewRouter()
+
+	isDisabled := cfg.StripeSecretKey == ""
+
+	// Set Stripe API key
+	if !isDisabled {
+		stripe.Key = cfg.StripeSecretKey
+	}
+
+	// GET /api/subscriptions/status
+	r.Get("/status", func(w http.ResponseWriter, r *http.Request) {
+		if isDisabled {
+			helpers.WriteJSON(w, http.StatusOK, map[string]interface{}{
+				"subscriptionStatus": "free",
+				"message":            "Stripe is disabled in local mode",
+			})
+			return
+		}
+
+		reqCtx := helpers.GetRequestContext(r)
+		if reqCtx == nil {
+			helpers.WriteError(w, http.StatusUnauthorized, "Authentication required")
+			return
+		}
+
+		helpers.WriteJSON(w, http.StatusOK, map[string]interface{}{
+			"subscriptionStatus": reqCtx.SubscriptionStatus,
+		})
+	})
+
+	// POST /api/subscriptions/create-checkout-session
+	r.Post("/create-checkout-session", func(w http.ResponseWriter, r *http.Request) {
+		if isDisabled {
+			helpers.WriteError(w, http.StatusServiceUnavailable, "Stripe is not configured")
+			return
+		}
+
+		reqCtx := helpers.GetRequestContext(r)
+		if reqCtx == nil {
+			helpers.WriteError(w, http.StatusUnauthorized, "Authentication required")
+			return
+		}
+
+		user, ok := reqCtx.User.(*model.User)
+		if !ok || user == nil {
+			helpers.WriteError(w, http.StatusUnauthorized, "Invalid user")
+			return
+		}
+
+		log.Info().Int64("userId", user.ID).Msg("Creating checkout session")
+
+		ctx := r.Context()
+
+		// Get or create Stripe customer
+		customerId := user.StripeCustomerID.String
+		needsNewCustomer := !user.StripeCustomerID.Valid || customerId == ""
+
+		// Verify existing customer still exists in Stripe
+		if !needsNewCustomer {
+			_, err := stripeCustomer.Get(customerId, nil)
+			if err != nil {
+				log.Warn().Str("customerId", customerId).Int64("userId", user.ID).Msg("Stale Stripe customer ID, creating new customer")
+				needsNewCustomer = true
+			}
+		}
+
+		if needsNewCustomer {
+			customerParams := &stripe.CustomerParams{
+				Email: stripe.String(user.Email),
+				Params: stripe.Params{
+					Metadata: map[string]string{
+						"userId": fmt.Sprintf("%d", user.ID),
+					},
+				},
+			}
+			customer, err := stripeCustomer.New(customerParams)
+			if err != nil {
+				log.Error().Err(err).Int64("userId", user.ID).Msg("Failed to create Stripe customer")
+				helpers.WriteError(w, http.StatusInternalServerError, "Failed to create checkout session")
+				return
+			}
+
+			customerId = customer.ID
+			user.StripeCustomerID = sql.NullString{String: customerId, Valid: true}
+			if err := db.UserStore().Update(ctx, user); err != nil {
+				log.Error().Err(err).Int64("userId", user.ID).Msg("Failed to save Stripe customer ID")
+				helpers.WriteError(w, http.StatusInternalServerError, "Failed to create checkout session")
+				return
+			}
+		}
+
+		// Create checkout session
+		sessionParams := &stripe.CheckoutSessionParams{
+			Customer:           stripe.String(customerId),
+			PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
+			LineItems: []*stripe.CheckoutSessionLineItemParams{
+				{
+					Price:    stripe.String(cfg.StripePriceID),
+					Quantity: stripe.Int64(1),
+				},
+			},
+			Mode:       stripe.String(string(stripe.CheckoutSessionModeSubscription)),
+			SuccessURL: stripe.String(cfg.FrontendURL + "/subscription-success?session_id={CHECKOUT_SESSION_ID}"),
+			CancelURL:  stripe.String(cfg.FrontendURL + "/subscription-cancel"),
+			Params: stripe.Params{
+				Metadata: map[string]string{
+					"userId": fmt.Sprintf("%d", user.ID),
+				},
+			},
+		}
+
+		session, err := checkoutSession.New(sessionParams)
+		if err != nil {
+			log.Error().Err(err).Int64("userId", user.ID).Msg("Failed to create checkout session")
+			helpers.WriteError(w, http.StatusInternalServerError, "Failed to create checkout session")
+			return
+		}
+
+		helpers.WriteJSON(w, http.StatusOK, map[string]string{"url": session.URL})
+	})
+
+	// POST /api/subscriptions/create-portal-session
+	r.Post("/create-portal-session", func(w http.ResponseWriter, r *http.Request) {
+		if isDisabled {
+			helpers.WriteError(w, http.StatusServiceUnavailable, "Stripe is not configured")
+			return
+		}
+
+		reqCtx := helpers.GetRequestContext(r)
+		if reqCtx == nil {
+			helpers.WriteError(w, http.StatusUnauthorized, "Authentication required")
+			return
+		}
+
+		user, ok := reqCtx.User.(*model.User)
+		if !ok || user == nil {
+			helpers.WriteError(w, http.StatusUnauthorized, "Invalid user")
+			return
+		}
+
+		log.Info().Int64("userId", user.ID).Msg("Redirecting user to customer portal")
+
+		if cfg.StripePortalURL != "" {
+			helpers.WriteJSON(w, http.StatusOK, map[string]string{"url": cfg.StripePortalURL})
+			return
+		}
+		helpers.WriteError(w, http.StatusServiceUnavailable, "Stripe portal URL not configured")
+	})
+
+	return r
+}
+
+// WebhookRouter creates Stripe webhook handler.
+func WebhookRouter(db *database.DB, cfg *config.Config) chi.Router {
+	r := chi.NewRouter()
+
+	isDisabled := cfg.StripeSecretKey == ""
+
+	// Set Stripe API key
+	if !isDisabled {
+		stripe.Key = cfg.StripeSecretKey
+	}
+
+	r.Post("/stripe", func(w http.ResponseWriter, r *http.Request) {
+		if isDisabled {
+			helpers.WriteJSON(w, http.StatusOK, map[string]string{"received": "true"})
+			return
+		}
+
+		// Read raw body for signature verification
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to read webhook body")
+			helpers.WriteError(w, http.StatusBadRequest, "Failed to read request body")
+			return
+		}
+
+		// Verify webhook signature (ignore API version mismatch — Stripe dashboard may use a newer version)
+		event, err := webhook.ConstructEventWithOptions(body, r.Header.Get("Stripe-Signature"), cfg.StripeWebhookSecret, webhook.ConstructEventOptions{
+			IgnoreAPIVersionMismatch: true,
+		})
+		if err != nil {
+			log.Error().Err(err).Msg("Webhook signature verification failed")
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "Webhook Error: %v", err)
+			return
+		}
+
+		// Idempotency check — skip already-processed events
+		if markEventProcessed(event.ID) {
+			log.Info().Str("eventId", event.ID).Str("eventType", string(event.Type)).Msg("Skipping duplicate webhook event")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Handle the event
+		var success bool
+		switch event.Type {
+		case "customer.subscription.created", "customer.subscription.updated":
+			success = handleSubscriptionUpdated(db, event)
+		case "customer.subscription.deleted":
+			success = handleSubscriptionDeleted(db, event)
+		case "invoice.payment_succeeded":
+			success = handlePaymentSucceeded(db, event)
+		case "invoice.payment_failed":
+			success = handlePaymentFailed(db, event)
+		default:
+			log.Info().Str("eventType", string(event.Type)).Msg("Unhandled event type")
+			success = true
+		}
+
+		if success {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			// Return 500 so Stripe will retry
+			helpers.WriteError(w, http.StatusInternalServerError, "Failed to process webhook")
+		}
+	})
+
+	return r
+}
+
+// handleSubscriptionUpdated processes customer.subscription.created and customer.subscription.updated events.
+func handleSubscriptionUpdated(db *database.DB, event stripe.Event) bool {
+	var subscription struct {
+		ID               string `json:"id"`
+		Customer         string `json:"customer"`
+		Status           string `json:"status"`
+		CurrentPeriodEnd int64  `json:"current_period_end"`
+	}
+	if err := json.Unmarshal(event.Data.Raw, &subscription); err != nil {
+		log.Error().Err(err).Msg("Failed to parse subscription from webhook event")
+		return false
+	}
+
+	log.Info().
+		Str("customerId", subscription.Customer).
+		Str("status", subscription.Status).
+		Msg("Processing subscription update")
+
+	ctx := context.Background()
+	user, err := db.UserStore().FindByStripeCustomerID(ctx, subscription.Customer)
+	if err != nil || user == nil {
+		log.Error().Str("customerId", subscription.Customer).Msg("User not found for customer")
+		return false
+	}
+
+	// Map Stripe statuses: 'trialing' should grant full access
+	effectiveStatus := subscription.Status
+	if effectiveStatus == "trialing" {
+		effectiveStatus = "active"
+	}
+
+	// Status priority check to prevent downgrade race conditions
+	// Only apply within the SAME subscription — a new subscription ID always wins
+	newPriority, ok := statusPriority[effectiveStatus]
+	if !ok {
+		newPriority = 1
+	}
+	currentStatus := user.GetSubscriptionStatus()
+	currentPriority, ok := statusPriority[currentStatus]
+	if !ok {
+		currentPriority = -1
+	}
+
+	currentSubID := ""
+	if user.SubscriptionID.Valid {
+		currentSubID = user.SubscriptionID.String
+	}
+	sameSubscription := currentSubID == subscription.ID
+
+	if sameSubscription && newPriority < currentPriority {
+		log.Info().
+			Int64("userId", user.ID).
+			Str("currentStatus", currentStatus).
+			Str("newStatus", effectiveStatus).
+			Str("stripeStatus", subscription.Status).
+			Msg("Skipping downgrade, updating subscription ID and period end only")
+
+		// Still update subscription ID and period end
+		user.SubscriptionID = sql.NullString{String: subscription.ID, Valid: true}
+		endsAt := time.Unix(subscription.CurrentPeriodEnd, 0)
+		user.SubscriptionEndsAt = &model.SQLiteTime{Time: endsAt, Valid: true}
+		if err := db.UserStore().Update(ctx, user); err != nil {
+			log.Error().Err(err).Int64("userId", user.ID).Msg("Failed to update subscription metadata")
+			return false
+		}
+		return true
+	}
+
+	log.Info().
+		Int64("userId", user.ID).
+		Str("customerId", subscription.Customer).
+		Str("effectiveStatus", effectiveStatus).
+		Str("stripeStatus", subscription.Status).
+		Msg("Updating subscription status")
+
+	user.SubscriptionStatus = sql.NullString{String: effectiveStatus, Valid: true}
+	user.SubscriptionID = sql.NullString{String: subscription.ID, Valid: true}
+	endsAt := time.Unix(subscription.CurrentPeriodEnd, 0)
+	user.SubscriptionEndsAt = &model.SQLiteTime{Time: endsAt, Valid: true}
+
+	if err := db.UserStore().Update(ctx, user); err != nil {
+		log.Error().Err(err).Int64("userId", user.ID).Msg("Failed to update subscription")
+		return false
+	}
+
+	if effectiveStatus == "active" {
+		alerts.Fire(alerts.Event{
+			Type:     alerts.TypeNewSubscription,
+			Severity: "info",
+			Message:  "New subscription activated",
+			Details:  map[string]interface{}{"userId": user.ID, "subscriptionId": subscription.ID},
+		})
+	}
+
+	log.Info().Int64("userId", user.ID).Str("status", effectiveStatus).Msg("Successfully updated subscription")
+	return true
+}
+
+// handleSubscriptionDeleted processes customer.subscription.deleted events.
+func handleSubscriptionDeleted(db *database.DB, event stripe.Event) bool {
+	var subscription struct {
+		Customer   string `json:"customer"`
+		CanceledAt int64  `json:"canceled_at"`
+	}
+	if err := json.Unmarshal(event.Data.Raw, &subscription); err != nil {
+		log.Error().Err(err).Msg("Failed to parse subscription deletion from webhook event")
+		return false
+	}
+
+	ctx := context.Background()
+	user, err := db.UserStore().FindByStripeCustomerID(ctx, subscription.Customer)
+	if err != nil || user == nil {
+		log.Error().Str("customerId", subscription.Customer).Msg("User not found for customer")
+		return false
+	}
+
+	user.SubscriptionStatus = sql.NullString{String: "canceled", Valid: true}
+	if subscription.CanceledAt > 0 {
+		canceledAt := time.Unix(subscription.CanceledAt, 0)
+		user.SubscriptionEndsAt = &model.SQLiteTime{Time: canceledAt, Valid: true}
+	}
+
+	if err := db.UserStore().Update(ctx, user); err != nil {
+		log.Error().Err(err).Int64("userId", user.ID).Msg("Failed to update subscription deletion")
+		return false
+	}
+
+	alerts.Fire(alerts.Event{
+		Type:     alerts.TypeSubscriptionCancelled,
+		Severity: "info",
+		Message:  "Subscription cancelled",
+		Details:  map[string]interface{}{"userId": user.ID},
+	})
+
+	log.Info().Int64("userId", user.ID).Msg("Subscription canceled")
+	return true
+}
+
+// handlePaymentSucceeded processes invoice.payment_succeeded events.
+// Monthly reset is handled by cron, so this only logs.
+func handlePaymentSucceeded(db *database.DB, event stripe.Event) bool {
+	var invoice struct {
+		Customer     string `json:"customer"`
+		Subscription string `json:"subscription"`
+	}
+	if err := json.Unmarshal(event.Data.Raw, &invoice); err != nil {
+		log.Error().Err(err).Msg("Failed to parse invoice from webhook event")
+		return false
+	}
+
+	if invoice.Subscription != "" {
+		ctx := context.Background()
+		user, err := db.UserStore().FindByStripeCustomerID(ctx, invoice.Customer)
+		if err != nil || user == nil {
+			log.Error().Str("customerId", invoice.Customer).Msg("User not found for customer")
+			return false
+		}
+		log.Info().Int64("userId", user.ID).Msg("Payment success recorded")
+	}
+	return true
+}
+
+// handlePaymentFailed processes invoice.payment_failed events.
+func handlePaymentFailed(db *database.DB, event stripe.Event) bool {
+	var invoice struct {
+		Customer     string `json:"customer"`
+		Subscription string `json:"subscription"`
+	}
+	if err := json.Unmarshal(event.Data.Raw, &invoice); err != nil {
+		log.Error().Err(err).Msg("Failed to parse invoice from webhook event")
+		return false
+	}
+
+	if invoice.Subscription != "" {
+		ctx := context.Background()
+		user, err := db.UserStore().FindByStripeCustomerID(ctx, invoice.Customer)
+		if err != nil || user == nil {
+			log.Error().Str("customerId", invoice.Customer).Msg("User not found for customer")
+			return false
+		}
+
+		user.SubscriptionStatus = sql.NullString{String: "past_due", Valid: true}
+		if err := db.UserStore().Update(ctx, user); err != nil {
+			log.Error().Err(err).Int64("userId", user.ID).Msg("Failed to update subscription to past_due")
+			return false
+		}
+
+		alerts.Fire(alerts.Event{
+			Type:     alerts.TypeStripePaymentFailed,
+			Severity: "warning",
+			Message:  "Stripe payment failed — subscription set to past_due",
+			Details:  map[string]interface{}{"userId": user.ID, "subscriptionId": invoice.Subscription},
+		})
+
+		log.Info().Int64("userId", user.ID).Msg("Updated subscription status to past_due")
+	}
+	return true
+}
+
