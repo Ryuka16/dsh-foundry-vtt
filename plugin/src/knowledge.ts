@@ -9,11 +9,29 @@
  */
 
 import { readFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const PAGE_SIZE = 4000
 const MAX_GREP_LINES = 40
 const MAX_LINE_CHARS = 400
+
+/**
+ * 内置知识文档（随插件包发布，clone 仓库的人没有本机资料库也能用）。
+ * 文件位于 <插件包>/lib/knowledge-docs/*.md（build 时从 src/knowledge-docs/ 拷贝）。
+ * 内容 = 本机资料库精华的通用化提炼（结构模板/效应配方/宏体系/纪律与坑）。
+ */
+const BUILTIN_KB_DIR = join(dirname(fileURLToPath(import.meta.url)), 'knowledge-docs')
+
+/** 内置主题：topic → 内置文档文件名 + 描述。 */
+const BUILTIN_TOPICS: Record<string, { file: string; desc: string }> = {
+  'kb-structure': { file: '01-结构模板.md', desc: 'dnd5e 5.3.x 结构模板：武器（damage.base 铁律）/豁免三件套+层级铁律/ActiveEffect/NPC 骨架/feat+spell/状态 id 全集' },
+  'kb-effects': { file: '02-效应配方.md', desc: '效应配方：mode 表/加伤（bonuses）/OverTime 持续伤害/常用 flags/物品宏三件套/光环/DAE 机制与 change-key 配方/激活条件/附魔/Optional/反应触发' },
+  'kb-macros': { file: '03-宏体系.md', desc: '宏体系：挂宏 6 位置/Document 模型铁律/MidiQOL 常用函数/世界脚本与 CPR fork/DAE 宏/socket 远程委托/调试三板斧' },
+  'kb-pitfalls': { file: '04-纪律与坑.md', desc: '纪律与坑：开工五病根七铁律/高频坑速查（effects 层级/伤害骰两说/DC 两说/图标 404/回读误报）/术语对照/卡面纪律/世界数据纪律' },
+}
 
 /** 资料库白名单：topic → 相对 knowledgeDir 的文件路径（真实文件名，已 glob 确认）。 */
 const TOPICS: Record<string, { file: string; desc: string }> = {
@@ -68,15 +86,16 @@ export function registerKnowledgeTools(
   getKnowledgeDir: () => string,
 ) {
   const topics = Object.keys(TOPICS)
+  const builtinTopics = Object.keys(BUILTIN_TOPICS)
 
   const tool: { name: string } & Record<string, unknown> = {
     name: 'foundry_knowledge',
     description:
-      '按需读用户本地 FVTT 技术资料库（血泪教训/数据字典/图标真源/世界宏金标准，用户亲手沉淀，优先级高于任何猜测）。**碰到 reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① 大文件先传 query 关键词 grep 定位（返回匹配行+行号）；② 再传 offset 读原文页（每页 ' + PAGE_SIZE + ' 字符）。topic 清单：' + topics.join('/'),
+      '按需读 FVTT 技术知识。两级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 用户本机资料库（血泪教训/数据字典/图标真源/世界宏金标准，若配置了 knowledgeDir 才有，主题：' + topics.join('/') + '）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① 大文件先传 query 关键词 grep 定位（返回匹配行+行号）；② 再传 offset 读原文页（每页 ' + PAGE_SIZE + ' 字符）。',
     parameters: {
       type: 'object',
       properties: {
-        topic: { type: 'string', enum: topics, description: '资料文件主题：' + topics.join(' / ') },
+        topic: { type: 'string', description: '知识主题（内置：' + builtinTopics.join(' / ') + '；本机资料库：' + topics.join(' / ') + '）' },
         query: { type: 'string', description: '可选：按行搜索关键词（如 "OverTime"/"光环"/"图标"），返回最多 40 行匹配（含行号）。大文件先 query 定位再 offset 读原文。' },
         offset: { type: 'number', description: '可选：从第几个字符开始读原文（无 query 时生效，默认 0）。返回值里有 nextOffset 与 hasMore 用于翻页。' },
       },
@@ -94,11 +113,36 @@ export function registerKnowledgeTools(
     },
     async execute(args: Record<string, unknown>) {
       const topic = String(args.topic)
+
+      // 内置主题：读插件包自带 knowledge-docs（任何环境可用）
+      if (BUILTIN_TOPICS[topic]) {
+        const entry = BUILTIN_TOPICS[topic]
+        const file = join(BUILTIN_KB_DIR, entry.file)
+        if (!existsSync(file)) {
+          return { topic, error: '内置知识文档缺失：' + file + '（插件包不完整，请重装插件）' }
+        }
+        let text: string
+        try {
+          text = (await readFile(file, 'utf8')).replace(/^\uFEFF/, '')
+        } catch (e) {
+          return { topic, file: entry.file, error: '内置文档读取失败：' + (e instanceof Error ? e.message : String(e)) }
+        }
+        return servePage(args, topic, entry.file, entry.desc, text)
+      }
+
+      // 本机资料库主题：依赖用户环境的 knowledgeDir
       const entry = TOPICS[topic]
       if (!entry) {
-        return { topic, error: '未知资料主题「' + topic + '」。可用：' + topics.join(', ') }
+        return { topic, error: '未知知识主题「' + topic + '」。内置：' + builtinTopics.join(', ') + '；本机资料库（若已配置 knowledgeDir）：' + topics.join(', ') }
       }
       const root = getKnowledgeDir()
+      if (!root || !existsSync(root)) {
+        return {
+          topic,
+          file: entry.file,
+          error: '本机资料库未找到（knowledgeDir 指向「' + root + '」不存在）。当前环境没有本机资料库时，请改用内置主题：' + builtinTopics.join(', ') + '（随插件发布，覆盖结构模板/效应配方/宏体系/纪律坑）。',
+        }
+      }
       const file = resolve(join(root, entry.file))
       let text: string
       try {
@@ -110,45 +154,49 @@ export function registerKnowledgeTools(
           error: '资料库文件读取失败：' + file + '（' + (e instanceof Error ? e.message : String(e)) + '）。可检查 config.json 的 knowledgeDir 指向资料库根目录。',
         }
       }
-
-      const query = args.query === undefined ? '' : String(args.query)
-      if (query) {
-        const lines = text.split(/\r?\n/)
-        const hits: string[] = []
-        for (let i = 0; i < lines.length && hits.length < MAX_GREP_LINES; i++) {
-          const line = lines[i]
-          if (line.toLowerCase().includes(query.toLowerCase())) {
-            hits.push('L' + (i + 1) + ': ' + line.slice(0, MAX_LINE_CHARS))
-          }
-        }
-        if (hits.length === 0) {
-          return { topic, file: entry.file, query, totalChars: text.length, matched: 0, content: '「' + query + '」无匹配行。换关键词，或传 offset 读全文（文件 ' + text.length + ' 字符）。' }
-        }
-        const truncated = hits.length >= MAX_GREP_LINES ? '\n（已达 ' + MAX_GREP_LINES + ' 行上限，可能还有更多匹配；可换更精确关键词）' : ''
-        return {
-          topic, file: entry.file, query, matched: hits.length, totalChars: text.length,
-          content: '【' + entry.desc + '】\n文件：' + entry.file + '\n匹配「' + query + '」' + hits.length + ' 行：\n' + hits.join('\n') + truncated,
-        }
-      }
-
-      const offset = Math.max(0, Math.floor(Number(args.offset) || 0))
-      const chunk = text.slice(offset, offset + PAGE_SIZE)
-      const nextOffset = offset + chunk.length
-      const hasMore = nextOffset < text.length
-      return {
-        topic,
-        file: entry.file,
-        desc: entry.desc,
-        totalChars: text.length,
-        offset,
-        nextOffset,
-        hasMore,
-        content:
-          '【' + entry.desc + '】\n文件：' + entry.file + '（共 ' + text.length + ' 字符）\n第 ' + offset + '–' + nextOffset + ' 字符' + (hasMore ? '（还有更多，传 offset=' + nextOffset + ' 继续读）' : '（已到末尾）') + '：\n' + chunk,
-      }
+      return servePage(args, topic, entry.file, entry.desc, text)
     },
   }
   REG(tool)
+}
+
+/** 分页/检索服务：query 走行 grep，否则 offset 分页。 */
+async function servePage(args: Record<string, unknown>, topic: string, fileName: string, desc: string, text: string) {
+  const query = args.query === undefined ? '' : String(args.query)
+  if (query) {
+    const lines = text.split(/\r?\n/)
+    const hits: string[] = []
+    for (let i = 0; i < lines.length && hits.length < MAX_GREP_LINES; i++) {
+      const line = lines[i]
+      if (line.toLowerCase().includes(query.toLowerCase())) {
+        hits.push('L' + (i + 1) + ': ' + line.slice(0, MAX_LINE_CHARS))
+      }
+    }
+    if (hits.length === 0) {
+      return { topic, file: fileName, query, totalChars: text.length, matched: 0, content: '「' + query + '」无匹配行。换关键词，或传 offset 读全文（文件 ' + text.length + ' 字符）。' }
+    }
+    const truncated = hits.length >= MAX_GREP_LINES ? '\n（已达 ' + MAX_GREP_LINES + ' 行上限，可能还有更多匹配；可换更精确关键词）' : ''
+    return {
+      topic, file: fileName, query, matched: hits.length, totalChars: text.length,
+      content: '【' + desc + '】\n文件：' + fileName + '\n匹配「' + query + '」' + hits.length + ' 行：\n' + hits.join('\n') + truncated,
+    }
+  }
+
+  const offset = Math.max(0, Math.floor(Number(args.offset) || 0))
+  const chunk = text.slice(offset, offset + PAGE_SIZE)
+  const nextOffset = offset + chunk.length
+  const hasMore = nextOffset < text.length
+  return {
+    topic,
+    file: fileName,
+    desc,
+    totalChars: text.length,
+    offset,
+    nextOffset,
+    hasMore,
+    content:
+      '【' + desc + '】\n文件：' + fileName + '（共 ' + text.length + ' 字符）\n第 ' + offset + '–' + nextOffset + ' 字符' + (hasMore ? '（还有更多，传 offset=' + nextOffset + ' 继续读）' : '（已到末尾）') + '：\n' + chunk,
+  }
 }
 
 export { DEFAULT_KNOWLEDGE_DIR, TOPICS }
