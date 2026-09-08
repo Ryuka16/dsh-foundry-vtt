@@ -449,7 +449,7 @@ export function apply(ctx) {
         return callRelay('DELETE', '/delete', { query: q });
     }));
     // 7. foundry_modify_actor —— 给/移除物品、增减数值、击杀。
-    REG(makeTool('foundry_modify_actor', '对 actor 做操作：give 给物品（toUuid 收件人 + itemUuid/itemName）、remove 移除物品（actorUuid/selected + itemUuid/itemName）、increase/decrease 增减属性（uuid/selected + attribute 点号路径 + amount）、kill 击杀（hp 归 0）。**remove 移除 actor 身上的嵌入物品（compendium 导入怪自带的武器等）时，itemUuid 必须用内嵌形式 Actor.<actorId>.Item.<itemId>（传 Item.<id> 会报 Item not found，因为嵌入物品不在世界物品目录）。**', {
+    REG(makeTool('foundry_modify_actor', '对 actor 做操作：give 给物品（toUuid 收件人 + itemUuid/itemName）、remove 移除物品（actorUuid/selected + itemUuid/itemName）、increase/decrease 增减属性（uuid/selected + attribute 点号路径 + amount）、kill 击杀（hp 归 0）。**⚠️ give 的 itemUuid 必须传完整 uuid（如 Item.xxxx 或 Compendium.dnd5e.monsters.Item.xxxx，裸 id 会报 Item not found）——先用 foundry_search 拿 uuid。remove 移除 actor 身上的嵌入物品（compendium 导入怪自带的武器等）时，itemUuid 必须用内嵌形式 Actor.<actorId>.Item.<itemId>（传 Item.<id> 会报 Item not found，因为嵌入物品不在世界物品目录）。**', {
         action: { type: 'string', enum: ['give', 'remove', 'increase', 'decrease', 'kill'], description: '操作类型' },
         toUuid: { type: 'string', description: '[give] 收件 actor 的 uuid' },
         fromUuid: { type: 'string', description: '[give] 来源 actor 的 uuid' },

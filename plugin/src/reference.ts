@@ -12,109 +12,197 @@ const REFERENCE: Record<string, string> = {
 流程：foundry_create_entity{entityType:"Item", data:<本模板>} 创建物品 → foundry_modify_actor{action:"give", itemUuid} 给怪物。
 铁律：伤害骰只写 system.damage.base{number,denomination,bonus,types}；activities 的 damage.parts 必须留空数组 + includeBase:true；写 parts[].formula 会被 5.3.3 清洗成空（怪物没伤害）。
 
-最小可用模板（啃咬 1d8 穿刺）：
+完整模板（实测成功：守卫锯肉刀 1d6 挥砍 + 命中触发体质豁免，dnd5e 5.3.3 / Foundry 13.351）：
+⚠️ 铁律：直接照抄本结构，字段勿精简——5.3.3 对缺失字段会拒绝（400 "Failed to create entity"）或静默清空。改动的只有：name/img/description/damage.base{number,denomination,types}/attack.ability/range.value/save.dc.formula。
 {
-  "name": "啃咬",
+  "name": "锯肉刀 Saw Cleaver",
   "type": "weapon",
-  "img": "icons/weapons/fangs/fangs-bite.webp",
+  "img": "icons/weapons/axes/cleaver-black.webp",
   "system": {
-    "description": { "value": "" },
-    "source": { "rules": "2024", "book": "", "page": "", "custom": "" },
+    "description": { "chat": "", "value": "" },
+    "source": { "rules": "2014", "revision": 1, "book": "", "page": "", "custom": "", "license": "" },
     "quantity": 1,
-    "weight": { "value": 0, "units": "lb" },
-    "price": { "value": 0, "denomination": "gp" },
+    "weight": { "value": 3, "units": "lb" },
+    "price": { "value": 10, "denomination": "gp" },
     "attunement": "",
     "equipped": true,
     "rarity": "",
     "identified": true,
+    "unidentified": { "description": "" },
+    "mastery": "",
+    "identifier": "saw-cleaver",
     "properties": [],
-    "proficient": false,
-    "type": { "value": "natural", "baseItem": "" },
-    "range": { "value": null, "long": null, "units": "ft" },
-    "uses": { "spent": 0, "max": null, "recovery": [] },
+    "proficient": 1,
+    "type": { "value": "simpleM", "baseItem": "" },
+    "range": { "value": 5, "long": null, "reach": 5, "units": "ft" },
+    "uses": { "spent": 0, "max": "", "recovery": [] },
+    "armor": { "value": 10 },
+    "ammunition": {},
+    "crew": { "value": [] },
+    "container": null,
+    "cover": null,
+    "hp": { "conditions": "", "dt": null, "max": 0, "value": 0 },
     "damage": {
-      "base": { "number": 1, "denomination": 8, "bonus": "", "types": ["piercing"],
+      "base": { "number": 1, "denomination": 6, "bonus": "", "types": ["slashing"],
         "custom": { "enabled": false, "formula": "" },
-        "scaling": { "mode": "", "number": null, "formula": "" } }
+        "scaling": { "mode": "", "number": null, "formula": "" } },
+      "versatile": { "types": [], "custom": { "enabled": false }, "scaling": { "number": 1 } }
     },
     "activities": {
       "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
         "type": "attack",
         "name": "",
-        "activation": { "type": "action", "value": 1, "condition": "" },
-        "duration": { "value": "inst", "units": "inst", "concentration": false },
-        "range": { "value": 5, "long": null, "units": "ft" },
-        "target": { "template": { "type": null, "count": "", "contiguous": false, "units": "" },
-          "affects": { "type": "creature", "count": 1, "special": "" } },
-        "attack": { "ability": "str", "bonus": "3", "critical": { "threshold": null },
-          "flat": false, "type": { "value": "melee", "classification": "weapon" } },
+        "activation": { "condition": "", "override": false, "type": "action", "value": 1 },
+        "ammunition": "",
+        "attack": { "ability": "str", "bonus": "", "critical": { "threshold": null }, "flat": false,
+          "type": { "classification": "weapon", "value": "melee" } },
+        "attackMode": "oneHanded",
+        "attackRollPerTarget": "default",
+        "consumption": { "scaling": { "allowed": false, "max": "" }, "spellSlot": true, "targets": [] },
         "damage": { "critical": { "bonus": "" }, "includeBase": true, "parts": [] },
+        "description": { "chatFlavor": "" },
+        "duration": { "concentration": false, "override": false, "special": "", "units": "inst", "value": "" },
+        "effectConditionText": "",
         "effects": [],
-        "consumption": { "scaling": { "allowed": false, "max": "" }, "targets": [] },
-        "otherActivityId": "",
-        "uses": { "spent": 0, "max": null, "recovery": [] },
-        "properties": [],
-        "_id": "dnd5eactivity000"
+        "flags": {},
+        "fumbleThreshold": 1,
+        "ignoreTraits": { "ida": false, "idi": false, "idm": false, "idr": false, "idv": false },
+        "img": null,
+        "isOverTimeFlag": false,
+        "macroData": { "command": "", "name": "" },
+        "midiProperties": { "autoCEEffects": "default", "autoConsume": false, "autoTargetAction": "default",
+          "autoTargetType": "any", "automationOnly": false, "chooseEffects": false, "confirmTargets": "default",
+          "displayActivityName": false, "forceConsumeDialog": "default", "forceDamageDialog": "default",
+          "forceRollDialog": "default", "identifier": "", "ignoreFullCover": false, "ignoreTraits": [],
+          "magicDamage": false, "magicEffect": false, "noConcentrationCheck": false,
+          "otherActivityAsParentType": true, "otherActivityCompatible": true, "removeChatButtons": "default",
+          "rollMode": "default", "skipConcentrationCheck": false, "toggleEffect": false,
+          "triggeredActivityConditionText": "", "triggeredActivityConfigure": true, "triggeredActivityConsume": true,
+          "triggeredActivityId": "none", "triggeredActivityRollAs": "self", "triggeredActivityTargets": "targets" },
+        "otherActivityAsParentType": true,
+        "otherActivityId": "dnd5eactivity100",
+        "otherActivityUuid": "",
+        "overTimeProperties": { "postRemoveConditionText": "", "preRemoveConditionText": "", "rollAs": "target", "saveRemoves": true },
+        "range": { "override": false, "special": "", "units": "ft", "value": "5" },
+        "sort": 0,
+        "target": { "affects": { "choice": false, "count": "", "special": "", "type": "creature" },
+          "override": false, "prompt": true,
+          "template": { "contiguous": false, "count": "", "height": "", "size": "", "stationary": false,
+            "type": "", "units": "ft", "width": "" } },
+        "useConditionReason": "",
+        "useConditionText": "",
+        "uses": { "max": "", "recovery": [], "spent": 0 },
+        "visibility": { "level": {}, "requireAttunement": false, "requireIdentification": false, "requireMagic": false }
       }
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": { "dnd5e": { "riders": { "activity": [] } } }
 }
-要点：attack.ability 用 str/dex 等缩写；attack.bonus 写总加值字符串（如 "3"）或留 "" 让系统算；range.value 5 = 近战 5 尺。带毒版本三件套：attack 设 "otherActivityId":"dnd5eactivity100" + save 活动（见 save-activity）+ 物品顶层 effects 放毒 ActiveEffect（见 effect）——缺一不可，详情见 save-activity 的层级铁律。`,
+要点：
+- attack.bonus 留 "" = 系统自动算（能力修正+熟练）；写死则写总加值字符串（如 "3"）
+- 物品级 range.value 近战写数字 5；活动内 range.value 写字符串 "5"；远程写活动 range.value "80" + units "ft"
+- 活动 _id 必须 16 位字母数字：dnd5eactivity000=攻击活动、dnd5eactivity100=豁免活动
+- 命中带豁免（毒/流血/麻痹）三件套缺一不可：attack.otherActivityId="dnd5eactivity100" + save 活动（完整模板见 save-activity）+ 物品顶层 effects 放 ActiveEffect（完整模板见 effect）
+- type.value 用官方简称（simpleM/simpleR/martialM/martialR/natural）；identifier 英文小写唯一 id（如 saw-cleaver）；系统自动生成 _id/_stats/folder/ownership，不要手写
+- img 用图标真源（grep 资料库 fvtt-icon-paths.txt 或照抄示例）`,
 
-  'save-activity': `【5.3.3 豁免活动模板 · 已验证（僵尸啃咬尸毒实测正常 + 多多剑翻车案例修正）】
+  'save-activity': `【5.3.3 豁免活动完整模板 · 实测成功（锯肉刀流血：命中→DC11 体质豁免→失败流血）】
 攻击命中后目标过豁免、失败中状态。三件套缺一不可：
 
 ① attack 活动必须设 "otherActivityId": "dnd5eactivity100" 指向 save 活动（漏了 = 攻击不触发豁免，多多剑翻车点之一）
-② save 活动本体：
+② save 活动本体（照抄勿精简，damage 是 onSave 结构不是 includeBase！）：
 {
   "dnd5eactivity100": {
+    "_id": "dnd5eactivity100",
     "type": "save",
-    "name": "",
-    "activation": { "type": "", "value": null, "condition": "" },
-    "duration": { "value": "", "units": "inst", "concentration": false },
-    "range": { "value": null, "long": null, "units": "spec" },
-    "target": { "template": { "type": null, "count": "", "contiguous": false, "units": "" },
-      "affects": { "type": "creature", "count": 1, "special": "" } },
+    "name": "流血·体质豁免",
+    "activation": { "condition": "", "override": false, "type": "special", "value": null },
+    "consumption": { "scaling": { "allowed": false, "max": "" }, "spellSlot": true, "targets": [] },
+    "damage": { "critical": { "allow": false }, "onSave": "none", "parts": [] },
+    "description": { "chatFlavor": "被锯肉刀砍中的目标必须进行一次 DC 11 体质豁免，失败则流血。" },
+    "duration": { "concentration": false, "override": false, "special": "", "units": "inst", "value": "" },
+    "effectConditionText": "",
+    "effects": [ { "_id": "bleedOT000000001", "level": {}, "onSave": false } ],
+    "flags": {},
+    "friendlySave": "default",
+    "ignoreTraits": { "ida": false, "idi": false, "idm": false, "idr": false, "idv": false },
+    "img": null,
+    "isOverTimeFlag": false,
+    "macroData": { "command": "", "name": "" },
+    "midiProperties": { "autoCEEffects": "default", "autoConsume": false, "autoTargetAction": "default",
+      "autoTargetType": "any", "automationOnly": false, "chooseEffects": false, "confirmTargets": "default",
+      "displayActivityName": false, "forceConsumeDialog": "default", "forceDamageDialog": "default",
+      "forceRollDialog": "default", "identifier": "", "ignoreFullCover": false, "ignoreTraits": [],
+      "magicDamage": false, "magicEffect": false, "noConcentrationCheck": false,
+      "otherActivityAsParentType": true, "otherActivityCompatible": true, "removeChatButtons": "default",
+      "rollMode": "default", "skipConcentrationCheck": false, "toggleEffect": false,
+      "triggeredActivityConditionText": "", "triggeredActivityConfigure": true, "triggeredActivityConsume": true,
+      "triggeredActivityId": "none", "triggeredActivityRollAs": "self", "triggeredActivityTargets": "targets" },
+    "otherActivityAsParentType": true,
+    "otherActivityId": "",
+    "overTimeProperties": { "postRemoveConditionText": "", "preRemoveConditionText": "", "rollAs": "target", "saveRemoves": true },
+    "range": { "override": false, "special": "", "units": "self", "value": "" },
     "save": {
       "ability": ["con"],
-      "dc": { "calculation": "flat", "formula": "11" },
-      "scaling": { "mode": "none", "formula": "", "bonus": "" }
+      "dc": { "calculation": "flat", "formula": "11" }
     },
-    "damage": { "critical": { "bonus": "" }, "includeBase": false, "parts": [] },
-    "effects": [ { "_id": "d23QTwP434lw72W2", "onSave": false } ],
-    "consumption": { "scaling": { "allowed": false, "max": "" }, "targets": [] },
-    "uses": { "spent": 0, "max": null, "recovery": [] },
-    "properties": [],
-    "_id": "dnd5eactivity100"
+    "sort": 100000,
+    "target": { "affects": { "choice": false, "count": "", "special": "", "type": "creature" },
+      "override": false, "prompt": true,
+      "template": { "contiguous": false, "count": "", "height": "", "size": "", "stationary": false,
+        "type": "", "units": "ft", "width": "" } },
+    "useConditionReason": "",
+    "useConditionText": "",
+    "uses": { "max": "", "recovery": [], "spent": 0 },
+    "visibility": { "level": {}, "requireAttunement": false, "requireIdentification": false, "requireMagic": false }
   }
 }
-③ 真正的中毒效果挂【物品级 effects 数组】（ActiveEffect 结构），不是 activity.effects！
+③ 真正的中毒/流血效果挂【物品级 effects 数组】（ActiveEffect 结构），不是 activity.effects！
 
-⚠️ 层级铁律（多多剑翻车根因）：save activity 的 effects 是【空壳】{_id, onSave:false}——往里面塞 name/statuses/duration 会被 5.3.3 清洗成空（实测：statuses 全丢）。挂状态（poisoned 等）必须写在物品顶层 effects 数组（ActiveEffect 结构，见 effect 主题）。僵尸啃咬 = 本模板 + 物品级「尸毒」ActiveEffect，用户实测正常；照抄勿改。
-要点：dc.formula 写固定数字字符串（如 "11"）；onSave:false = 豁免失败才生效。`,
+⚠️ 层级铁律（多多剑翻车根因）：save activity 的 effects 是【空壳】[{_id, level:{}, onSave:false}]——往里面塞 name/statuses/duration 会被 5.3.3 清洗成空（实测：statuses 全丢）。挂状态（poisoned 等）/OverTime 必须写在物品顶层 effects 数组（完整 ActiveEffect 模板见 effect 主题）。锯肉刀 = 本模板 + 物品级「流血」ActiveEffect（changes 写 OverTime），实测正常；照抄勿改。
+要点：dc.formula 写固定数字字符串（如 "11"）；onSave:false = 豁免失败才生效；save.ability 数组如 ["con"]；_id 必须 16 位字母数字。`,
 
-  effect: `【物品 ActiveEffect 自动化模板 · 已验证（僵尸啃咬尸毒实测正常）】
-放进物品/特性顶层的 effects 数组（注意：不是 activity 的 effects！层级见 save-activity 铁律）。或直接用 foundry_add_effect{uuid, statusId:"poisoned"} 给 actor 挂现成状态（最简单，推荐优先）。
+  effect: `【物品 ActiveEffect 完整模板 · 实测成功（锯肉刀流血 OverTime）】
+放进物品/特性顶层的 effects 数组（注意：不是 activity 的 effects！层级见 save-activity 铁律）。照抄勿精简——特别是 img（不是 icon！写 icon 会被 5.3.3 丢弃）。最简情况可用 foundry_add_effect{uuid, statusId:"poisoned"} 给 actor 挂现成状态。
 
 {
-  "name": "尸毒",
-  "icon": "icons/magic/poison/dagger-poison-green.webp",
-  "statuses": ["poisoned"],
-  "duration": { "seconds": 3600, "rounds": null, "turns": null, "startTime": null, "startRound": null, "startTurn": null },
-  "disabled": false,
-  "transfer": false,
+  "_id": "bleedOT000000001",
+  "name": "流血 Bleeding",
+  "img": "icons/skills/wounds/blood-drip-droplet-red.webp",
+  "origin": null,
+  "type": "base",
+  "system": {},
   "changes": [
-    { "key": "flags.midi-qol.disadvantage.attack.all", "mode": 0, "value": "1", "priority": 20 }
+    { "key": "flags.midi-qol.OverTime", "mode": 0, "priority": 20,
+      "value": "turn=start,damageRoll=1d4,damageType=slashing,saveDC=11,saveAbility=con,saveCount=1-,label=流血" }
   ],
-  "flags": {},
-  "origin": null
+  "disabled": false,
+  "duration": { "startTime": null, "seconds": 60, "combat": null, "rounds": null,
+    "turns": null, "startRound": null, "startTurn": null },
+  "description": "<p>伤口流血不止：每回合开始受到 1d4 挥砍伤害，可重复进行 DC 11 体质豁免，成功即止血。</p>",
+  "tint": "#ffffff",
+  "transfer": false,
+  "statuses": [],
+  "sort": 0,
+  "flags": {
+    "core": { "overlay": false },
+    "dae": { "disableCondition": "", "disableIncapacitated": false, "dontApply": false,
+      "durationExpression": "", "enableCondition": "", "macroRepeat": "none",
+      "selfTarget": false, "selfTargetAlways": false, "showIcon": false,
+      "specialDuration": [], "stackable": "noneName" }
+  }
 }
 要点：
-- statuses 放状态 id（poisoned/prone 等，见 status-list）→ 命中后目标被挂对应状态（与 save activity 配合：豁免失败才触发）
-- changes 是附加自动化：常用 key "flags.midi-qol.disadvantage.attack.all"（攻击劣势）、"flags.midi-qol.disadvantage.check.all"（检定劣势）——需要 midi-qol 模块；mode 0=覆盖 2=加 5=减
-- 完整「命中→豁免→失败中毒」链路 = weapon 的 attack 活动 + otherActivityId 指向 save 活动 + 本模板（见 save-activity）`,
+- img 是图标字段（ActiveEffect 没有 icon 字段，写 icon 会被丢弃）
+- statuses 放状态 id（poisoned/prone 等，见 status-list）→ 挂现成状态（与 save activity 配合：豁免失败才触发）
+- changes 是附加自动化，常用 key：
+  · flags.midi-qol.OverTime：持续伤害/状态，value 逗号式 "turn=start,damageRoll=1d4,damageType=slashing,saveDC=11,saveAbility=con,saveCount=1-,label=流血"（turn=start=每回合开始、saveCount=1-=每回合可豁免移除）
+  · flags.midi-qol.disadvantage.attack.all / .check.all：攻击/检定劣势，value "1"
+  · 需要 midi-qol 模块；mode 0=覆盖 2=加 5=减
+- duration.seconds：状态持续秒数（60=1 分钟=10 轮战斗）；永久状态不写 duration 或用 duration.seconds=null
+- 完整「命中→豁免→失败中毒/流血」链路 = weapon 的 attack 活动 otherActivityId 指向 save 活动 + save 活动空壳 effects + 本模板（见 save-activity）`,
 
   creature: `【dnd5e 5.3.3 NPC 数值骨架 · 核心字段已验证】
 建议先 foundry_get_entity(uuid, summary:true) 读一个现成同类怪拿准确字段路径再改；手写参考此骨架（僵尸，已验证数值）：
