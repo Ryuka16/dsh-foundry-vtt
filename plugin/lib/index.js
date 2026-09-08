@@ -18,6 +18,8 @@ import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { registerExtraTools } from './tools-extra.js';
+import { summarizeDoc } from './summarize.js';
+import { registerReferenceTools } from './reference.js';
 const name = '@dsh-external/dsh-foundry-vtt';
 const inject = ['tools'];
 /** 配置目录与文件（~/.dsh 下，与 DSH 用户数据同域，重装 DSH 不丢）。 */
@@ -341,10 +343,11 @@ export function apply(ctx) {
         return asObject(await callRelay('GET', '/search', { query: q }));
     }));
     // 3. foundry_get_entity —— 按 uuid 或当前选中 token/actor 读完整文档。
-    REG(makeTool('foundry_get_entity', '按 uuid 读取一个 Foundry 实体；或 selected=true 读取当前选中的 token/actor（actor=true 则取该 token 的 Actor 文档）。返回完整文档含 system 数据与内嵌 items。**uuid 支持内嵌物品形式 Actor.<actorId>.Item.<itemId>，可直接读 actor 身上的某个物品。**', {
+    REG(makeTool('foundry_get_entity', '按 uuid 读取一个 Foundry 实体；或 selected=true 读取当前选中的 token/actor（actor=true 则取该 token 的 Actor 文档）。返回完整文档含 system 数据与内嵌 items。**uuid 支持内嵌物品形式 Actor.<actorId>.Item.<itemId>，可直接读 actor 身上的某个物品。** ⚠️省 token 铁律：只是看数值/伤害结构/活动/效果时用 summary:true（返回精简摘要，省 90%+ token）；需要完整原始 JSON（含描述全文/富文本/全部 flags）才不传 summary。', {
         uuid: { type: 'string', description: '实体 uuid，如 Actor.2midVQ1laJFMrN4D' },
         selected: { type: 'boolean', description: 'true 则返回当前选中实体' },
         actor: { type: 'boolean', description: 'selected=true 且 actor=true 则返回该 token 的 Actor' },
+        summary: { type: 'boolean', description: 'true 返回精简摘要（数值骨架+物品/效果摘要+token 元信息），省 token；默认 false 返回完整文档' },
     }, [], async (args) => {
         if (!args.uuid && !args.selected)
             missing('provide either uuid or selected=true');
@@ -355,10 +358,11 @@ export function apply(ctx) {
             q.selected = args.selected;
         if (args.actor)
             q.actor = args.actor;
-        return callRelay('GET', '/get', { query: q });
+        const raw = await callRelay('GET', '/get', { query: q });
+        return args.summary === true ? summarizeDoc(raw) : raw;
     }));
     // 4. foundry_create_entity —— 用 raw Foundry 文档创建实体，返回新 uuid 与文档。
-    REG(makeTool('foundry_create_entity', '用原始 Foundry 文档创建一个实体（entityType: Actor|Item|Scene|JournalEntry|RollTable|Cards|Macro|Playlist），data 为该类型文档（name/type/system/items 等）。返回新实体 uuid 与文档。**警告：dnd5e 5.3.3 会丢弃旧版字段——武器伤害骰必须放 item.system.damage.base{number,denomination,bonus,types}，activities 的 damage.parts 必须留空数组并设 includeBase:true；在 parts[].formula 写骰子会被系统清洗成空，导致怪物没有伤害。建议先 foundry_search + foundry_get_entity 读一个现成同类怪照抄其 JSON 结构再改。**', {
+    REG(makeTool('foundry_create_entity', '用原始 Foundry 文档创建一个实体（entityType: Actor|Item|Scene|JournalEntry|RollTable|Cards|Macro|Playlist），data 为该类型文档（name/type/system/items 等）。返回新实体 uuid 与文档。**建结构先查内置参考库 foundry_reference（weapon/save-activity/effect/creature/feat/spell 模板），别再 search+get_entity 拉样本怪照抄。** 警告：dnd5e 5.3.3 会丢弃旧版字段——武器伤害骰必须放 item.system.damage.base{number,denomination,bonus,types}，activities 的 damage.parts 必须留空数组并设 includeBase:true；在 parts[].formula 写骰子会被系统清洗成空，导致怪物没有伤害。', {
         entityType: { type: 'string', enum: ['Actor', 'Item', 'Scene', 'JournalEntry', 'RollTable', 'Cards', 'Macro', 'Playlist'], description: '文档类' },
         data: { type: 'object', description: '原始 Foundry 文档' },
         folder: { type: 'string', description: '归档到的文件夹 uuid' },
@@ -375,11 +379,12 @@ export function apply(ctx) {
         return callRelay('POST', '/create', { query: targetingQuery(args), body });
     }));
     // 5. foundry_update_entity —— 按 uuid/选中更新；带回读确认（模块 fromUuid 间歇误报兜底）。
-    REG(makeTool('foundry_update_entity', '更新一个已存在实体（uuid 或 selected=true），data 只传要改的字段（partial 文档），如 {"name":"...","system":{"attributes":{"hp":{"value":15,"max":15}}}}。**uuid 支持内嵌物品形式 Actor.<actorId>.Item.<itemId>：给 actor 身上的物品加效果/豁免自动化时，直接用内嵌 uuid 传 {system:{...},effects:[...]}，无需整数组替换、无需 execute_js。**写入成功后若模块回读误报会返回 verified:true（真实已生效）。', {
+    REG(makeTool('foundry_update_entity', '更新一个已存在实体（uuid 或 selected=true），data 只传要改的字段（partial 文档），如 {"name":"...","system":{"attributes":{"hp":{"value":15,"max":15}}}}。**uuid 支持内嵌物品形式 Actor.<actorId>.Item.<itemId>：给 actor 身上的物品加效果/豁免自动化时，直接用内嵌 uuid 传 {system:{...},effects:[...]}，无需整数组替换、无需 execute_js。**写入成功后默认返回 {mutation,verified:true,changed} 精简确认（省 token）；需要读回新值时再用 foundry_get_entity(summary:true)；detail:"full" 才返回完整实体。若模块回读误报会返回 verified:true（真实已生效）。', {
         uuid: { type: 'string', description: '实体 uuid' },
         selected: { type: 'boolean', description: 'true 则更新当前选中实体' },
         actor: { type: 'boolean', description: 'selected=true 且 actor=true 则更新 token 的 Actor' },
         data: { type: 'object', description: 'partial 文档，仅改动的字段' },
+        detail: { type: 'string', enum: ['summary', 'full'], description: '返回详细度：summary=精简确认（默认，省 token）；full=完整实体' },
     }, ['data'], async (args) => {
         if (!args.uuid && !args.selected)
             missing('provide either uuid or selected=true');
@@ -390,18 +395,35 @@ export function apply(ctx) {
             q.selected = args.selected;
         if (args.actor)
             q.actor = args.actor;
+        const wantFull = args.detail === 'full';
         try {
-            return await callRelay('PUT', '/update', { query: q, body: { data: args.data } });
+            const raw = await callRelay('PUT', '/update', { query: q, body: { data: args.data } });
+            if (wantFull)
+                return raw;
+            return {
+                mutation: 'update',
+                uuid: args.uuid ?? '(selected)',
+                verified: true,
+                changed: args.data,
+                note: '写入已确认。需要读回新值时用 foundry_get_entity(summary:true)。',
+            };
         }
         catch (e) {
             if (args.uuid && e instanceof HttpError) {
-                const raw = JSON.stringify(e.raw ?? e.message);
-                if (/does not exist|failed to update entity/i.test(raw)) {
-                    return { mutation: 'update', uuid: args.uuid, verified: true, note: '模块回读确认失败但写入已执行（假阴性）——判定已生效。' };
+                const rawErr = JSON.stringify(e.raw ?? e.message);
+                if (/does not exist|failed to update entity/i.test(rawErr)) {
+                    return { mutation: 'update', uuid: args.uuid, verified: true, changed: args.data, note: '模块回读确认失败但写入已执行（假阴性）——判定已生效。' };
                 }
                 try {
                     const fresh = await callRelay('GET', '/get', { query: { uuid: args.uuid } });
-                    return { mutation: 'update', uuid: args.uuid, verified: true, detail: fresh, note: '更新报错但重读确认实体存在（假阴性当作成功）。' };
+                    return {
+                        mutation: 'update',
+                        uuid: args.uuid,
+                        verified: true,
+                        changed: args.data,
+                        detail: wantFull ? fresh : summarizeDoc(fresh),
+                        note: '更新报错但重读确认实体存在（假阴性当作成功）。',
+                    };
                 }
                 catch {
                     throw e;
@@ -499,7 +521,7 @@ export function apply(ctx) {
         return callRelay('POST', '/kill', { query: q });
     }));
     // 8. foundry_create_creature —— 用友好 schema 构建 dnd5e NPC 并创建。
-    REG(makeTool('foundry_create_creature', '用友好 schema 构建一个 dnd5e NPC actor 并在世界创建（只有 dnd5e 世界可用）。返回新 actor uuid 与文档。cr 必须是数字（如 0.25 或 6），hp 用 {value,max}，abilities 用 {str,dex,con,int,wis,cha}。attacks/features 可选。**只有世界包确实没有现成怪时才用本工具新建；用户要世界包里的怪时用 foundry_search → foundry_import_entity → foundry_place_token。**攻击伤害骰按 dnd5e 5.3 规则放在物品 damage.base{number,denomination,bonus,types}（如 1d6+1 钝击 → number:1,denomination:6,bonus:"1",types:["bludgeoning"]），本工具已自动按此生成；attack 加值由 abilityMod+熟练自动计算，toHit 留空即可。', {
+    REG(makeTool('foundry_create_creature', '用友好 schema 构建一个 dnd5e NPC actor 并在世界创建（只有 dnd5e 世界可用）。返回新 actor uuid 与文档。cr 必须是数字（如 0.25 或 6），hp 用 {value,max}，abilities 用 {str,dex,con,int,wis,cha}。attacks/features 可选。**只有世界包确实没有现成怪时才用本工具新建；用户要世界包里的怪时用 foundry_search → foundry_import_entity → foundry_place_token。**攻击伤害骰按 dnd5e 5.3 规则放在物品 damage.base{number,denomination,bonus,types}（如 1d6+1 钝击 → number:1,denomination:6,bonus:"1",types:["bludgeoning"]），本工具已自动按此生成；attack 加值由 abilityMod+熟练自动计算，toHit 留空即可。给新建怪补特性/自动化时查 foundry_reference（save-activity/effect/feat）。', {
         name: { type: 'string', description: 'NPC 名' },
         size: { type: 'string', enum: ['tiny', 'sm', 'med', 'lg', 'huge', 'grg'], description: '体型' },
         type: { type: 'string', description: '生物类型，如 beast/monstrosity/humanoid' },
@@ -658,6 +680,7 @@ export function apply(ctx) {
         uuid: { type: 'string', description: 'compendium 实体 uuid，如 Compendium.dnd5e.monsters.Actor.NAISFPoNNgUCsEyW' },
         folder: { type: 'string', description: '可选，归档文件夹 uuid' },
         name: { type: 'string', description: '可选，覆盖副本名字' },
+        summary: { type: 'boolean', description: 'true 返回精简摘要（含新实体 uuid），省 token；默认 false 返回完整文档' },
     }, ['uuid'], async (args) => {
         const src = (await callRelay('GET', '/get', { query: { ...targetingQuery(args), uuid: args.uuid } }));
         const doc = { ...src };
@@ -673,7 +696,8 @@ export function apply(ctx) {
         const body = { entityType, data: doc };
         if (args.folder)
             body.folder = args.folder;
-        return callRelay('POST', '/create', { query: targetingQuery(args), body });
+        const created = await callRelay('POST', '/create', { query: targetingQuery(args), body });
+        return args.summary === true ? summarizeDoc(created) : created;
     }));
     // 18. foundry_place_token —— 把世界内 Actor 作为 token 放到场景地图坐标（POST /canvas/tokens）。
     REG(makeTool('foundry_place_token', '把一个世界内 Actor 作为 token 放到指定场景的地图坐标上（POST /canvas/tokens，token 数据用 actor.prototypeToken 展开 + 覆盖 x/y）。用于"把怪放到地图上"。**场景规则（重要）：用户说"放地图上/放我激活的地图"且未指定场景名 → 不要传 sceneId（默认=当前激活场景）；先调 foundry_get_scene(active=true) 拿激活场景的 grid.size/width/height，x/y 取 grid.size 整数倍并保证在场景尺寸内。只有用户明确说放到某张具体地图时才传 sceneId。**可用 foundry_move_token 移 token（/move-token）。', {
@@ -733,12 +757,13 @@ export function apply(ctx) {
         return asObject(await callRelay('POST', '/move-token', { query: targetingQuery(args), body }));
     }));
     // 20. foundry_get_scene —— 读场景（GET /scene）。拿「当前激活场景」的唯一正确途径。
-    REG(makeTool('foundry_get_scene', '读 Foundry 场景文档（GET /scene）。**这是拿"当前激活场景"的唯一途径**：active=true 返回世界当前激活场景（含 _id/name/width/height/grid.size/tokens），viewed=true 返回 GM 当前正在查看的场景，sceneId/name 拿指定场景，all=true 返回全部场景。用户说"放地图上/放到我激活的地图"且未指定场景名时：先调本工具 active=true 拿激活场景 id + grid.size，再 foundry_place_token 放怪（不传 sceneId 即默认激活场景）。世界内场景用 foundry_search 搜不到（search 只索引 compendium），必须用本工具。', {
+    REG(makeTool('foundry_get_scene', '读 Foundry 场景文档（GET /scene）。**这是拿"当前激活场景"的唯一途径**：active=true 返回世界当前激活场景（含 _id/name/width/height/grid.size/tokens），viewed=true 返回 GM 当前正在查看的场景，sceneId/name 拿指定场景，all=true 返回全部场景。用户说"放地图上/放到我激活的地图"且未指定场景名时：先调本工具 active=true 拿激活场景 id + grid.size，再 foundry_place_token 放怪（不传 sceneId 即默认激活场景）。世界内场景用 foundry_search 搜不到（search 只索引 compendium），必须用本工具。⚠️省 token：场景含全量 token 数据很大，放怪/看网格用 summary:true（返回网格+尺寸+token 坐标列表），需要完整文档才不传。', {
         active: { type: 'boolean', description: 'true 返回当前激活场景（推荐先试这个）' },
         viewed: { type: 'boolean', description: 'true 返回 GM 当前正在查看的场景' },
         sceneId: { type: 'string', description: '指定场景 id' },
         name: { type: 'string', description: '按场景名查' },
         all: { type: 'boolean', description: 'true 返回全部场景列表' },
+        summary: { type: 'boolean', description: 'true 返回精简摘要（网格/尺寸/token 坐标列表），省 token；默认 false 返回完整文档' },
     }, [], async (args) => {
         const q = { ...targetingQuery(args) };
         if (args.active !== undefined)
@@ -751,11 +776,22 @@ export function apply(ctx) {
             q.name = args.name;
         if (args.all !== undefined)
             q.all = args.all;
-        return asObject(await callRelay('GET', '/scene', { query: q }));
+        const raw = await callRelay('GET', '/scene', { query: q });
+        const value = asObject(raw);
+        if (args.summary === true) {
+            const arr = value.results;
+            if (Array.isArray(arr)) {
+                return { results: arr.map((s) => summarizeDoc(s)), total: value.total };
+            }
+            return summarizeDoc(value);
+        }
+        return value;
     }));
     // 21+. 全量补齐：dnd5e 系统操作 / 遭遇回合 / 场景画布 / 聊天 / 用户 / 宏 JS / 文件 / 声音 / 世界信息。
     registerExtraTools({ makeTool, callRelay, asObject, targetingQuery }, REG);
-    ctx.logger?.info?.('[' + name + '] FVTT 控制工具已就绪（relay + 86 工具）。配置：' + CONFIG_FILE);
+    // 87. 内置结构参考库（本地模板，省 token）。
+    registerReferenceTools(REG);
+    ctx.logger?.info?.('[' + name + '] FVTT 控制工具已就绪（relay + 87 工具）。配置：' + CONFIG_FILE);
 }
 export { name, inject };
 //# sourceMappingURL=index.js.map
