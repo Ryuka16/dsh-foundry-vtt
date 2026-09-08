@@ -3,5 +3,9 @@
   "apiKey": "<relay 的 scoped API key（64 位 hex，见 docs/部署教程.md 第四步）>",
   "clientId": "<模块配对后的 clientId，如 fvtt_xxxxxxxxxxxxxxxx>",
   "knowledgeDir": "C:\\Users\\<你的用户名>\\Desktop\\智能体\\01_跑团工具\\FVTT技术资料",
-  "sampleDir": "C:\\Users\\<你的用户名>\\Desktop\\智能体\\01_跑团工具\\怪物与物品卡"
+  "sampleDir": "C:\\Users\\<你的用户名>\\Desktop\\智能体\\01_跑团工具\\怪物与物品卡",
+  "relayExePath": "C:\\<解压目录>\\dsh-foundry-vtt\\relay\\go-relay\\relay.exe",
+  "relayDataDir": "C:\\<解压目录>\\dsh-foundry-vtt\\relay\\data",
+  "relayAdminEmail": "you@example.com",
+  "relayAdminPassword": "CHANGE_ME"
 }

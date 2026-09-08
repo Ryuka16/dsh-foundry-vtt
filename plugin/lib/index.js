@@ -16,8 +16,9 @@
  */
 import { promises as fs, readFileSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
+import { spawn } from 'node:child_process';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import { registerExtraTools } from './tools-extra.js';
 /** 注入系统提示的工作铁律：强制 AI 先查模板/样本/真源，再写 JSON。每个新对话 AI 自动看到。 */
 const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须遵守）
@@ -140,6 +141,11 @@ async function getCfg() {
         apiKey: fileCfg.apiKey || process.env.FOUNDRY_API_KEY || '',
         clientId: fileCfg.clientId || process.env.FOUNDRY_CLIENT_ID || '',
         knowledgeDir: fileCfg.knowledgeDir || process.env.FOUNDRY_KNOWLEDGE_DIR || DEFAULT_KNOWLEDGE_DIR,
+        relayExePath: fileCfg.relayExePath || process.env.FOUNDRY_RELAY_EXE || '',
+        relayDataDir: fileCfg.relayDataDir || '',
+        relayAdminEmail: fileCfg.relayAdminEmail || '',
+        relayAdminPassword: fileCfg.relayAdminPassword || '',
+        relayHealthUrl: fileCfg.relayHealthUrl || process.env.FOUNDRY_RELAY_HEALTH_URL || '',
     };
 }
 // ── 工具 JSON 文本渲染 + 原始 ToolDefinition 构造 ──────────────
@@ -413,10 +419,74 @@ function buildNpcDocument(input) {
         doc.folder = input.folder;
     return doc;
 }
+/** relay 守护：DSH 启动时检查 relay 健康，没跑就静默拉起（隐藏窗口，detached 不随 DSH 退出）。
+ *  直接 spawn relay.exe + 环境变量，不经 .ps1 脚本——Windows PowerShell 5.1 按 GBK 读无 BOM 的 UTF-8 脚本，
+ *  中文路径会乱码（实测：Set-Location 找不到路径），绕过脚本才是根治。 */
+async function ensureRelay() {
+    let cfg;
+    try {
+        cfg = await getCfg();
+    }
+    catch {
+        return;
+    }
+    const exe = cfg.relayExePath;
+    if (!exe)
+        return; // 未配置 relayExePath：不自动拉起（发布版默认，用户按需开启）
+    const healthUrl = cfg.relayHealthUrl || cfg.relayUrl.replace(/\/$/, '') + '/api/health';
+    const probe = async () => {
+        try {
+            const r = await fetch(healthUrl, { signal: AbortSignal.timeout(2500) });
+            return r.ok;
+        }
+        catch {
+            return false;
+        }
+    };
+    if (await probe())
+        return; // 已在跑
+    const env = { ...process.env };
+    env.DB_TYPE = 'sqlite';
+    env.PORT = env.PORT || '3010';
+    env.APP_ENV = 'production';
+    env.LOG_LEVEL = env.LOG_LEVEL || 'info';
+    env.PER_MINUTE_REQUEST_LIMIT = '0';
+    env.KEY_REQUEST_RATE_LIMIT = env.KEY_REQUEST_RATE_LIMIT || '100000';
+    env.PAIRING_RATE_LIMIT = env.PAIRING_RATE_LIMIT || '100000';
+    env.FRONTEND_URL = env.FRONTEND_URL || 'http://localhost:3010';
+    env.DATA_DIR = cfg.relayDataDir || join(dirname(exe), 'data');
+    if (cfg.relayAdminEmail)
+        env.ADMIN_EMAIL = cfg.relayAdminEmail;
+    if (cfg.relayAdminPassword)
+        env.ADMIN_PASSWORD = cfg.relayAdminPassword;
+    try {
+        const child = spawn(exe, [], {
+            cwd: dirname(exe),
+            env,
+            detached: true,
+            stdio: 'ignore',
+            windowsHide: true,
+        });
+        child.unref();
+    }
+    catch {
+        return; // 拉起失败不阻塞 DSH 启动
+    }
+    for (let i = 0; i < 16; i++) {
+        await new Promise((r) => setTimeout(r, 1000));
+        if (await probe()) {
+            console.log('[dsh-foundry-vtt] relay 已自动启动:', healthUrl);
+            return;
+        }
+    }
+    console.warn('[dsh-foundry-vtt] relay 已拉起但 16s 内未就绪:', exe);
+}
 export function apply(ctx) {
     const tools = ctx.tools;
     if (!tools)
         return;
+    // -1. relay 守护：开 DSH 自动确保桥在跑（异步，不阻塞启动）。
+    void ensureRelay();
     const REG = (t) => tools.register(t);
     // 0. 工作铁律：注入系统提示段落（每个新对话的 AI 自动看到），强制「先查模板/样本再写」。
     try {

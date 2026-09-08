@@ -1,4 +1,4 @@
-# Foundry REST API Relay - 本地桌机启动脚本（模板）
+﻿# Foundry REST API Relay - 本地桌机启动脚本（模板）
 # 用法：改 ADMIN_EMAIL / ADMIN_PASSWORD，其余保持默认即可
 $env:DB_TYPE='sqlite'
 $env:PORT='3010'
