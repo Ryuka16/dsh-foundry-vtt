@@ -15,6 +15,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import { cpSync, mkdirSync, readFileSync, rmSync, statSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -54,7 +55,9 @@ const zip = (fromDir, zipPath) => {
 console.log(`=== 打包 v${ver} ===`)
 console.log(`仓库：${repo}`)
 console.log(`输出：${outDir}`)
-const stage = join(outDir, `_stage-${ver}`)
+// stage 必须放在仓库之外：全量打包要 cpSync(仓库, stage)，若 stage 在仓库内，
+// Node 会以 ERR_FS_CP_EINVAL 拒绝（dest 是 src 的子目录）。
+const stage = join(tmpdir(), `dsh-foundry-vtt-pack-${ver}`)
 rmSync(stage, { recursive: true, force: true })
 mkdirSync(stage, { recursive: true })
 

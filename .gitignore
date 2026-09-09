@@ -5,6 +5,9 @@ relay/go-relay/data/
 relay/data/
 plugin/.gitignore
 
+# 打包产物（pack.mjs 输出，只进 Release 资产，不进 git）
+dist/
+
 # 敏感数据（relay.db 含配对关系与 API key，绝不提交）
 *.db
 *.db-shm
