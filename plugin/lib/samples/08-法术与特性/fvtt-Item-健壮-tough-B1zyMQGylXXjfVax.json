@@ -1,0 +1,134 @@
+{
+  "name": "健壮 Tough",
+  "type": "feat",
+  "img": "icons/creatures/mammals/bull-horned-blue.webp",
+  "effects": [
+    {
+      "name": "健壮",
+      "origin": "Item.B1zyMQGylXXjfVax",
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "flags": {
+        "dnd5e": {}
+      },
+      "_id": "1ktk5eLrdnSCMbDm",
+      "changes": [
+        {
+          "key": "system.attributes.hp.bonuses.level",
+          "mode": 2,
+          "value": "+ 2",
+          "priority": null
+        }
+      ],
+      "description": "",
+      "transfer": true,
+      "statuses": [],
+      "tint": "#ffffff",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "img": "icons/creatures/mammals/bull-horned-blue.webp",
+      "type": "base",
+      "system": {},
+      "sort": 0
+    }
+  ],
+  "folder": null,
+  "flags": {
+    "dnd5e": {
+      "riders": {
+        "activity": [],
+        "effect": []
+      }
+    },
+    "midi-qol": {
+      "rollAttackPerTarget": "default",
+      "removeAttackDamageButtons": "default",
+      "itemCondition": "",
+      "reactionCondition": "",
+      "otherCondition": "",
+      "effectCondition": ""
+    },
+    "midiProperties": {
+      "autoFailFriendly": false,
+      "autoSaveFriendly": false,
+      "magicdam": false,
+      "magiceffect": false,
+      "noConcentrationCheck": false,
+      "toggleEffect": false,
+      "ignoreTotalCover": false
+    },
+    "scene-packer": {
+      "hash": "b3a879428086363ddb384e32c1c2bb5ac527a850",
+      "sourceId": "Item.B1zyMQGylXXjfVax"
+    }
+  },
+  "system": {
+    "description": {
+      "value": "<p>获得该专长时，你的生命值上限增加你当前等级两倍的数值。并且在你随后每次升级时，生命值上限都会额外加2。</p>",
+      "chat": ""
+    },
+    "source": {
+      "custom": "PHB",
+      "revision": 1,
+      "rules": "2014",
+      "book": "PHB"
+    },
+    "cover": null,
+    "uses": {
+      "max": "0",
+      "spent": 0,
+      "recovery": []
+    },
+    "type": {
+      "value": "feat",
+      "subtype": ""
+    },
+    "requirements": "",
+    "activities": {},
+    "identifier": "-tough",
+    "advancement": {},
+    "crewed": false,
+    "enchant": {},
+    "prerequisites": {
+      "level": null,
+      "repeatable": false,
+      "items": []
+    },
+    "properties": []
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.dnd5e_classpack.feats-all.Item.1qPQNtq5EQwEa7OC",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Item.B1zyMQGylXXjfVax",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788843474193,
+    "modifiedTime": 1788843474499,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

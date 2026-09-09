@@ -1,0 +1,6499 @@
+{
+  "name": "怪奇独奏者",
+  "type": "npc",
+  "img": "modules/longhua-dm-toolkit/assets/si-she/du-zou-zhe/%E7%8B%AC%E5%A5%8F%E8%80%85%20(1).png",
+  "system": {
+    "currency": {
+      "pp": 0,
+      "gp": 0,
+      "ep": 0,
+      "sp": 0,
+      "cp": 0
+    },
+    "abilities": {
+      "str": {
+        "value": 10,
+        "proficient": 0,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "dex": {
+        "value": 16,
+        "proficient": 1,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "con": {
+        "value": 14,
+        "proficient": 0,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "int": {
+        "value": 12,
+        "proficient": 0,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "wis": {
+        "value": 10,
+        "proficient": 0,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "cha": {
+        "value": 18,
+        "proficient": 1,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      }
+    },
+    "bonuses": {
+      "mwak": {
+        "attack": "",
+        "damage": ""
+      },
+      "rwak": {
+        "attack": "",
+        "damage": ""
+      },
+      "msak": {
+        "attack": "",
+        "damage": ""
+      },
+      "rsak": {
+        "attack": "",
+        "damage": ""
+      },
+      "abilities": {
+        "check": "",
+        "save": "",
+        "skill": ""
+      },
+      "spell": {
+        "dc": ""
+      }
+    },
+    "skills": {
+      "prf": {
+        "value": 2,
+        "ability": "dex",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "bonuses": {
+          "check": "",
+          "passive": ""
+        }
+      },
+      "prc": {
+        "value": 1,
+        "ability": "dex",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "bonuses": {
+          "check": "",
+          "passive": ""
+        }
+      },
+      "acr": {
+        "value": 1,
+        "ability": "dex",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "bonuses": {
+          "check": "",
+          "passive": ""
+        }
+      }
+    },
+    "tools": {
+      "music": {
+        "value": 2,
+        "ability": "int",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "bonuses": {
+          "check": ""
+        }
+      }
+    },
+    "spells": {
+      "spell1": {
+        "value": 4
+      },
+      "spell2": {
+        "value": 3
+      },
+      "spell3": {
+        "value": 2
+      },
+      "spell4": {
+        "value": 0
+      },
+      "spell5": {
+        "value": 0
+      },
+      "spell6": {
+        "value": 0
+      },
+      "spell7": {
+        "value": 0
+      },
+      "spell8": {
+        "value": 0
+      },
+      "spell9": {
+        "value": 0
+      },
+      "pact": {
+        "value": 0
+      }
+    },
+    "attributes": {
+      "ac": {
+        "calc": "default",
+        "flat": 15
+      },
+      "init": {
+        "ability": "",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "bonus": ""
+      },
+      "movement": {
+        "walk": "30",
+        "units": "ft",
+        "hover": false,
+        "ignoredDifficultTerrain": []
+      },
+      "attunement": {
+        "max": 3
+      },
+      "senses": {
+        "units": null,
+        "special": "",
+        "ranges": {
+          "darkvision": null,
+          "blindsight": null,
+          "tremorsense": null,
+          "truesight": null
+        }
+      },
+      "spellcasting": "cha",
+      "exhaustion": 0,
+      "concentration": {
+        "ability": "",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "bonuses": {
+          "save": ""
+        },
+        "limit": 1
+      },
+      "loyalty": {},
+      "hd": {
+        "spent": 0
+      },
+      "hp": {
+        "value": 78,
+        "max": 78,
+        "temp": 0,
+        "tempmax": 0,
+        "formula": "12d8 + 24"
+      },
+      "death": {
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "success": 0,
+        "failure": 0,
+        "bonuses": {
+          "save": ""
+        }
+      },
+      "spell": {
+        "level": 5
+      },
+      "price": {
+        "value": null,
+        "denomination": "gp"
+      }
+    },
+    "details": {
+      "biography": {
+        "value": "",
+        "public": ""
+      },
+      "alignment": "",
+      "ideal": "",
+      "bond": "",
+      "flaw": "",
+      "race": null,
+      "type": {
+        "value": "humanoid",
+        "subtype": "",
+        "swarm": "",
+        "custom": ""
+      },
+      "habitat": {
+        "value": [],
+        "custom": ""
+      },
+      "cr": 5,
+      "treasure": {
+        "value": []
+      }
+    },
+    "resources": {
+      "legact": {
+        "max": 0,
+        "spent": 0
+      },
+      "legres": {
+        "max": 0,
+        "spent": 0
+      },
+      "lair": {
+        "value": false,
+        "initiative": null,
+        "inside": false
+      }
+    },
+    "source": {
+      "revision": 1,
+      "rules": "2014"
+    },
+    "traits": {
+      "size": "med",
+      "di": {
+        "value": [],
+        "custom": "",
+        "bypasses": []
+      },
+      "dr": {
+        "value": [
+          "thunder",
+          "psychic"
+        ],
+        "custom": "",
+        "bypasses": []
+      },
+      "dv": {
+        "value": [],
+        "custom": "",
+        "bypasses": []
+      },
+      "dm": {
+        "amount": {},
+        "bypasses": []
+      },
+      "ci": {
+        "value": [
+          "charmed",
+          "frightened"
+        ],
+        "custom": ""
+      },
+      "languages": {
+        "value": [],
+        "custom": "",
+        "communication": {}
+      },
+      "important": false
+    }
+  },
+  "prototypeToken": {
+    "name": "怪奇独奏者",
+    "displayName": 20,
+    "actorLink": false,
+    "width": 1,
+    "height": 1,
+    "texture": {
+      "src": "modules/longhua-dm-toolkit/assets/si-she/du-zou-zhe/*",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "offsetX": 0,
+      "offsetY": 0,
+      "fit": "contain",
+      "scaleX": 1,
+      "scaleY": 1,
+      "rotation": 0,
+      "tint": "#ffffff",
+      "alphaThreshold": 0.75
+    },
+    "lockRotation": false,
+    "rotation": 0,
+    "alpha": 1,
+    "disposition": -1,
+    "displayBars": 20,
+    "bar1": {
+      "attribute": "attributes.hp"
+    },
+    "bar2": {
+      "attribute": null
+    },
+    "light": {
+      "negative": false,
+      "priority": 0,
+      "alpha": 0.5,
+      "angle": 360,
+      "bright": 0,
+      "color": null,
+      "coloration": 1,
+      "dim": 0,
+      "attenuation": 0.5,
+      "luminosity": 0.5,
+      "saturation": 0,
+      "contrast": 0,
+      "shadows": 0,
+      "animation": {
+        "type": null,
+        "speed": 5,
+        "intensity": 5,
+        "reverse": false
+      },
+      "darkness": {
+        "min": 0,
+        "max": 1
+      }
+    },
+    "sight": {
+      "enabled": true,
+      "range": 60,
+      "angle": 360,
+      "visionMode": "basic",
+      "color": null,
+      "attenuation": 0.1,
+      "brightness": 0,
+      "saturation": 0,
+      "contrast": 0
+    },
+    "detectionModes": [],
+    "occludable": {
+      "radius": 0
+    },
+    "ring": {
+      "enabled": false,
+      "colors": {
+        "ring": null,
+        "background": null
+      },
+      "effects": 0,
+      "subject": {
+        "scale": 1,
+        "texture": null
+      }
+    },
+    "turnMarker": {
+      "mode": 1,
+      "animation": null,
+      "src": null,
+      "disposition": false
+    },
+    "movementAction": null,
+    "flags": {
+      "monks-tokenbar": {
+        "include": "default"
+      },
+      "splatter": {
+        "bloodColor": ""
+      },
+      "wall-height": {
+        "tokenHeight": 0
+      },
+      "patrol": {
+        "enablePatrol": false,
+        "enableSpotting": false,
+        "makePatroller": false,
+        "multiPath": false,
+        "patrolPathName": "",
+        "pathNodeIndex": "0"
+      },
+      "swarm": {
+        "isSwarm": false,
+        "swarmSize": 20,
+        "swarmSpeed": 1,
+        "animation": "circular"
+      },
+      "Rideable": {
+        "issetRideableFlag": true,
+        "MaxRiderFlag": null,
+        "CustomRidingheightFlag": null,
+        "UseRidingHeightFlag": true,
+        "RidersScaleFlag": 1,
+        "RiderPositioningFlag": "RowPlacement",
+        "RiderOffsetFlag": [
+          0,
+          0
+        ],
+        "TokenFormFlag": "TokenFormCircle",
+        "InsideMovementFlag": false,
+        "SpawnRidersFlag": "",
+        "WorldMEffectOverrideFlag": false,
+        "MountingEffectsFlag": "",
+        "SelfApplyEffectsFlag": false,
+        "forMountEffectsFlag": "",
+        "CanbePilotedFlag": false,
+        "CheckPilotedCollisionFlag": false,
+        "PilotedbyDefaultFlag": false
+      },
+      "healthEstimate": {
+        "dontMarkDead": false,
+        "hideHealthEstimate": false,
+        "hideName": false
+      }
+    },
+    "randomImg": true,
+    "appendNumber": false,
+    "prependAdjective": true
+  },
+  "items": [
+    {
+      "_id": "PolyrhythmMind01",
+      "name": "多重复调心智  Polyrhythmic Mind",
+      "type": "feat",
+      "img": "icons/magic/control/hypnosis-mesmerism-swirl.webp",
+      "system": {
+        "description": {
+          "value": "<p>独奏者的思绪被多重旋律占据。任何试图通过魔法读取其思想的生物必须进行一次 DC 15 的智力豁免，失败者将受到 10 (3d6) 点心灵伤害且魔法失效。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {},
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "AuraOfCacophony1",
+      "name": "喧嚣音域  Aura of Cacophony",
+      "type": "feat",
+      "img": "icons/magic/sonic/projectile-sound-rings-wave.webp",
+      "system": {
+        "description": {
+          "value": "<p>只要独奏者未处于失能状态，其周围 15 尺内充斥着刺耳的噪音。任何进入该区域的生物自动陷入<strong>耳聋 (Deafened)</strong> 状态。</p><p>尝试在该区域内施展带有<strong>言语成分 (Verbal)</strong> 的法术时，必须进行一次 DC 15 的体质豁免。失败则施展失败，动作浪费，但不消耗法术位。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {},
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [
+        {
+          "_id": "AuraCacophonyEf1",
+          "name": "耳聋 (喧嚣音域)",
+          "statuses": [],
+          "transfer": true,
+          "description": "<p>你深陷刺耳的噪音之中，无法听见任何声音。</p>",
+          "flags": {
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "dae": {
+              "disableCondition": "",
+              "stackable": "noneName",
+              "showIcon": true,
+              "disableIncapacitated": true,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": [],
+              "enableCondition": "",
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false
+            },
+            "core": {
+              "overlay": false
+            }
+          },
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "img": "icons/svg/deaf.svg",
+          "type": "auraeffects.aura",
+          "system": {
+            "showRadius": true,
+            "applyToSelf": true,
+            "bestFormula": "",
+            "canStack": false,
+            "collisionTypes": [],
+            "color": "#521fe0",
+            "combatOnly": false,
+            "disableOnHidden": true,
+            "distanceFormula": "15",
+            "disposition": 0,
+            "evaluatePreApply": false,
+            "opacity": 0.15,
+            "overrideName": "",
+            "script": "",
+            "stashedChanges": [],
+            "stashedStatuses": [
+              "deafened"
+            ]
+          },
+          "changes": [],
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "seconds": null,
+            "rounds": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "origin": "Actor.plrmRsGhJE0fj1sn.Item.AuraOfCacophony1",
+          "tint": "#ffffff",
+          "sort": 0
+        }
+      ],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "Multiattack00001",
+      "name": "多重攻击  Multiattack",
+      "type": "feat",
+      "img": "icons/skills/melee/hand-grip-staff-yellow-brown.webp",
+      "system": {
+        "description": {
+          "value": "<p>独奏者发动两次强音震波攻击。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {},
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "FortissimoBlast1",
+      "name": "强音震波  Fortissimo Blast",
+      "type": "weapon",
+      "img": "icons/magic/sonic/projectile-sound-rings-wave.webp",
+      "system": {
+        "description": {
+          "value": "<p><em>远程法术攻击：</em> 命中 +7，射程 60 尺。造成 13 (2d8+4) 点雷鸣或心灵伤害。</p>",
+          "chat": ""
+        },
+        "equipped": true,
+        "type": {
+          "value": "simpleR",
+          "baseItem": ""
+        },
+        "activities": {
+          "BlastAttack00001": {
+            "type": "attack",
+            "_id": "BlastAttack00001",
+            "name": "攻击",
+            "activation": {
+              "type": "action",
+              "value": 1,
+              "override": false,
+              "condition": ""
+            },
+            "range": {
+              "value": "60",
+              "units": "ft",
+              "override": false
+            },
+            "attack": {
+              "ability": "cha",
+              "type": {
+                "value": "",
+                "classification": "spell"
+              },
+              "critical": {
+                "threshold": null
+              },
+              "flat": false,
+              "bonus": ""
+            },
+            "damage": {
+              "parts": [
+                {
+                  "custom": {
+                    "enabled": false,
+                    "formula": ""
+                  },
+                  "number": 2,
+                  "denomination": 8,
+                  "bonus": "@mod",
+                  "types": [
+                    "thunder",
+                    "psychic"
+                  ],
+                  "scaling": {
+                    "number": 1
+                  }
+                }
+              ],
+              "critical": {
+                "bonus": ""
+              },
+              "includeBase": true
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "target": {
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "type": "",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false,
+                "type": ""
+              },
+              "override": false,
+              "prompt": true
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": [],
+              "max": ""
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "attackMode": "oneHanded",
+            "ammunition": "",
+            "otherActivityUuid": "",
+            "attackRollPerTarget": "default",
+            "fumbleThreshold": 1,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "identified": true,
+        "unidentified": {
+          "description": ""
+        },
+        "container": null,
+        "quantity": 1,
+        "weight": {
+          "value": 0,
+          "units": "lb"
+        },
+        "price": {
+          "value": 0,
+          "denomination": "gp"
+        },
+        "rarity": "",
+        "attunement": "",
+        "attuned": false,
+        "ammunition": {},
+        "armor": {},
+        "damage": {
+          "base": {
+            "types": [],
+            "custom": {
+              "enabled": false
+            },
+            "scaling": {
+              "number": 1
+            }
+          },
+          "versatile": {
+            "types": [],
+            "custom": {
+              "enabled": false
+            },
+            "scaling": {
+              "number": 1
+            }
+          }
+        },
+        "properties": [],
+        "proficient": null,
+        "range": {
+          "units": "ft"
+        },
+        "crew": {
+          "value": []
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "dnd5e": {
+          "riders": {
+            "effect": [],
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "CapriciousSuite1",
+      "name": "怪奇狂想组曲  Capricious Suite",
+      "type": "feat",
+      "img": "icons/tools/instruments/harp-yellow-teal.webp",
+      "system": {
+        "description": {
+          "value": "<p>作为一个动作，独奏者演奏出混乱乐章。请点击下方的<strong>轮盘掷骰</strong> (1d4)，并根据掷出的结果，使用对应的后续技能表项。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {
+          "SuiteRollAct0001": {
+            "type": "utility",
+            "_id": "SuiteRollAct0001",
+            "name": "轮盘掷骰 (1d4)",
+            "activation": {
+              "type": "action",
+              "value": 1,
+              "override": false
+            },
+            "roll": {
+              "formula": "1d4",
+              "name": "组曲轮盘",
+              "prompt": false,
+              "visible": true
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {},
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "units": "self",
+              "override": false
+            },
+            "target": {
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false,
+              "prompt": true
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": []
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "ComicalTrombone1",
+      "name": "1. 滑稽长号  Comical Trombone",
+      "type": "feat",
+      "img": "icons/tools/instruments/horn-flared-wood.webp",
+      "system": {
+        "description": {
+          "value": "<p>30 尺内的一个可见生物必须进行感知豁免，失败则陷入<strong>狂笑</strong>并<strong>倒地 (Prone)</strong>，在持续时间内处于<strong>失能 (Incapacitated)</strong> 且无法站立。目标在其每个回合结束时可重新豁免。最多持续 1 分钟。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {
+          "TromboneAct00001": {
+            "type": "save",
+            "_id": "TromboneAct00001",
+            "name": "长号豁免",
+            "activation": {
+              "type": "special",
+              "override": false,
+              "condition": ""
+            },
+            "range": {
+              "value": "30",
+              "units": "ft",
+              "override": false,
+              "special": ""
+            },
+            "save": {
+              "ability": [
+                "wis"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": "15"
+              }
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "TromboneEffect01",
+                "onSave": false,
+                "level": {}
+              }
+            ],
+            "target": {
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "type": "",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false,
+                "type": ""
+              },
+              "override": false,
+              "prompt": true
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": [],
+              "max": ""
+            },
+            "damage": {
+              "onSave": "half",
+              "critical": {
+                "allow": false
+              },
+              "parts": []
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "effects": [
+        {
+          "_id": "TromboneEffect01",
+          "name": "狂笑失能",
+          "statuses": [
+            "prone",
+            "incapacitated"
+          ],
+          "transfer": false,
+          "description": "<p>你狂笑不止，倒地且陷入失能状态，无法站立。在你的回合结束时可重新进行感知豁免。</p>",
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "img": "icons/tools/instruments/horn-flared-wood.webp",
+          "type": "base",
+          "system": {},
+          "changes": [],
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "seconds": null,
+            "rounds": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "origin": null,
+          "tint": "#ffffff",
+          "sort": 0,
+          "flags": {
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "dae": {
+              "enableCondition": "",
+              "disableCondition": "",
+              "stackable": "noneName",
+              "showIcon": false,
+              "disableIncapacitated": false,
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": []
+            },
+            "core": {
+              "overlay": false
+            }
+          }
+        }
+      ],
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "effect": [],
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "LullingHarmonica",
+      "name": "2. 催眠口琴  Lulling Harmonica",
+      "type": "feat",
+      "img": "icons/tools/instruments/chimes-wood-white.webp",
+      "system": {
+        "description": {
+          "value": "<p>周围 30 尺内的所有敌对生物必须进行感知豁免。豁免失败者的速度减半，且无法采取反应，直到独奏者的下个回合结束。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {
+          "HarmonicaAct0001": {
+            "type": "save",
+            "_id": "HarmonicaAct0001",
+            "name": "口琴豁免",
+            "activation": {
+              "type": "special",
+              "override": false,
+              "condition": ""
+            },
+            "target": {
+              "template": {
+                "type": "radius",
+                "size": "30",
+                "units": "ft",
+                "contiguous": false,
+                "count": "",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false,
+                "count": "",
+                "type": "enemy",
+                "special": "-self"
+              },
+              "override": false,
+              "prompt": true
+            },
+            "save": {
+              "ability": [
+                "wis"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": "15"
+              }
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "HarmonicaEffect1",
+                "onSave": false,
+                "level": {}
+              }
+            ],
+            "range": {
+              "units": "self",
+              "override": false,
+              "special": ""
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": [],
+              "max": ""
+            },
+            "damage": {
+              "onSave": "half",
+              "critical": {
+                "allow": false
+              },
+              "parts": []
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "effects": [
+        {
+          "_id": "HarmonicaEffect1",
+          "name": "迟缓 (速度减半)",
+          "changes": [
+            {
+              "key": "system.attributes.movement.walk",
+              "mode": 1,
+              "value": "0.5",
+              "priority": 10
+            }
+          ],
+          "transfer": false,
+          "description": "<p>你被古怪的慢节奏催眠，移动速度减半且无法使用反应。</p>",
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "img": "icons/tools/instruments/chimes-wood-white.webp",
+          "type": "base",
+          "system": {},
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "seconds": null,
+            "rounds": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "origin": null,
+          "tint": "#ffffff",
+          "statuses": [],
+          "sort": 0,
+          "flags": {
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "dae": {
+              "enableCondition": "",
+              "disableCondition": "",
+              "stackable": "noneName",
+              "showIcon": false,
+              "disableIncapacitated": false,
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": []
+            },
+            "core": {
+              "overlay": false
+            }
+          }
+        }
+      ],
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "effect": [],
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "RousingBassDrum1",
+      "name": "3. 激昂大鼓 Rousing Bass Drum",
+      "type": "feat",
+      "img": "icons/tools/instruments/drum-brown-red.webp",
+      "system": {
+        "description": {
+          "value": "<p>独奏者及其周围 30 尺内可见盟友获得 8 (1d8 + 4) 点临时生命值。直到独奏者的下回合结束前，这些生物的下一次武器攻击检定具有优势。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {
+          "BassDrumAct00001": {
+            "type": "heal",
+            "_id": "BassDrumAct00001",
+            "name": "大鼓激昂 (Temp HP)",
+            "activation": {
+              "type": "special",
+              "override": false,
+              "condition": ""
+            },
+            "target": {
+              "template": {
+                "type": "radius",
+                "size": "30",
+                "units": "ft",
+                "contiguous": false,
+                "count": "",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false,
+                "count": "",
+                "type": "ally",
+                "special": "-self"
+              },
+              "override": false,
+              "prompt": true
+            },
+            "healing": {
+              "number": 1,
+              "denomination": 8,
+              "bonus": "4",
+              "types": [
+                "temphp"
+              ],
+              "custom": {
+                "enabled": false
+              },
+              "scaling": {
+                "number": 1
+              }
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "units": "self",
+              "override": false,
+              "special": ""
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": [],
+              "max": ""
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "effects": [
+        {
+          "_id": "BassDrumEffect01",
+          "name": "激昂优势",
+          "transfer": false,
+          "description": "<p>下一次武器攻击检定具有优势。</p>",
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "img": "icons/tools/instruments/drum-brown-red.webp",
+          "type": "base",
+          "system": {},
+          "changes": [
+            {
+              "key": "flags.midi-qol.advantage.attack.all",
+              "mode": 0,
+              "value": "1",
+              "priority": 20
+            }
+          ],
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "seconds": null,
+            "rounds": 1,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "origin": null,
+          "tint": "#ffffff",
+          "statuses": [],
+          "sort": 0,
+          "flags": {
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "dae": {
+              "enableCondition": "",
+              "disableCondition": "",
+              "stackable": "noneName",
+              "showIcon": false,
+              "disableIncapacitated": false,
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": [
+                "1Attack"
+              ]
+            },
+            "core": {
+              "overlay": false
+            }
+          }
+        }
+      ],
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "JarringCymbals01",
+      "name": "4. 刺耳铜钹  Jarring Cymbals",
+      "type": "feat",
+      "img": "icons/tools/instruments/bell-silver.webp",
+      "system": {
+        "description": {
+          "value": "<p>周围 30 尺内的所有敌对生物必须进行体质豁免。失败受 14 (4d6) 点雷鸣伤害，并被迫丢弃手中持握的物品；成功伤害减半且不掉落物品。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {
+          "CymbalsAct000001": {
+            "type": "save",
+            "_id": "CymbalsAct000001",
+            "name": "铜钹豁免",
+            "activation": {
+              "type": "special",
+              "override": false,
+              "condition": ""
+            },
+            "target": {
+              "template": {
+                "type": "radius",
+                "size": "30",
+                "units": "ft",
+                "contiguous": false,
+                "count": "",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false,
+                "count": "",
+                "type": "enemy",
+                "special": "-self"
+              },
+              "override": false,
+              "prompt": true
+            },
+            "save": {
+              "ability": [
+                "con"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": "15"
+              }
+            },
+            "damage": {
+              "parts": [
+                {
+                  "custom": {
+                    "enabled": false,
+                    "formula": ""
+                  },
+                  "number": 4,
+                  "denomination": 6,
+                  "bonus": "",
+                  "types": [
+                    "thunder"
+                  ],
+                  "scaling": {
+                    "number": 1
+                  }
+                }
+              ],
+              "onSave": "half",
+              "critical": {
+                "allow": false
+              }
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "units": "self",
+              "override": false,
+              "special": ""
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": [],
+              "max": ""
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "SyncopatedStep01",
+      "name": "切分音滑步  Syncopated Step",
+      "type": "feat",
+      "img": "icons/skills/movement/feet-winged-boots-brown.webp",
+      "system": {
+        "description": {
+          "value": "<p>独奏者踩着违背常理的节拍移动最多 15 尺。此次移动不会引发借机攻击。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {
+          "StepUtility00001": {
+            "type": "utility",
+            "_id": "StepUtility00001",
+            "name": "滑步",
+            "activation": {
+              "type": "bonus",
+              "value": 1,
+              "override": false
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {},
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "units": "self",
+              "override": false
+            },
+            "target": {
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false,
+              "prompt": true
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": []
+            },
+            "roll": {
+              "prompt": false,
+              "visible": false
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "name": "器乐施法  Instrumental Casting",
+      "type": "feat",
+      "_id": "kccEPYwbMTut1YlE",
+      "img": "icons/tools/instruments/harp-lap-brown.webp",
+      "system": {
+        "activities": {},
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "description": {
+          "value": "<p>独奏者施展法术时不需要言语成分 (Verbal)。他通过演奏身上的乐器来替代魔法的言语与材料需求。</p>",
+          "chat": ""
+        },
+        "identifier": "-",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": "",
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        }
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "scene-packer": {
+          "hash": "32b6d16f38e383d1867b15fe6b05bd25f3f32bf8"
+        },
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "dZ3k2qfcEmbHWXrw",
+      "name": "次级幻影 Minor Illusion",
+      "type": "spell",
+      "flags": {
+        "midi-qol": {
+          "AoETargetType": "any",
+          "AoETargetTypeIncludeSelf": true,
+          "autoTarget": "default",
+          "rollAttackPerTarget": "always",
+          "itemCondition": "",
+          "effectCondition": ""
+        },
+        "midiProperties": {
+          "confirmTargets": "always",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": false,
+          "magiceffect": false,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "dnd5e": {
+          "migratedProperties": [
+            "somatic",
+            "material"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "3264ff8a5e4d2e7c43ff7627f4b43f5ac882276a"
+        }
+      },
+      "img": "modules/dnd5e_classpack/Nicons/Spell_Priest_DivineStar_Shadow2.png",
+      "effects": [],
+      "system": {
+        "description": {
+          "value": "<div class=\"description \"> 你在施法距离内创造一段声响或一个物件的影像，并使之维持至法术持续时间结束。你也可以用一个动作解除幻象，或者再次施展该法术来终止幻象。\n<br />如果你创造一段声响，其音量可以是低声耳语也可以是高声尖叫。它可以是你或其他任何人的嗓音，或者是一头狮子的咆哮、一段鼓声以及任何你指定的其它声响。声响在持续时间内不会减弱，或者你也可以于法术终止前在不同的时间段创造几段分散的声响。\n<br />如果你创造一个物件的影像（比如一把椅子、泥泞的脚印、一个小箱子等），则该物件大小不得大于一个边长5尺的立方体。\n<br />该影像不具有声音、光亮、味道或任何其他的感官效应。由于影像可以被任何物件所穿透，因此与之进行物理互动时都会揭露其幻象的本质。\n<br />生物用其动作调查该声响或影像时，必须进行一次对抗该法术豁免DC 的智力（调查）检定，检定成功则判断出眼前即是幻象。幻象在看穿它的生物面前会显得模糊不清。\n<br /></div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 260",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "value": "1",
+          "units": "minute"
+        },
+        "target": {
+          "affects": {
+            "choice": false
+          },
+          "template": {
+            "units": "ft",
+            "type": "cube",
+            "size": "5",
+            "contiguous": false,
+            "stationary": false
+          }
+        },
+        "range": {
+          "value": "30",
+          "units": "ft"
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 0,
+        "school": "ill",
+        "materials": {
+          "value": "一小块羊毛",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "somatic",
+          "material",
+          "mgc"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "utility",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "roll": {
+              "formula": "",
+              "name": "",
+              "prompt": false,
+              "visible": false
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "minor-illusion",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 2200000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "QUE4tBdB6vCdPujJ",
+      "name": "不谐低语 Dissonant Whispers",
+      "type": "spell",
+      "flags": {
+        "midiProperties": {
+          "confirmTargets": "always",
+          "saveDamage": "halfdam",
+          "bonusSaveDamage": "fulldam",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": true,
+          "magiceffect": false,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "always",
+          "removeAttackDamageButtons": "default",
+          "itemCondition": "",
+          "effectCondition": "",
+          "reactionCondition": "",
+          "otherCondition": ""
+        },
+        "dnd5e": {
+          "migratedProperties": [
+            "vocal"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "65560c2dc880dd073676b94b559fb0204512cdca"
+        }
+      },
+      "img": "modules/dnd5e_classpack/Nicons/httpcloud3steamusercontentcomugc842585341025537431C8D829D636A4FF883DA7B75CB91A77B63ECEA582.jpg",
+      "effects": [
+        {
+          "name": "不谐低语Dissonant Whispers",
+          "origin": "Compendium.dnd5e_classpack.new-icon.Item.j8wwbcc1tlY9hLRf",
+          "duration": {
+            "rounds": 1,
+            "startTime": null,
+            "seconds": null,
+            "combat": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "disabled": false,
+          "_id": "ouuEVafbbgXTT8nv",
+          "changes": [],
+          "description": "",
+          "transfer": false,
+          "statuses": [],
+          "flags": {
+            "dae": {
+              "disableIncapacitated": false,
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false,
+              "stackable": "noneName",
+              "showIcon": true,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": [
+                "isMoved"
+              ],
+              "enableCondition": "",
+              "disableCondition": ""
+            },
+            "ActiveAuras": {
+              "isAura": false,
+              "aura": "None",
+              "nameOverride": "",
+              "radius": "",
+              "alignment": "",
+              "type": "",
+              "customCheck": "",
+              "ignoreSelf": false,
+              "height": false,
+              "hidden": false,
+              "displayTemp": false,
+              "hostile": false,
+              "onlyOnce": false,
+              "wallsBlock": "system",
+              "statuses": []
+            },
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "core": {
+              "overlay": false
+            }
+          },
+          "tint": "#ffffff",
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "img": "modules/dnd5e_classpack/Nicons/httpcloud3steamusercontentcomugc842585341025537431C8D829D636A4FF883DA7B75CB91A77B63ECEA582.jpg",
+          "type": "base",
+          "system": {},
+          "sort": 0
+        }
+      ],
+      "system": {
+        "description": {
+          "value": "<div class=\"description \">\n<div class=\"description \">你指定一个施法距离内能够听到你声音的生物，并对其说出只有他能听到的不谐低语，使其受强烈的痛苦折磨。目标必须进行一次感知豁免。豁免失败则受到3d6 点心灵伤害，并立即执行反应往远离你的方向移动其速度所允许的距离。该生物不会进入明显危险的地域，如火堆或陷坑。豁免成功则伤害减半，且不会执行远离的反应。陷入耳聋状态的目标，进行该豁免时直接判定为成功。</div>\n<div class=\"description \"> </div>\n<div class=\"description \">升环施法效应。</div>\n<div class=\"description \">使用2 环或更高法术位施展该法术，你使用的法术位每比1 环高一环，伤害就提高1d6。</div>\n</div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 277",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "value": "",
+          "units": "inst"
+        },
+        "target": {
+          "affects": {
+            "type": "creature",
+            "count": "",
+            "choice": false,
+            "special": ""
+          },
+          "template": {
+            "units": "ft",
+            "contiguous": false,
+            "type": "",
+            "stationary": false
+          }
+        },
+        "range": {
+          "value": "60",
+          "units": "ft",
+          "special": ""
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 1,
+        "school": "enc",
+        "materials": {
+          "value": "",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "vocal",
+          "mgc"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "save",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "ouuEVafbbgXTT8nv",
+                "onSave": false,
+                "level": {}
+              }
+            ],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "damage": {
+              "onSave": "half",
+              "parts": [
+                {
+                  "number": 3,
+                  "denomination": 6,
+                  "bonus": "",
+                  "types": [
+                    "psychic"
+                  ],
+                  "custom": {
+                    "enabled": false,
+                    "formula": ""
+                  },
+                  "scaling": {
+                    "mode": "whole",
+                    "number": 1,
+                    "formula": ""
+                  }
+                }
+              ],
+              "critical": {
+                "allow": false
+              }
+            },
+            "save": {
+              "ability": [
+                "wis"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": ""
+              }
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "dissonant-whispers",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 300000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "QyspxRIhL3lVSDuv",
+      "name": "雷鸣波 Thunderwave",
+      "type": "spell",
+      "flags": {
+        "midi-qol": {
+          "AoETargetType": "any",
+          "AoETargetTypeIncludeSelf": true,
+          "autoTarget": "default",
+          "rollAttackPerTarget": "always",
+          "removeAttackDamageButtons": "default",
+          "itemCondition": "",
+          "effectCondition": "",
+          "reactionCondition": "",
+          "otherCondition": ""
+        },
+        "midiProperties": {
+          "confirmTargets": "always",
+          "saveDamage": "halfdam",
+          "bonusSaveDamage": "fulldam",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": true,
+          "magiceffect": false,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "dnd5e": {
+          "migratedProperties": [
+            "vocal",
+            "somatic"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "0001247b5dfaf85a6cebb7ea4380718d55939010"
+        }
+      },
+      "img": "modules/dnd5e_classpack/Nicons/Ability_ThunderKing_Overcharge.png",
+      "effects": [
+        {
+          "name": "雷鸣波 Thunderwave",
+          "origin": "Compendium.dnd5e_classpack.new-icon.Item.8GM6YBgYFPIcFXKg",
+          "duration": {
+            "rounds": 1,
+            "startTime": null,
+            "seconds": null,
+            "combat": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "disabled": false,
+          "_id": "iQWVlYMSWrbxFN8o",
+          "changes": [],
+          "description": "",
+          "transfer": false,
+          "statuses": [],
+          "flags": {
+            "dae": {
+              "disableIncapacitated": false,
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false,
+              "stackable": "noneName",
+              "showIcon": true,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": [
+                "isMoved"
+              ]
+            },
+            "ActiveAuras": {
+              "isAura": false,
+              "aura": "None",
+              "nameOverride": "",
+              "radius": "",
+              "alignment": "",
+              "type": "",
+              "customCheck": "",
+              "ignoreSelf": false,
+              "height": false,
+              "hidden": false,
+              "displayTemp": false,
+              "hostile": false,
+              "onlyOnce": false,
+              "wallsBlock": "system"
+            }
+          },
+          "tint": "#ffffff",
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "img": "modules/dnd5e_classpack/Nicons/Ability_ThunderKing_Overcharge.png",
+          "type": "base",
+          "system": {},
+          "sort": 0
+        }
+      ],
+      "system": {
+        "description": {
+          "value": "<div class=\"description \"> 一道雷鸣波从你的身体向外扫去。在以你为源点15尺立方区域内的每个生物必须进行一次体质豁免。豁免失败者将受到2d8点雷鸣伤害，并被推离10尺。豁免成功则伤害减半，且不会被推离。\n<br />此外，所有完全位于该区域内且没被固定住的物件都将被自动推离10尺。而该法术还会发出方圆300尺内都能听见的雷霆巨响。\n<br /><strong>升环施法效应。</strong>使用2环或更高法术位施展该法术时，你使用的法术位每比1环高一环，法术的伤害就增加1d8。\n<br /></div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 282",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "value": "",
+          "units": "inst"
+        },
+        "target": {
+          "affects": {
+            "choice": false
+          },
+          "template": {
+            "units": "ft",
+            "type": "cube",
+            "size": "15",
+            "contiguous": false,
+            "stationary": false
+          }
+        },
+        "range": {
+          "units": "self"
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 1,
+        "school": "evo",
+        "materials": {
+          "value": "",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "vocal",
+          "somatic",
+          "mgc"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "save",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "iQWVlYMSWrbxFN8o",
+                "onSave": false,
+                "level": {}
+              }
+            ],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "damage": {
+              "onSave": "half",
+              "parts": [
+                {
+                  "number": 2,
+                  "denomination": 8,
+                  "bonus": "",
+                  "types": [
+                    "thunder"
+                  ],
+                  "custom": {
+                    "enabled": false,
+                    "formula": ""
+                  },
+                  "scaling": {
+                    "mode": "whole",
+                    "number": 1,
+                    "formula": ""
+                  }
+                }
+              ],
+              "critical": {
+                "allow": false
+              }
+            },
+            "save": {
+              "ability": [
+                "con"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": ""
+              }
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "thunderwave",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 15600000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "qQJKIdpQjwqZlz4N",
+      "name": "灾祸术 Bane",
+      "type": "spell",
+      "flags": {
+        "midiProperties": {
+          "confirmTargets": "always",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": false,
+          "magiceffect": true,
+          "concentration": true,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "always",
+          "itemCondition": "",
+          "effectCondition": "",
+          "removeAttackDamageButtons": "default",
+          "reactionCondition": "",
+          "otherCondition": ""
+        },
+        "dnd5e": {
+          "migratedProperties": [
+            "vocal",
+            "somatic",
+            "material",
+            "concentration"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "8854545170a70e4284d349d45bd78744152efb85"
+        }
+      },
+      "img": "modules/dnd5e_classpack/Nicons/INV_Misc_Idol_02.png",
+      "effects": [
+        {
+          "name": "灾祸术 Bane",
+          "origin": "Compendium.dnd5e_classpack.new-icon.Item.XT4GwLQNAuPvtnrF",
+          "duration": {
+            "rounds": 10,
+            "startTime": null,
+            "seconds": null,
+            "combat": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "disabled": false,
+          "_id": "6aQRyiNu8nJlHL1F",
+          "changes": [
+            {
+              "key": "system.bonuses.abilities.save",
+              "mode": 2,
+              "value": "-1d4",
+              "priority": 20
+            },
+            {
+              "key": "system.bonuses.All-Attacks",
+              "mode": 2,
+              "value": "-1d4",
+              "priority": 20
+            }
+          ],
+          "description": "",
+          "transfer": false,
+          "statuses": [],
+          "flags": {
+            "dae": {
+              "disableIncapacitated": false,
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false,
+              "stackable": "noneName",
+              "showIcon": true,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": []
+            },
+            "ActiveAuras": {
+              "isAura": false,
+              "aura": "None",
+              "nameOverride": "",
+              "radius": "",
+              "alignment": "",
+              "type": "",
+              "customCheck": "",
+              "ignoreSelf": false,
+              "height": false,
+              "hidden": false,
+              "displayTemp": false,
+              "hostile": false,
+              "onlyOnce": false,
+              "wallsBlock": "system"
+            }
+          },
+          "tint": "#ffffff",
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "img": "modules/dnd5e_classpack/Nicons/INV_Misc_Idol_02.png",
+          "type": "base",
+          "system": {},
+          "sort": 0
+        }
+      ],
+      "system": {
+        "description": {
+          "value": "<div class=\"description \"> 指定施法距离内至多三个你能看见的生物，并迫使其进行一次魅力豁免。豁免失败者直至法术终止前，在每当进行攻击检定或豁免检定时，必须从投骰结果中减去一个d4。\n<br /><strong>升环施法效应。</strong>使用2环或更高法术位施展该法术时，你使用的法术位每比1环高一环，就能多指定一个目标。\n<br /></div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 216",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "value": "1",
+          "units": "minute"
+        },
+        "target": {
+          "affects": {
+            "type": "creature",
+            "count": "",
+            "choice": false,
+            "special": ""
+          },
+          "template": {
+            "units": "ft",
+            "contiguous": false,
+            "type": "",
+            "stationary": false
+          }
+        },
+        "range": {
+          "value": "30",
+          "units": "ft",
+          "special": ""
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 1,
+        "school": "enc",
+        "materials": {
+          "value": "一滴血",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "vocal",
+          "somatic",
+          "material",
+          "concentration",
+          "mgc"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "save",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "6aQRyiNu8nJlHL1F",
+                "onSave": false,
+                "level": {}
+              }
+            ],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "damage": {
+              "onSave": "half",
+              "parts": [],
+              "critical": {
+                "allow": false
+              }
+            },
+            "save": {
+              "ability": [
+                "cha"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": ""
+              }
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "bane",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 35900000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "zDoQ2Lly4fSbSYNC",
+      "name": "粉碎音波 Shatter",
+      "type": "spell",
+      "flags": {
+        "midi-qol": {
+          "AoETargetType": "any",
+          "AoETargetTypeIncludeSelf": true,
+          "autoTarget": "default",
+          "rollAttackPerTarget": "always",
+          "removeAttackDamageButtons": "default",
+          "itemCondition": "",
+          "effectCondition": "",
+          "reactionCondition": "",
+          "otherCondition": ""
+        },
+        "midiProperties": {
+          "confirmTargets": "always",
+          "saveDamage": "halfdam",
+          "bonusSaveDamage": "fulldam",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": true,
+          "magiceffect": false,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false,
+          "idr": false,
+          "idi": false,
+          "idv": false,
+          "ida": false
+        },
+        "dnd5e": {
+          "persistSourceMigration": true,
+          "migratedProperties": [
+            "vocal",
+            "somatic",
+            "material"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "7511cb9461a37cdd241aac18cba5afa44e946c98"
+        }
+      },
+      "img": "modules/dnd5e_classpack/Nicons/002607.png",
+      "effects": [],
+      "system": {
+        "description": {
+          "value": "<div class=\"description \"> 你指定施法距离内一点，并在其上忽然爆发一阵震耳欲聋的噪音。以该点为中心半径10尺球状区域内的所有生物必须要进行一次体质豁免。豁免失败者将受到3d8点雷鸣伤害；豁免成功则伤害减半。以无机物质（如石头，水晶或金属）构成的生物进行该豁免时具有劣势。\n<br />如果法术的范围内有一个不被任何生物着装携带的非魔法物件，则它也要受到该伤害。\n<br /><strong>升环施法效应。</strong>使用3环或更高法术位施展该法术时，使用的法术位每比2环高一环，法术伤害就增加1d8。\n<br /></div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 275",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "units": "inst"
+        },
+        "target": {
+          "affects": {
+            "choice": false,
+            "type": ""
+          },
+          "template": {
+            "units": "ft",
+            "type": "sphere",
+            "size": "10",
+            "contiguous": false,
+            "count": "",
+            "stationary": false
+          }
+        },
+        "range": {
+          "value": "60",
+          "units": "ft",
+          "special": ""
+        },
+        "uses": {
+          "max": "0",
+          "spent": 0,
+          "recovery": []
+        },
+        "ability": "",
+        "level": 2,
+        "school": "evo",
+        "materials": {
+          "value": "一片云母",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "vocal",
+          "somatic",
+          "material",
+          "mgc"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "save",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "damage": {
+              "onSave": "half",
+              "parts": [
+                {
+                  "custom": {
+                    "enabled": false,
+                    "formula": ""
+                  },
+                  "number": 3,
+                  "denomination": 8,
+                  "bonus": "",
+                  "types": [
+                    "thunder"
+                  ],
+                  "scaling": {
+                    "mode": "whole",
+                    "number": 1,
+                    "formula": ""
+                  }
+                }
+              ],
+              "critical": {
+                "allow": false
+              }
+            },
+            "save": {
+              "ability": [
+                "con"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": ""
+              }
+            },
+            "sort": 0,
+            "name": "",
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "shatter",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 6600000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "pPrCJ6HGQlyB31A4",
+      "name": "镜影术 Mirror Image",
+      "type": "spell",
+      "flags": {
+        "midiProperties": {
+          "confirmTargets": "always",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": false,
+          "magiceffect": false,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false,
+          "idr": false,
+          "idi": false,
+          "idv": false,
+          "ida": false
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "always",
+          "itemCondition": "",
+          "otherCondition": "",
+          "effectCondition": "",
+          "removeAttackDamageButtons": "default",
+          "reactionCondition": ""
+        },
+        "dnd5e": {
+          "persistSourceMigration": true,
+          "migratedProperties": [
+            "vocal",
+            "somatic"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "901290ac71c39a31dce817f4090cf4bc98b8a3a7"
+        }
+      },
+      "img": "modules/dnd5e_classpack/Nicons/Spell_Shaman_ElementalOath.png",
+      "effects": [
+        {
+          "name": "镜影术 Mirror Image",
+          "img": "modules/dnd5e_classpack/Nicons/Spell_Shaman_ElementalOath.png",
+          "origin": "Compendium.dnd5e_classpack.new-icon.Item.1EkQSAH6o8WMxUU3",
+          "transfer": false,
+          "_id": "gWfr0sENKE31TU0R",
+          "type": "base",
+          "system": {},
+          "changes": [],
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "seconds": 60,
+            "combat": null,
+            "rounds": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "description": "",
+          "tint": "#ffffff",
+          "statuses": [],
+          "sort": 0,
+          "flags": {
+            "dae": {
+              "enableCondition": "",
+              "disableCondition": "",
+              "disableIncapacitated": false,
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false,
+              "stackable": "multi",
+              "showIcon": false,
+              "durationExpression": "",
+              "specialDuration": []
+            },
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "core": {
+              "overlay": false
+            }
+          },
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          }
+        }
+      ],
+      "system": {
+        "description": {
+          "value": "<div class=\"description \"> 三个你自身的幻象分身出现在你的位置上。直至法术终止前，分身都会随你移动，并模仿你的动作和位置变换，使人无法追踪判断哪一个是你的真身。分身存在时，你可以用动作来解散这些幻象分身。\n<br />在法术持续时间内，每当一个生物以你为攻击目标时，掷一次d20决定该次攻击击中的是否其中一个分身。\n<br />如果你有三个分身，则你必须掷出6或更高数值才能使目标的攻击命中分身。如果你有两个分身，则你必须掷出8或更高数值。如果你有一个分身，则你必须掷出11或更高数值。\n<br />分身的AC等于10＋你的敏捷调整值。单次攻击命中分身时，相应分身立即被摧毁。分身只会被一次命中它的攻击摧毁，而无视所有其他的伤害和效应。三个分身全部被毁后该法术终止。\n<br />如果一个生物无法视物，或者它可以依靠视觉之外的其它感官（例如盲视），又或者它可以如同真实视觉一样洞察幻象，则该法术无法影响该生物。\n<br /></div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 260",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "value": "1",
+          "units": "minute"
+        },
+        "target": {
+          "affects": {
+            "type": "self",
+            "choice": false,
+            "special": ""
+          },
+          "template": {
+            "units": "ft",
+            "contiguous": false,
+            "type": "",
+            "stationary": false
+          }
+        },
+        "range": {
+          "units": "self",
+          "special": ""
+        },
+        "uses": {
+          "max": "0",
+          "spent": 0,
+          "recovery": []
+        },
+        "ability": "",
+        "level": 2,
+        "school": "ill",
+        "materials": {
+          "value": "",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "vocal",
+          "somatic",
+          "mgc"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "utility",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "gWfr0sENKE31TU0R",
+                "level": {}
+              }
+            ],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "roll": {
+              "formula": "1d20",
+              "name": "",
+              "prompt": false,
+              "visible": false
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "mirror-image",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 14600000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "bI8ZbzN82NfpZdR6",
+      "name": "催眠图纹 Hypnotic Pattern",
+      "type": "spell",
+      "flags": {
+        "dnd5e": {
+          "migratedProperties": [
+            "somatic",
+            "material",
+            "concentration"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "default",
+          "removeAttackDamageButtons": "default",
+          "itemCondition": "",
+          "reactionCondition": "",
+          "otherCondition": "",
+          "effectCondition": ""
+        },
+        "midiProperties": {
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "magicdam": false,
+          "magiceffect": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "scene-packer": {
+          "hash": "8d5a2a0290451b17275fd5288a335c2d3aff5fa0"
+        }
+      },
+      "img": "modules/dnd5e_classpack/Nicons/Spell_Nature_AstralRecal.png",
+      "effects": [
+        {
+          "name": "催眠图纹 Hypnotic Pattern",
+          "img": "modules/dnd5e_classpack/Nicons/Spell_Nature_AstralRecal.png",
+          "origin": "Compendium.dnd5e_classpack.new-icon.Item.BbpCbjCXt14a08Jp",
+          "transfer": false,
+          "_id": "6wwsIi0cjK10TtN9",
+          "type": "base",
+          "system": {},
+          "changes": [
+            {
+              "key": "system.attributes.movement.all",
+              "mode": 0,
+              "value": "0",
+              "priority": 20
+            }
+          ],
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "seconds": 60,
+            "combat": null,
+            "rounds": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "description": "",
+          "tint": "#ffffff",
+          "statuses": [
+            "charmed",
+            "incapacitated"
+          ],
+          "sort": 0,
+          "flags": {
+            "dae": {
+              "enableCondition": "",
+              "disableCondition": "",
+              "disableIncapacitated": false,
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false,
+              "stackable": "noneName",
+              "showIcon": false,
+              "durationExpression": "",
+              "specialDuration": [
+                "isDamaged"
+              ]
+            },
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "core": {
+              "overlay": false
+            },
+            "ActiveAuras": {
+              "isAura": false,
+              "aura": "None",
+              "nameOverride": "",
+              "radius": "",
+              "alignment": "",
+              "type": "",
+              "customCheck": "",
+              "ignoreSelf": false,
+              "height": false,
+              "hidden": false,
+              "displayTemp": false,
+              "hostile": false,
+              "onlyOnce": false,
+              "wallsBlock": "system",
+              "statuses": []
+            }
+          },
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          }
+        }
+      ],
+      "system": {
+        "description": {
+          "value": "<div class=\"description \"> 你在施法距离内一处边长30尺的立方区域内创造出一个在空中舞动旋转的彩色图纹。图纹在出现片刻后消失，然后迫使区域内每个看到它的生物进行一次感知豁免，豁免失败者将在法术持续时间内被魅惑。被该法术魅惑的生物陷入失能状态，且速度降为0。\n<br />如果受术生物受到任何伤害，或者他人将其从恍惚中摇醒，则该法术在其身上的效应终止。\n<br /></div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 252",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "value": "1",
+          "units": "minute"
+        },
+        "target": {
+          "affects": {
+            "choice": false,
+            "type": ""
+          },
+          "template": {
+            "units": "ft",
+            "type": "cube",
+            "size": "30",
+            "contiguous": false,
+            "count": "",
+            "stationary": false
+          }
+        },
+        "range": {
+          "value": "120",
+          "units": "ft",
+          "special": ""
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 3,
+        "school": "ill",
+        "materials": {
+          "value": "一根点燃的熏香或一个装有磷光材料的水晶小瓶",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "somatic",
+          "material",
+          "concentration"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "save",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "6wwsIi0cjK10TtN9",
+                "onSave": false,
+                "level": {}
+              }
+            ],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "damage": {
+              "onSave": "half",
+              "parts": [],
+              "critical": {
+                "allow": false
+              }
+            },
+            "save": {
+              "ability": [
+                "wis"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": ""
+              }
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "hypnotic-pattern",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 2500000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "SlHANiw9iuYGZ0o2",
+      "name": "恐惧术 Fear",
+      "type": "spell",
+      "flags": {
+        "midi-qol": {
+          "AoETargetType": "any",
+          "AoETargetTypeIncludeSelf": true,
+          "autoTarget": "default",
+          "rollAttackPerTarget": "always",
+          "itemCondition": "",
+          "effectCondition": "",
+          "removeAttackDamageButtons": "default",
+          "reactionCondition": "",
+          "otherCondition": ""
+        },
+        "midiProperties": {
+          "confirmTargets": "always",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": false,
+          "magiceffect": false,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "dnd5e": {
+          "migratedProperties": [
+            "vocal",
+            "somatic",
+            "material",
+            "concentration"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "e2e915e4ffa9b4795894dde19753b8843c0b8d4f"
+        }
+      },
+      "img": "modules/dnd5e_classpack/Nicons/Ability_Druid_Cower.png",
+      "effects": [
+        {
+          "changes": [
+            {
+              "key": "flags.midi-qol.disadvantage.attack.all",
+              "mode": 0,
+              "value": "1",
+              "priority": 0
+            },
+            {
+              "key": "flags.midi-qol.disadvantage.ability.check.all",
+              "mode": 0,
+              "value": "1",
+              "priority": 0
+            }
+          ],
+          "description": "<p>- A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight.<br />- The creature can't willingly move closer to the source of its fear.</p>",
+          "disabled": false,
+          "duration": {
+            "rounds": 10,
+            "seconds": null,
+            "turns": null,
+            "startTime": null,
+            "combat": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "flags": {
+            "dfreds-convenient-effects": {
+              "isConvenient": true,
+              "isDynamic": false,
+              "isViewable": true,
+              "nestedEffects": [],
+              "subEffects": []
+            },
+            "dae": {
+              "disableIncapacitated": false,
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false,
+              "stackable": "noneName",
+              "showIcon": false,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": []
+            },
+            "ActiveAuras": {
+              "isAura": false,
+              "aura": "None",
+              "nameOverride": "",
+              "radius": "",
+              "alignment": "",
+              "type": "",
+              "customCheck": "",
+              "ignoreSelf": false,
+              "height": false,
+              "hidden": false,
+              "displayTemp": false,
+              "hostile": false,
+              "onlyOnce": false,
+              "wallsBlock": "system"
+            }
+          },
+          "name": "Frightened",
+          "origin": "Compendium.dnd5e_classpack.new-icon.Item.wnJNHkm5kThiJixx",
+          "tint": "#ffffff",
+          "transfer": false,
+          "statuses": [
+            "Convenient Effect: Frightened",
+            "frightened"
+          ],
+          "_id": "ASS1FHZ3LhFQTteZ",
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "img": "modules/dfreds-convenient-effects/images/frightened.svg",
+          "type": "base",
+          "system": {},
+          "sort": 0
+        }
+      ],
+      "system": {
+        "description": {
+          "value": "<div class=\"description \"> 你制造一个目标最惧怕的幻象，并迫使30尺锥状区域内的所有生物进行一次感知豁免，豁免失败者将丢弃其所有持握物，并在法术持续时间内陷入恐慌。\n<br />被法术恐慌的生物必须在其回合内执行疾走Dash 动作，并以此寻找最安全的路线远离施法者，直至其无路可走为止。如果该生物在施法者视野外结束其回合，则其可以再进行一次感知豁免，豁免成功则法术对该生物的效应终止。\n<br /></div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 239",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "value": "1",
+          "units": "minute"
+        },
+        "target": {
+          "affects": {
+            "choice": false,
+            "type": ""
+          },
+          "template": {
+            "units": "ft",
+            "type": "cone",
+            "size": "30",
+            "contiguous": false,
+            "count": "",
+            "stationary": false
+          }
+        },
+        "range": {
+          "units": "self",
+          "special": ""
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 3,
+        "school": "ill",
+        "materials": {
+          "value": "一片白羽毛或一颗母鸡心",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "vocal",
+          "somatic",
+          "material",
+          "concentration",
+          "mgc"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "save",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "ASS1FHZ3LhFQTteZ",
+                "onSave": false,
+                "level": {}
+              }
+            ],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "damage": {
+              "onSave": "half",
+              "parts": [],
+              "critical": {
+                "allow": false
+              }
+            },
+            "save": {
+              "ability": [
+                "wis"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": ""
+              }
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "fear",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 15200000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "ZIHbjp5Gy6Sn5G6a",
+      "name": "法术反制 Counterspell",
+      "type": "spell",
+      "img": "modules/dnd5e_classpack/Nicons/Spell_Arcane_Arcane01.png",
+      "effects": [],
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 4500000,
+      "flags": {
+        "midiProperties": {
+          "confirmTargets": "always",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": false,
+          "magiceffect": false,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "always",
+          "itemCondition": "",
+          "reactionCondition": "",
+          "otherCondition": "",
+          "effectCondition": "",
+          "removeAttackDamageButtons": "default"
+        },
+        "dnd5e": {
+          "migratedProperties": [
+            "somatic"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "7f3692c9f28aa6ed667b5acf6dbdb3874bd4180a"
+        }
+      },
+      "system": {
+        "description": {
+          "value": "<div class=\"description \"> 你试图打断一个生物正在施展的一个法术。如果该生物正在施展3环或更低环阶法术，则其法术失败且不产生任何效应。如果该生物正在施展4环或更高环阶法术，则你以施法关键属性进行一次属性检定，其检定DC 等于10＋目标法术的环阶。检定成功则目标法术失败且不产生任何效应。\n<br /><strong>升环施法效应。</strong>使用4环或更高法术位施展该法术时，如果被打断法术的环阶不高于你所用的法术位环阶，则该目标法术直接被打断。\n<br /></div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 228",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "reaction",
+          "condition": "当你看见身边 60 尺范围内一个生物施展法术时执行",
+          "value": 1
+        },
+        "duration": {
+          "value": "",
+          "units": "inst"
+        },
+        "target": {
+          "affects": {
+            "type": "creature",
+            "count": "1",
+            "choice": false
+          },
+          "template": {
+            "units": "ft",
+            "contiguous": false,
+            "stationary": false
+          }
+        },
+        "range": {
+          "value": "60",
+          "units": "ft"
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 3,
+        "school": "abj",
+        "materials": {
+          "value": "",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "somatic",
+          "mgc"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "utility",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "roll": {
+              "formula": "1d20 + @mod",
+              "name": "",
+              "prompt": false,
+              "visible": false
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "counterspell",
+        "method": "spell",
+        "prepared": 1
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "BlmMBA9jOm2l8QVd",
+      "name": "心灵尖刺Mind Spike",
+      "type": "spell",
+      "flags": {
+        "midiProperties": {
+          "confirmTargets": "always",
+          "saveDamage": "fulldam",
+          "bonusSaveDamage": "fulldam",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": true,
+          "magiceffect": true,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "always",
+          "removeAttackDamageButtons": "default",
+          "itemCondition": "",
+          "effectCondition": "",
+          "reactionCondition": "",
+          "otherCondition": ""
+        },
+        "dnd5e": {
+          "migratedProperties": [
+            "somatic",
+            "concentration"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "9df957043b7e26c003b3c805b99415a6aceeccfe"
+        }
+      },
+      "img": "icons/skills/melee/strike-dagger-arcane-pink.webp",
+      "effects": [
+        {
+          "origin": "Compendium.dnd5e_classpack.new-icon.Item.s8UCeuM4ylInooTb",
+          "duration": {
+            "rounds": 1,
+            "startTime": null,
+            "seconds": null,
+            "combat": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "disabled": false,
+          "_id": "ycS1ja3b3SRwyRGJ",
+          "changes": [
+            {
+              "key": "system.bonuses.abilities.save",
+              "mode": 2,
+              "value": "-1d4",
+              "priority": 20
+            }
+          ],
+          "tint": "#ffffff",
+          "transfer": false,
+          "flags": {
+            "dfreds-convenient-effects": {
+              "description": ""
+            },
+            "dae": {
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "stackable": "multi",
+              "durationExpression": "",
+              "specialDuration": [
+                "isSave"
+              ]
+            },
+            "core": {
+              "statusId": "12431243"
+            },
+            "ActiveAuras": {
+              "isAura": false,
+              "aura": "None",
+              "radius": "",
+              "alignment": "",
+              "type": "",
+              "ignoreSelf": false,
+              "height": false,
+              "hidden": false,
+              "displayTemp": false,
+              "hostile": false,
+              "onlyOnce": false
+            }
+          },
+          "name": "心灵之楔 Mind Sliver（TCE）",
+          "description": "",
+          "statuses": [],
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "img": "modules/dnd5e_classpack/Nicons/ability_demonhunter_soulcleave2.jpg",
+          "type": "base",
+          "system": {},
+          "sort": 0
+        }
+      ],
+      "system": {
+        "description": {
+          "value": "<p>你接触施法距离内一个你可见生物的内心。目标必须进行感知豁免检定，若失败会受到3d8精神伤害，成功则只承受一半。在目标豁免失败时，你在法术结束之前能时刻得知目标所在的位置，只要你们还处于同一位面上。当你拥有这个信息时，目标将不能对你躲藏，并且如果它隐形了，在对抗你时它不能从这个状态中受益。</p>\n<p><strong>升环效果：</strong>当你使用3环或更高的法术位施放该法术时，使用的法术位每高一环，伤害就增加1d8。</p>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "XGE",
+          "revision": 1,
+          "rules": "2014",
+          "book": "XGE"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "value": "1",
+          "units": "hour"
+        },
+        "target": {
+          "affects": {
+            "type": "creature",
+            "count": "1",
+            "choice": false,
+            "special": ""
+          },
+          "template": {
+            "units": "ft",
+            "contiguous": false,
+            "type": "",
+            "stationary": false
+          }
+        },
+        "range": {
+          "value": "60",
+          "units": "ft",
+          "special": ""
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 2,
+        "school": "div",
+        "materials": {
+          "value": "",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "somatic",
+          "concentration"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "save",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "ycS1ja3b3SRwyRGJ",
+                "onSave": false,
+                "level": {}
+              }
+            ],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "damage": {
+              "onSave": "half",
+              "parts": [
+                {
+                  "number": 3,
+                  "denomination": 8,
+                  "bonus": "",
+                  "types": [
+                    "psychic"
+                  ],
+                  "custom": {
+                    "enabled": false,
+                    "formula": ""
+                  },
+                  "scaling": {
+                    "mode": "whole",
+                    "number": 1,
+                    "formula": ""
+                  }
+                }
+              ],
+              "critical": {
+                "allow": false
+              }
+            },
+            "save": {
+              "ability": [
+                "wis"
+              ],
+              "dc": {
+                "calculation": "spellcasting",
+                "formula": ""
+              }
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "mind-spike",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "uCsiJvZQjqz2QNRl",
+      "sort": 15000000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "name": "吸收元素 Absorb Elements",
+      "type": "spell",
+      "flags": {
+        "midiProperties": {
+          "confirmTargets": "always",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": false,
+          "magiceffect": true,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "always",
+          "removeAttackDamageButtons": "default",
+          "itemCondition": "",
+          "reactionCondition": "",
+          "effectCondition": "",
+          "otherCondition": "",
+          "onUseMacroName": "[postActiveEffects]ItemMacro"
+        },
+        "dnd5e": {
+          "migratedProperties": [
+            "somatic"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "dae": {
+          "macro": {
+            "name": "吸收元素 Absorb Elements",
+            "img": "icons/magic/control/silhouette-hold-change-blue.webp",
+            "type": "script",
+            "scope": "global",
+            "command": "const version = \"11.0.7\";\ntry {\n  let tactor;\n  let itemName = args[0].itemData.name;\n  if (args[0].tokenUuid) tactor = (await fromUuid(args[0].tokenUuid)).actor;\n  else tactor = game.actors.get(args[0].actorId);\n\n  let dialog = new Promise((resolve, reject) => {\n      new Dialog({\n          title: 'Choose a damage type',\n          content: `\n            <form class=\"flexcol\">\n              <div class=\"form-group\">\n                <select id=\"element\">\n                  <option value=\"acid\">Acid</option>\n                  <option value=\"cold\">Cold</option>\n                  <option value=\"fire\">Fire</option>\n                  <option value=\"lightning\">Lightning</option>\n                  <option value=\"thunder\">Thunder</option>\n                </select>\n              </div>\n            </form>\n          `,\n          //select element type\n          buttons: {\n              yes: {\n                  icon: '<i class=\"fas fa-bolt\"></i>',\n                  label: 'Select',\n                  callback: async (html) => {\n                      let element = html.find('#element').val();\n                      let effect =  tactor.effects.find(i => i.label === itemName);\n                      let changes = duplicate(effect.changes);\n                      changes[0].value = `${Math.max(1, args[0].spellLevel)}d6[${element}]`;\n                      changes[1].value = `${Math.max(1,args[0].spellLevel)}d6[${element}]`;\n                      await effect.update({changes});\n                      effect =  tactor.effects.find(i => i.label === `${itemName} Resistance`);\n                      changes = duplicate(effect.changes);\n                      changes[0].value = element;\n                      await effect.update({changes});\n                      resolve();\n                  },\n              },\n          }\n      }).render(true);\n  })\n  await dialog;\n} catch (err) {\n    console.error(`${itemName} - Absorb Elements ${version}`, err);\n}",
+            "author": "WqWGW8MuBm7BNHxt",
+            "ownership": {
+              "default": 3
+            },
+            "_id": null,
+            "folder": null,
+            "sort": 0,
+            "flags": {},
+            "_stats": {
+              "coreVersion": "12.343",
+              "systemId": "dnd5e",
+              "systemVersion": "4.3.9",
+              "createdTime": null,
+              "modifiedTime": null,
+              "lastModifiedBy": null,
+              "compendiumSource": null,
+              "duplicateSource": null
+            }
+          }
+        },
+        "scene-packer": {
+          "hash": "f318f91169ae83addbc1233fc250ae8bf7d27578"
+        }
+      },
+      "img": "icons/magic/control/silhouette-hold-change-blue.webp",
+      "_id": "wtgBsKRC7C1R2yRz",
+      "effects": [
+        {
+          "name": "吸收元素 Absorb Elements",
+          "img": "icons/magic/control/silhouette-hold-change-blue.webp",
+          "origin": "Compendium.dnd5e_classpack.new-icon.Item.UQuDHLKUVMyZIiTn",
+          "_id": "VQcYXWMVQ1IDg4Kx",
+          "type": "base",
+          "system": {},
+          "changes": [
+            {
+              "key": "system.bonuses.msak.damage",
+              "mode": 2,
+              "value": "0",
+              "priority": 20
+            },
+            {
+              "key": "system.bonuses.mwak.damage",
+              "mode": 2,
+              "value": "0",
+              "priority": 20
+            }
+          ],
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "seconds": null,
+            "combat": null,
+            "rounds": null,
+            "turns": 1,
+            "startRound": null,
+            "startTurn": null
+          },
+          "description": "",
+          "tint": "#ffffff",
+          "transfer": false,
+          "statuses": [],
+          "sort": 0,
+          "flags": {
+            "dae": {
+              "disableCondition": "",
+              "disableIncapacitated": false,
+              "stackable": "noneName",
+              "showIcon": false,
+              "durationExpression": "",
+              "specialDuration": [
+                "1Hit:mwak",
+                "1Hit:msak"
+              ],
+              "enableCondition": "",
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false
+            },
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "core": {
+              "overlay": false
+            },
+            "ActiveAuras": {
+              "isAura": false,
+              "aura": "None",
+              "nameOverride": "",
+              "radius": "",
+              "alignment": "",
+              "type": "",
+              "customCheck": "",
+              "ignoreSelf": false,
+              "height": false,
+              "hidden": false,
+              "displayTemp": false,
+              "hostile": false,
+              "onlyOnce": false,
+              "wallsBlock": "system",
+              "statuses": []
+            }
+          },
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          }
+        },
+        {
+          "name": "吸收元素 Absorb Elements Resistance",
+          "img": "icons/magic/control/silhouette-hold-change-blue.webp",
+          "origin": "Compendium.dnd5e_classpack.new-icon.Item.UQuDHLKUVMyZIiTn",
+          "_id": "B02H8ldCyC7qrG1y",
+          "type": "base",
+          "system": {},
+          "changes": [
+            {
+              "key": "system.traits.dr.value",
+              "mode": 2,
+              "value": "fire",
+              "priority": 20
+            }
+          ],
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "seconds": null,
+            "combat": null,
+            "rounds": null,
+            "turns": 1,
+            "startRound": null,
+            "startTurn": null
+          },
+          "description": "",
+          "tint": "#ffffff",
+          "transfer": false,
+          "statuses": [],
+          "sort": 0,
+          "flags": {
+            "dae": {
+              "disableCondition": "",
+              "disableIncapacitated": false,
+              "stackable": "noneName",
+              "showIcon": false,
+              "durationExpression": "",
+              "specialDuration": [
+                "None"
+              ],
+              "enableCondition": "",
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false
+            },
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "core": {
+              "overlay": false
+            },
+            "ActiveAuras": {
+              "isAura": false,
+              "aura": "None",
+              "nameOverride": "",
+              "radius": "",
+              "alignment": "",
+              "type": "",
+              "customCheck": "",
+              "ignoreSelf": false,
+              "height": false,
+              "hidden": false,
+              "displayTemp": false,
+              "hostile": false,
+              "onlyOnce": false,
+              "wallsBlock": "system",
+              "statuses": []
+            }
+          },
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          }
+        }
+      ],
+      "system": {
+        "description": {
+          "value": "<p>此法术捕获了部分袭来的能量，减轻它对你的效果，并将之储存起来以用在你的下一次近战攻击中。在你的下个回合的开始之前，你对于触发法术的伤害类型具有抗力。此外，在你的下个回合，第一次以近战攻击命中时，目标额外受到1d6点触发法术的伤害类型的伤害，同时此法术终结。</p>\n<p><strong>升环效果：</strong>当你使用2环或更高的法术位施放该法术时，使用的法术位每高一环，额外伤害便增加1d6。</p>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "XGE",
+          "revision": 1,
+          "rules": "2014",
+          "book": "XGE"
+        },
+        "activation": {
+          "type": "reaction",
+          "condition": "于你受到强酸，寒冷，火焰，电击或雷鸣伤害时进行",
+          "value": 1
+        },
+        "duration": {
+          "value": "1",
+          "units": "round"
+        },
+        "target": {
+          "affects": {
+            "type": "self",
+            "count": "",
+            "choice": false,
+            "special": ""
+          },
+          "template": {
+            "units": "ft",
+            "contiguous": false,
+            "type": "",
+            "stationary": false
+          }
+        },
+        "range": {
+          "units": "self",
+          "special": ""
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 1,
+        "school": "abj",
+        "materials": {
+          "value": "",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "somatic",
+          "mgc"
+        ],
+        "activities": {
+          "nAlToOuDOe4Nsrug": {
+            "type": "utility",
+            "_id": "nAlToOuDOe4Nsrug",
+            "sort": 0,
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [
+              {
+                "_id": "VQcYXWMVQ1IDg4Kx",
+                "level": {}
+              },
+              {
+                "_id": "B02H8ldCyC7qrG1y",
+                "level": {}
+              }
+            ],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false,
+              "prompt": true
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": [],
+              "max": ""
+            },
+            "roll": {
+              "prompt": false,
+              "visible": false,
+              "name": "",
+              "formula": ""
+            },
+            "useConditionText": "reaction === \"isDamaged\"",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "name": "",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "absorb-elements",
+        "method": "spell",
+        "prepared": 1
+      },
+      "folder": "uCsiJvZQjqz2QNRl",
+      "sort": 14700000,
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "lUpCQjF188PBhjra",
+      "name": "魔法伎俩 Prestidigitation",
+      "type": "spell",
+      "img": "modules/dnd5e_classpack/Nicons/Spell_Frost_ManaBurn.png",
+      "effects": [],
+      "folder": "hSoScUNgYYqpKuFk",
+      "sort": 19800000,
+      "flags": {
+        "midiProperties": {
+          "confirmTargets": "always",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": false,
+          "magiceffect": false,
+          "concentration": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "always",
+          "itemCondition": "",
+          "effectCondition": "",
+          "removeAttackDamageButtons": "default",
+          "reactionCondition": "",
+          "otherCondition": ""
+        },
+        "dnd5e": {
+          "migratedProperties": [
+            "vocal",
+            "somatic"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "6340bd72fa15a3488f83ec88a1be744f5835d8c9"
+        }
+      },
+      "system": {
+        "description": {
+          "value": "<div class=\"description \"> 该法术是一个初级施法者用来练习的魔法小伎俩。你在施法距离内创造下列魔法效果中的一种：\n<br />你创造一个立即生效的，无害的感观效应，比如一束火花，一阵风，微弱音乐或古怪的臭味。\n<br />你立即点燃或熄灭一支蜡烛，一支火把或一小型营火。\n<br />你立即使一个不大于1立方尺的物件变得清洁或肮脏。\n<br />你立即使一个不大于1立方尺的非活体物质变得冰冷、温暖或对其调味，其效应持续1小时。\n<br />你在一个物件或一个表面上创造一块色斑，或者一个记号，又或者一个标志，其效应持续1小时。\n<br />你创造一个巴掌大小的非魔法小玩意或一个虚幻图像，其效应持续到你下回合结束。\n<br />如果你多次施展该法术，则可以同时维持至多三个不同的非即时效应，并且可以用一个动作解散其中一种效应。\n<br /></div>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 267",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "activation": {
+          "type": "action",
+          "condition": "",
+          "value": 1
+        },
+        "duration": {
+          "value": "1",
+          "units": "hour"
+        },
+        "target": {
+          "affects": {
+            "choice": false,
+            "type": ""
+          },
+          "template": {
+            "units": "ft",
+            "contiguous": false,
+            "type": "",
+            "stationary": false
+          }
+        },
+        "range": {
+          "value": "10",
+          "units": "ft",
+          "special": ""
+        },
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": null
+        },
+        "ability": "",
+        "level": 0,
+        "school": "trs",
+        "materials": {
+          "value": "",
+          "consumed": false,
+          "cost": 0,
+          "supply": 0
+        },
+        "properties": [
+          "vocal",
+          "somatic",
+          "mgc"
+        ],
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "utility",
+            "activation": {
+              "type": "action",
+              "value": null,
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "override": false,
+              "units": "self"
+            },
+            "target": {
+              "prompt": true,
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "roll": {
+              "formula": "",
+              "name": "",
+              "prompt": false,
+              "visible": false
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "prestidigitation",
+        "method": "spell",
+        "prepared": 1
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "VHUXGP9wMn90UwTq",
+      "name": "镶钉皮甲 Studded Leather Armor",
+      "type": "equipment",
+      "img": "icons/equipment/chest/breastplate-rivited-red.webp",
+      "effects": [],
+      "folder": "Fg7afQDTDUg3r5kp",
+      "flags": {
+        "core": {},
+        "midiProperties": {
+          "confirmTargets": "default",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": false,
+          "magiceffect": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false,
+          "idr": false,
+          "idi": false,
+          "idv": false,
+          "ida": false
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "default",
+          "itemCondition": "",
+          "effectCondition": "",
+          "removeAttackDamageButtons": "default",
+          "reactionCondition": "",
+          "otherCondition": ""
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "scene-packer": {
+          "hash": "e8b040e27beb6c18088036381d7eca467d09123e"
+        }
+      },
+      "system": {
+        "description": {
+          "value": "该护甲由坚固而柔韧的皮革制成，其表面由紧密的铆钉和尖刺进行加固。",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 144",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "quantity": 1,
+        "weight": {
+          "value": 13,
+          "units": "lb"
+        },
+        "price": {
+          "value": 45,
+          "denomination": "gp"
+        },
+        "attunement": "",
+        "rarity": "",
+        "identified": true,
+        "cover": null,
+        "uses": {
+          "max": "",
+          "spent": null,
+          "recovery": []
+        },
+        "armor": {
+          "value": 12,
+          "dex": null
+        },
+        "hp": {
+          "value": 0,
+          "max": 0,
+          "dt": null,
+          "conditions": ""
+        },
+        "speed": {
+          "value": null,
+          "conditions": "",
+          "units": "ft"
+        },
+        "strength": null,
+        "proficient": null,
+        "unidentified": {
+          "description": ""
+        },
+        "type": {
+          "value": "light",
+          "baseItem": "studded"
+        },
+        "container": null,
+        "properties": [],
+        "activities": {},
+        "identifier": "-studded-leather-armor",
+        "attuned": false,
+        "equipped": true,
+        "crew": {
+          "value": []
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "sort": 1000000,
+      "ownership": {
+        "default": 0
+      }
+    }
+  ],
+  "effects": [],
+  "folder": "p3Hayf0ZmslvxV12",
+  "flags": {
+    "scene-packer": {
+      "sourceId": "Actor.xSz4PtDQIIhYFeAF",
+      "hash": "2004fd5f10e3f9204d06dd7b47e709743d24f5a4"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Actor.xSz4PtDQIIhYFeAF",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788842066266,
+    "modifiedTime": 1788842066266,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

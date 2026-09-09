@@ -1,0 +1,1875 @@
+{
+  "name": "战地督军 Battle Warlord",
+  "type": "npc",
+  "img": "modules/longhua-dm-toolkit/assets/si-she/%E6%88%98%E5%9C%BA%E7%9D%A3%E5%86%9B.webp",
+  "system": {
+    "currency": {
+      "pp": 0,
+      "gp": 0,
+      "ep": 0,
+      "sp": 0,
+      "cp": 0
+    },
+    "abilities": {
+      "str": {
+        "value": 16,
+        "proficient": 1,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "save": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "max": null
+      },
+      "dex": {
+        "value": 14,
+        "proficient": 0,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "save": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "max": null
+      },
+      "con": {
+        "value": 14,
+        "proficient": 0,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "save": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "max": null
+      },
+      "int": {
+        "value": 10,
+        "proficient": 0,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "save": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "max": null
+      },
+      "wis": {
+        "value": 12,
+        "proficient": 1,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "save": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "max": null
+      },
+      "cha": {
+        "value": 16,
+        "proficient": 1,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "save": {
+          "roll": {
+            "mode": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "max": null
+      }
+    },
+    "bonuses": {
+      "mwak": {
+        "attack": "",
+        "damage": ""
+      },
+      "rwak": {
+        "attack": "",
+        "damage": ""
+      },
+      "msak": {
+        "attack": "",
+        "damage": ""
+      },
+      "rsak": {
+        "attack": "",
+        "damage": ""
+      },
+      "abilities": {
+        "check": "",
+        "save": "",
+        "skill": ""
+      },
+      "spell": {
+        "dc": ""
+      }
+    },
+    "skills": {
+      "ath": {
+        "value": 1,
+        "ability": "str",
+        "bonuses": {
+          "check": "",
+          "passive": ""
+        },
+        "roll": {
+          "mode": 0,
+          "min": null,
+          "max": null
+        }
+      },
+      "ins": {
+        "value": 1,
+        "ability": "wis",
+        "bonuses": {
+          "check": "",
+          "passive": ""
+        },
+        "roll": {
+          "mode": 0,
+          "min": null,
+          "max": null
+        }
+      },
+      "itm": {
+        "value": 1,
+        "ability": "cha",
+        "bonuses": {
+          "check": "",
+          "passive": ""
+        },
+        "roll": {
+          "mode": 0,
+          "min": null,
+          "max": null
+        }
+      }
+    },
+    "tools": {},
+    "spells": {
+      "spell1": {
+        "value": 0
+      },
+      "spell2": {
+        "value": 0
+      },
+      "spell3": {
+        "value": 0
+      },
+      "spell4": {
+        "value": 0
+      },
+      "spell5": {
+        "value": 0
+      },
+      "spell6": {
+        "value": 0
+      },
+      "spell7": {
+        "value": 0
+      },
+      "spell8": {
+        "value": 0
+      },
+      "spell9": {
+        "value": 0
+      },
+      "pact": {
+        "value": 0
+      }
+    },
+    "attributes": {
+      "ac": {
+        "calc": "default",
+        "flat": 18,
+        "formula": ""
+      },
+      "hp": {
+        "value": 75,
+        "max": 75,
+        "temp": 0,
+        "tempmax": 0,
+        "formula": "10d8 + 30"
+      },
+      "init": {
+        "ability": "dex",
+        "bonus": "0",
+        "roll": {
+          "mode": 0,
+          "min": null,
+          "max": null
+        }
+      },
+      "movement": {
+        "burrow": "0",
+        "climb": "0",
+        "fly": "0",
+        "swim": "0",
+        "walk": "30",
+        "units": "ft",
+        "hover": false,
+        "ignoredDifficultTerrain": []
+      },
+      "senses": {
+        "units": "ft",
+        "special": "",
+        "ranges": {
+          "darkvision": 0,
+          "blindsight": 0,
+          "tremorsense": 0,
+          "truesight": 0
+        }
+      },
+      "spellcasting": "",
+      "exhaustion": 0,
+      "concentration": {
+        "ability": "",
+        "roll": {
+          "mode": 0,
+          "min": null,
+          "max": null
+        },
+        "bonuses": {
+          "save": ""
+        },
+        "limit": 1
+      },
+      "spell": {
+        "level": 0
+      },
+      "attunement": {
+        "max": 3
+      },
+      "loyalty": {},
+      "hd": {
+        "spent": 0
+      },
+      "death": {
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "success": 0,
+        "failure": 0,
+        "bonuses": {
+          "save": ""
+        }
+      },
+      "price": {
+        "value": null,
+        "denomination": "gp"
+      }
+    },
+    "details": {
+      "biography": {
+        "value": "<p>自带双重光环的恐怖指挥官。只要他在场，周围所有的杂兵不仅跑得飞快，而且硬得像一块铁板。</p>",
+        "public": ""
+      },
+      "alignment": "守序邪恶",
+      "type": {
+        "value": "humanoid",
+        "subtype": "任意种族",
+        "swarm": "",
+        "custom": ""
+      },
+      "cr": 4,
+      "ideal": "",
+      "bond": "",
+      "flaw": "",
+      "race": null,
+      "habitat": {
+        "value": [],
+        "custom": ""
+      },
+      "treasure": {
+        "value": []
+      }
+    },
+    "resources": {
+      "legact": {
+        "max": 0,
+        "spent": 0
+      },
+      "legres": {
+        "max": 0,
+        "spent": 0
+      },
+      "lair": {
+        "value": false,
+        "initiative": null,
+        "inside": false
+      }
+    },
+    "source": {
+      "revision": 1,
+      "rules": "2014"
+    },
+    "traits": {
+      "size": "med",
+      "di": {
+        "value": [],
+        "custom": "",
+        "bypasses": []
+      },
+      "dr": {
+        "value": [],
+        "custom": "",
+        "bypasses": []
+      },
+      "dv": {
+        "value": [],
+        "custom": "",
+        "bypasses": []
+      },
+      "ci": {
+        "value": [
+          "frightened"
+        ],
+        "custom": ""
+      },
+      "languages": {
+        "value": [
+          "common"
+        ],
+        "custom": "",
+        "communication": {}
+      },
+      "dm": {
+        "amount": {},
+        "bypasses": []
+      },
+      "important": false
+    }
+  },
+  "prototypeToken": {
+    "name": "战地督军",
+    "displayName": 20,
+    "actorLink": false,
+    "width": 1,
+    "height": 1,
+    "texture": {
+      "src": "modules/longhua-dm-toolkit/assets/si-she/%E6%88%98%E5%9C%BA%E7%9D%A3%E5%86%9B.webp",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "offsetX": 0,
+      "offsetY": 0,
+      "fit": "contain",
+      "scaleX": 1,
+      "scaleY": 1,
+      "rotation": 0,
+      "tint": "#ffffff",
+      "alphaThreshold": 0.75
+    },
+    "lockRotation": false,
+    "rotation": 0,
+    "alpha": 1,
+    "disposition": -1,
+    "displayBars": 20,
+    "bar1": {
+      "attribute": "attributes.hp"
+    },
+    "bar2": {
+      "attribute": null
+    },
+    "light": {
+      "negative": false,
+      "priority": 0,
+      "alpha": 0.5,
+      "angle": 360,
+      "bright": 0,
+      "color": null,
+      "coloration": 1,
+      "dim": 0,
+      "attenuation": 0.5,
+      "luminosity": 0.5,
+      "saturation": 0,
+      "contrast": 0,
+      "shadows": 0,
+      "animation": {
+        "type": null,
+        "speed": 5,
+        "intensity": 5,
+        "reverse": false
+      },
+      "darkness": {
+        "min": 0,
+        "max": 1
+      }
+    },
+    "sight": {
+      "enabled": true,
+      "range": 60,
+      "angle": 360,
+      "visionMode": "basic",
+      "color": null,
+      "attenuation": 0.1,
+      "brightness": 0,
+      "saturation": 0,
+      "contrast": 0
+    },
+    "detectionModes": [],
+    "occludable": {
+      "radius": 0
+    },
+    "ring": {
+      "enabled": false,
+      "colors": {
+        "ring": null,
+        "background": null
+      },
+      "effects": 0,
+      "subject": {
+        "scale": 1,
+        "texture": null
+      }
+    },
+    "turnMarker": {
+      "mode": 1,
+      "animation": null,
+      "src": null,
+      "disposition": false
+    },
+    "movementAction": null,
+    "flags": {
+      "monks-tokenbar": {
+        "include": "default"
+      },
+      "splatter": {
+        "bloodColor": ""
+      },
+      "wall-height": {
+        "tokenHeight": 0
+      },
+      "patrol": {
+        "enablePatrol": false,
+        "enableSpotting": false,
+        "makePatroller": false,
+        "multiPath": false,
+        "patrolPathName": "",
+        "pathNodeIndex": "0"
+      },
+      "swarm": {
+        "isSwarm": false,
+        "swarmSize": 20,
+        "swarmSpeed": 1,
+        "animation": "circular"
+      },
+      "Rideable": {
+        "issetRideableFlag": true,
+        "MaxRiderFlag": null,
+        "CustomRidingheightFlag": null,
+        "UseRidingHeightFlag": true,
+        "RidersScaleFlag": 1,
+        "RiderPositioningFlag": "RowPlacement",
+        "RiderOffsetFlag": [
+          0,
+          0
+        ],
+        "TokenFormFlag": "TokenFormCircle",
+        "InsideMovementFlag": false,
+        "SpawnRidersFlag": "",
+        "WorldMEffectOverrideFlag": false,
+        "MountingEffectsFlag": "",
+        "SelfApplyEffectsFlag": false,
+        "forMountEffectsFlag": "",
+        "CanbePilotedFlag": false,
+        "CheckPilotedCollisionFlag": false,
+        "PilotedbyDefaultFlag": false
+      },
+      "healthEstimate": {
+        "dontMarkDead": false,
+        "hideHealthEstimate": false,
+        "hideName": false
+      }
+    },
+    "randomImg": false,
+    "appendNumber": false,
+    "prependAdjective": true
+  },
+  "items": [
+    {
+      "name": "多重攻击 Multiattack",
+      "type": "feat",
+      "_id": "ItemMulti0000000",
+      "img": "icons/skills/melee/hand-grip-staff-yellow-brown.webp",
+      "system": {
+        "description": {
+          "value": "<p>督军进行两次长剑攻击。他可以使用【指挥官打击】来代替其中一次攻击。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {
+          "actMulti00000000": {
+            "_id": "actMulti00000000",
+            "type": "utility",
+            "activation": {
+              "type": "action",
+              "value": 1,
+              "override": false
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {},
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "units": "self",
+              "override": false
+            },
+            "target": {
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false,
+              "prompt": true
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": []
+            },
+            "roll": {
+              "prompt": false,
+              "visible": false
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "name": "冲锋阵型 Charge Aura",
+      "type": "feat",
+      "_id": "ItemAura00000000",
+      "img": "icons/magic/movement/trail-streak-zigzag-yellow.webp",
+      "system": {
+        "description": {
+          "value": "<p>督军散发着令人振奋的战意。任何友方生物如果在督军身边 <strong>15 尺内</strong>，它的 <strong>步行速度增加 10 尺</strong>。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {},
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "effects": [
+        {
+          "_id": "EffectAura000000",
+          "name": "冲锋阵型 (+10尺移速)",
+          "type": "auraeffects.aura",
+          "img": "icons/magic/movement/trail-streak-zigzag-yellow.webp",
+          "changes": [
+            {
+              "key": "system.attributes.movement.walk",
+              "mode": 2,
+              "value": "10",
+              "priority": 20
+            }
+          ],
+          "transfer": true,
+          "flags": {
+            "ActiveAuras": {
+              "isAura": true,
+              "aura": "Allies",
+              "radius": "15",
+              "type": "",
+              "ignoreSelf": true,
+              "hidden": false,
+              "hostile": false,
+              "onlyOnce": false,
+              "nameOverride": "",
+              "alignment": "",
+              "customCheck": "",
+              "height": false,
+              "displayTemp": true,
+              "wallsBlock": "system",
+              "statuses": []
+            },
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "dae": {
+              "disableCondition": "",
+              "stackable": "noneName",
+              "showIcon": false,
+              "disableIncapacitated": false,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": [],
+              "enableCondition": "",
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false
+            },
+            "core": {
+              "overlay": false
+            },
+            "auraeffects": {
+              "originalType": "base"
+            }
+          },
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "system": {
+            "showRadius": true,
+            "applyToSelf": false,
+            "bestFormula": "",
+            "canStack": false,
+            "collisionTypes": [
+              "move"
+            ],
+            "color": "#baca3f",
+            "combatOnly": false,
+            "disableOnHidden": true,
+            "distanceFormula": "15",
+            "disposition": 1,
+            "evaluatePreApply": false,
+            "opacity": 0.05,
+            "overrideName": "",
+            "script": "",
+            "stashedChanges": [],
+            "stashedStatuses": []
+          },
+          "disabled": false,
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "seconds": null,
+            "rounds": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "description": "",
+          "origin": "Actor.J0FwuLXGijrVdBDL.Item.ItemAura00000000",
+          "tint": "#ffffff",
+          "statuses": [],
+          "sort": 0
+        }
+      ],
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "name": "铁壁战阵 Ironclad Formation",
+      "type": "feat",
+      "_id": "ItemIronclad0000",
+      "img": "icons/magic/defensive/armor-shield-barrier-steel.webp",
+      "system": {
+        "description": {
+          "value": "<p>督军散发着令人敬畏的统御力，指挥周围的部下结成坚不可摧的盾阵。任何友方生物如果在督军身边 <strong>15 尺内</strong>，其 <strong>护甲等级 (AC) 获得 +2 加值</strong>。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {},
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "effects": [
+        {
+          "_id": "EffIronclad00000",
+          "name": "铁壁防护 (+2 AC)",
+          "type": "auraeffects.aura",
+          "img": "icons/magic/defensive/armor-shield-barrier-steel.webp",
+          "changes": [
+            {
+              "key": "system.attributes.ac.bonus",
+              "mode": 2,
+              "value": "2",
+              "priority": 20
+            }
+          ],
+          "duration": {
+            "seconds": null,
+            "startTime": null,
+            "combat": null,
+            "rounds": null,
+            "turns": null,
+            "startRound": null,
+            "startTurn": null
+          },
+          "transfer": true,
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "system": {
+            "showRadius": true,
+            "applyToSelf": false,
+            "bestFormula": "",
+            "canStack": false,
+            "collisionTypes": [
+              "move"
+            ],
+            "color": "#d44e4e",
+            "combatOnly": false,
+            "disableOnHidden": true,
+            "distanceFormula": "15",
+            "disposition": 1,
+            "evaluatePreApply": false,
+            "opacity": 0.2,
+            "overrideName": "",
+            "script": "",
+            "stashedChanges": [],
+            "stashedStatuses": []
+          },
+          "disabled": false,
+          "description": "",
+          "origin": "Actor.J0FwuLXGijrVdBDL.Item.ItemIronclad0000",
+          "tint": "#ffffff",
+          "statuses": [],
+          "sort": 0,
+          "flags": {
+            "ActiveAuras": {
+              "isAura": true,
+              "aura": "Allies",
+              "radius": "15",
+              "type": "",
+              "ignoreSelf": true,
+              "hidden": false,
+              "hostile": false,
+              "onlyOnce": false,
+              "nameOverride": "",
+              "alignment": "",
+              "customCheck": "",
+              "height": false,
+              "displayTemp": true,
+              "wallsBlock": "system",
+              "statuses": []
+            },
+            "dnd5e": {
+              "riders": {
+                "statuses": []
+              }
+            },
+            "dae": {
+              "disableCondition": "",
+              "stackable": "noneName",
+              "showIcon": false,
+              "disableIncapacitated": false,
+              "durationExpression": "",
+              "macroRepeat": "none",
+              "specialDuration": [],
+              "enableCondition": "",
+              "selfTarget": false,
+              "selfTargetAlways": false,
+              "dontApply": false
+            },
+            "core": {
+              "overlay": false
+            },
+            "auraeffects": {
+              "originalType": "base"
+            }
+          }
+        }
+      ],
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "name": "指挥官打击 Commander's Strike",
+      "type": "feat",
+      "_id": "ItemCmdStrike000",
+      "img": "icons/skills/targeting/target-strike-gray.webp",
+      "system": {
+        "description": {
+          "value": "<p>督军可以放弃自己的一次武器攻击，转而大喊一声指挥身边 30 尺内的一名友军。该友军可以立刻使用 <strong>反应 (Reaction)</strong> 对目标发动一次武器攻击。</p>",
+          "chat": ""
+        },
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        },
+        "activities": {
+          "actCmd0000000000": {
+            "_id": "actCmd0000000000",
+            "type": "utility",
+            "activation": {
+              "type": "special",
+              "override": false
+            },
+            "target": {
+              "affects": {
+                "count": "1",
+                "type": "ally",
+                "choice": false
+              },
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "override": false,
+              "prompt": true
+            },
+            "range": {
+              "value": "30",
+              "units": "ft",
+              "override": false
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {},
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "uses": {
+              "spent": 0,
+              "recovery": []
+            },
+            "roll": {
+              "prompt": false,
+              "visible": false
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": ""
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {},
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "name": "统帅长剑 Longsword",
+      "type": "weapon",
+      "_id": "ItemLongsword000",
+      "img": "icons/weapons/swords/sword-runed-glowing.webp",
+      "system": {
+        "description": {
+          "value": "<p>近战武器攻击：命中+5，触及5尺。伤害：7 (1d8+3) 挥砍伤害。</p>",
+          "chat": ""
+        },
+        "equipped": true,
+        "proficient": 1,
+        "type": {
+          "value": "martialM",
+          "baseItem": "longsword"
+        },
+        "activities": {
+          "actSword00000000": {
+            "_id": "actSword00000000",
+            "type": "attack",
+            "activation": {
+              "type": "action",
+              "value": 1,
+              "override": false
+            },
+            "attack": {
+              "ability": "str",
+              "type": {
+                "value": "melee",
+                "classification": "weapon"
+              },
+              "critical": {},
+              "flat": false
+            },
+            "damage": {
+              "parts": [
+                {
+                  "number": 1,
+                  "denomination": 8,
+                  "bonus": "@mod",
+                  "types": [
+                    "slashing"
+                  ],
+                  "custom": {
+                    "enabled": false
+                  },
+                  "scaling": {
+                    "number": 1
+                  }
+                }
+              ],
+              "critical": {},
+              "includeBase": true
+            },
+            "target": {
+              "affects": {
+                "count": "1",
+                "type": "enemy",
+                "choice": false
+              },
+              "template": {
+                "contiguous": false,
+                "units": "ft",
+                "stationary": false
+              },
+              "override": false,
+              "prompt": true
+            },
+            "range": {
+              "value": "5",
+              "units": "ft",
+              "override": false
+            },
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {},
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "uses": {
+              "spent": 0,
+              "recovery": []
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "attackMode": "oneHanded",
+            "ammunition": "",
+            "otherActivityUuid": "",
+            "attackRollPerTarget": "default",
+            "fumbleThreshold": 1,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "identifier": "",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "identified": true,
+        "unidentified": {
+          "description": ""
+        },
+        "container": null,
+        "quantity": 1,
+        "weight": {
+          "value": 0,
+          "units": "lb"
+        },
+        "price": {
+          "value": 0,
+          "denomination": "gp"
+        },
+        "rarity": "",
+        "attunement": "",
+        "attuned": false,
+        "ammunition": {},
+        "armor": {},
+        "damage": {
+          "base": {
+            "types": [],
+            "custom": {
+              "enabled": false
+            },
+            "scaling": {
+              "number": 1
+            }
+          },
+          "versatile": {
+            "types": [],
+            "custom": {
+              "enabled": false
+            },
+            "scaling": {
+              "number": 1
+            }
+          }
+        },
+        "properties": [],
+        "range": {
+          "units": "ft"
+        },
+        "crew": {
+          "value": []
+        }
+      },
+      "flags": {
+        "midi-qol": {
+          "rollAttackPerTarget": "default"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "FxkPW5lorTQoXKjB",
+      "name": "板甲 Plate Armor",
+      "type": "equipment",
+      "img": "icons/equipment/chest/breastplate-cuirass-steel-grey.webp",
+      "effects": [],
+      "folder": "Fg7afQDTDUg3r5kp",
+      "flags": {
+        "dnd5e": {
+          "migratedProperties": [
+            "stealthDisadvantage"
+          ],
+          "riders": {
+            "activity": [],
+            "effect": []
+          }
+        },
+        "core": {},
+        "midiProperties": {
+          "confirmTargets": "default",
+          "autoFailFriendly": false,
+          "autoSaveFriendly": false,
+          "critOther": false,
+          "offHandWeapon": false,
+          "magicdam": false,
+          "magiceffect": false,
+          "noConcentrationCheck": false,
+          "toggleEffect": false,
+          "ignoreTotalCover": false,
+          "idr": false,
+          "idi": false,
+          "idv": false,
+          "ida": false
+        },
+        "midi-qol": {
+          "rollAttackPerTarget": "default",
+          "itemCondition": "",
+          "effectCondition": "",
+          "removeAttackDamageButtons": "default",
+          "reactionCondition": "",
+          "otherCondition": ""
+        },
+        "scene-packer": {
+          "hash": "a8875d28fabc546a9d6c33045973971bac947790"
+        }
+      },
+      "system": {
+        "description": {
+          "value": "板甲由覆盖全身，且相互连接的模铸金属板组成。一套板甲包括护手、重皮靴、一顶附面甲的头盔以及在护甲底层的厚重的布甲。其锁扣和皮带结构可以将护甲重量分配到身体各处。",
+          "chat": ""
+        },
+        "source": {
+          "custom": "PHB pg. 145",
+          "revision": 1,
+          "rules": "2014",
+          "book": "PHB"
+        },
+        "quantity": 1,
+        "weight": {
+          "value": 65,
+          "units": "lb"
+        },
+        "price": {
+          "value": 1500,
+          "denomination": "gp"
+        },
+        "attunement": "",
+        "rarity": "",
+        "identified": true,
+        "cover": null,
+        "uses": {
+          "max": "",
+          "spent": null,
+          "recovery": []
+        },
+        "armor": {
+          "value": 18,
+          "dex": 0
+        },
+        "hp": {
+          "value": 0,
+          "max": 0,
+          "dt": null,
+          "conditions": ""
+        },
+        "speed": {
+          "value": null,
+          "conditions": "",
+          "units": "ft"
+        },
+        "strength": 15,
+        "proficient": null,
+        "unidentified": {
+          "description": ""
+        },
+        "type": {
+          "value": "heavy",
+          "baseItem": "plate"
+        },
+        "container": null,
+        "properties": [
+          "stealthDisadvantage"
+        ],
+        "activities": {},
+        "identifier": "-plate-armor",
+        "attuned": false,
+        "equipped": true,
+        "crew": {
+          "value": []
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "sort": 100000,
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "Y3zOVrMnetWoBS3G",
+      "name": "格挡Parry",
+      "type": "feat",
+      "img": "icons/skills/melee/weapons-crossed-swords-yellow-teal.webp",
+      "system": {
+        "description": {
+          "value": "<section class=\"secret\">\n<p>角斗士在被一次近战攻击命中时，其<strong>AC</strong>加上3。</p>此时该角斗士必须能看见攻击者，且有在持用一把近战武器。<p></p>\n</section>\n<p>角斗士在被一次近战攻击命中时，其<strong>AC</strong>加上3。</p>",
+          "chat": ""
+        },
+        "source": {
+          "custom": "SRD 5.1",
+          "revision": 1,
+          "rules": "2024"
+        },
+        "cover": null,
+        "crewed": false,
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": 0
+        },
+        "type": {
+          "value": "",
+          "subtype": ""
+        },
+        "requirements": "",
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "utility",
+            "activation": {
+              "type": "reaction",
+              "value": 1,
+              "condition": "",
+              "override": false
+            },
+            "consumption": {
+              "targets": [],
+              "scaling": {
+                "allowed": false,
+                "max": ""
+              },
+              "spellSlot": true
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "concentration": false,
+              "value": "",
+              "units": "inst",
+              "special": "",
+              "override": false
+            },
+            "effects": [],
+            "range": {
+              "units": "none",
+              "special": "",
+              "override": false
+            },
+            "target": {
+              "template": {
+                "count": "",
+                "contiguous": false,
+                "type": "",
+                "size": "",
+                "width": "",
+                "height": "",
+                "units": "ft",
+                "stationary": false
+              },
+              "affects": {
+                "count": "",
+                "type": "",
+                "choice": false,
+                "special": ""
+              },
+              "prompt": true,
+              "override": false
+            },
+            "uses": {
+              "spent": 0,
+              "max": "",
+              "recovery": []
+            },
+            "roll": {
+              "formula": "",
+              "name": "",
+              "prompt": false,
+              "visible": false
+            },
+            "sort": 0,
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "otherActivityAsParentType": true,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "autoCEEffects": "default",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "skipConcentrationCheck": false
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": "",
+              "rollAs": "target"
+            },
+            "otherActivityId": "none",
+            "otherActivityAsParentType": true,
+            "flags": {},
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "img": null
+          }
+        },
+        "identifier": "parry",
+        "advancement": {},
+        "enchant": {},
+        "prerequisites": {
+          "level": null,
+          "repeatable": false,
+          "items": []
+        },
+        "properties": []
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        },
+        "scene-packer": {
+          "hash": "c0c621b981812ff95d2b76a510ea332239c3e3b9"
+        },
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "chris-premades": {
+          "config": {
+            "generic": {
+              "parry": {
+                "applied": true,
+                "formula": "3",
+                "showRoll": true
+              }
+            }
+          },
+          "macros": {
+            "midi": {
+              "item": [
+                "parry"
+              ]
+            }
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    }
+  ],
+  "effects": [],
+  "folder": "uE8qgnn4bqgmspPB",
+  "flags": {
+    "scene-packer": {
+      "sourceId": "Actor.MoMRypwjuqWQyj2Z",
+      "hash": "484a4b07f8030cd34f30d9a9369f8a17aadbf1f2"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Actor.MoMRypwjuqWQyj2Z",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788842066266,
+    "modifiedTime": 1788842066266,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

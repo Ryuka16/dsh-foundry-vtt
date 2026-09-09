@@ -1,0 +1,1225 @@
+{
+  "name": "疾风·浪客之刃 Wanderer's Blade",
+  "type": "weapon",
+  "img": "icons/skills/melee/maneuver-sword-katana-yellow.webp",
+  "system": {
+    "activities": {
+      "YasuoBasic000001": {
+        "_id": "YasuoBasic000001",
+        "type": "attack",
+        "name": "基础斩击",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "attack": {
+          "ability": "",
+          "type": {
+            "value": "melee",
+            "classification": "weapon"
+          },
+          "bonus": "1",
+          "flat": false,
+          "critical": {}
+        },
+        "damage": {
+          "includeBase": true,
+          "parts": [],
+          "critical": {}
+        },
+        "range": {
+          "units": "ft",
+          "override": false
+        },
+        "target": {
+          "affects": {
+            "type": "creature",
+            "count": "1",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          },
+          "prompt": true
+        },
+        "effects": [],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": null,
+        "sort": 0,
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "flags": {},
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "attackMode": "oneHanded",
+        "ammunition": "",
+        "otherActivityUuid": "",
+        "attackRollPerTarget": "default",
+        "fumbleThreshold": 1
+      },
+      "YasuoSteelTemp01": {
+        "_id": "YasuoSteelTemp01",
+        "type": "save",
+        "name": "斩钢闪 Steel Tempest",
+        "activation": {
+          "type": "special",
+          "value": 1,
+          "override": false
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "save": {
+          "ability": [
+            "dex"
+          ],
+          "dc": {
+            "calculation": "",
+            "formula": "8 + @prof + @abilities.dex.mod"
+          }
+        },
+        "damage": {
+          "onSave": "half",
+          "parts": [
+            {
+              "number": 1,
+              "denomination": 8,
+              "bonus": "",
+              "types": [
+                "piercing"
+              ],
+              "custom": {
+                "enabled": false
+              },
+              "scaling": {
+                "number": 1
+              }
+            }
+          ],
+          "critical": {
+            "allow": false
+          }
+        },
+        "range": {
+          "units": "self",
+          "override": false
+        },
+        "target": {
+          "template": {
+            "type": "line",
+            "size": "15",
+            "width": "5",
+            "units": "ft",
+            "contiguous": false,
+            "stationary": false
+          },
+          "affects": {
+            "type": "creature",
+            "count": "",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "prompt": true
+        },
+        "effects": [
+          {
+            "_id": "YasuoQMark000001",
+            "level": {},
+            "onSave": false
+          }
+        ],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": null,
+        "sort": 0,
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "flags": {
+          "autoanimations": {
+            "id": "35cfa44c-428f-4158-8714-12539f87e6d0",
+            "label": "斩钢闪 Steel Tempest",
+            "levels3d": {
+              "type": "explosion",
+              "data": {
+                "color01": "#FFFFFF",
+                "color02": "#FFFFFF",
+                "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+              },
+              "sound": {
+                "enable": false
+              },
+              "secondary": {
+                "enable": false,
+                "data": {
+                  "color01": "#FFFFFF",
+                  "color02": "#FFFFFF",
+                  "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+                }
+              }
+            },
+            "macro": {
+              "enable": false,
+              "playWhen": "0"
+            },
+            "meleeSwitch": {
+              "video": {
+                "dbSection": "range",
+                "menuType": "weapon",
+                "animation": "arrow",
+                "variant": "regular",
+                "color": "regular"
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "detect": "automatic",
+                "range": 2,
+                "returning": false,
+                "switchType": "on"
+              }
+            },
+            "menu": "melee",
+            "primary": {
+              "video": {
+                "dbSection": "melee",
+                "menuType": "generic",
+                "animation": "1hp",
+                "variant": "01",
+                "color": "white",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": true,
+                "delay": 0,
+                "file": "sounds/doors/magic/wall-open.ogg",
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "isWait": false,
+                "opacity": 1,
+                "playbackRate": 1,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "zIndex": 1
+              }
+            },
+            "secondary": {
+              "enable": false,
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": true,
+                "isWait": false,
+                "opacity": 1,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1.5,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "zIndex": 1
+              }
+            },
+            "soundOnly": {
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              }
+            },
+            "source": {
+              "enable": false,
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": false,
+                "isWait": true,
+                "opacity": 1,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "zIndex": 1
+              }
+            },
+            "target": {
+              "enable": false,
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": false,
+                "opacity": 1,
+                "persistent": false,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "unbindAlpha": false,
+                "unbindVisibility": false,
+                "zIndex": 1
+              }
+            },
+            "isEnabled": true,
+            "isCustomized": true,
+            "fromAmmo": false,
+            "version": 5
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "friendlySave": "default"
+      },
+      "YasuoSweepBld001": {
+        "_id": "YasuoSweepBld001",
+        "type": "utility",
+        "name": "踏前斩 Sweeping Blade",
+        "activation": {
+          "type": "special",
+          "value": 1,
+          "override": false
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "activityUses",
+              "value": "1",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "range": {
+          "value": "15",
+          "units": "ft",
+          "override": false
+        },
+        "target": {
+          "affects": {
+            "type": "creature",
+            "count": "1",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "prompt": true,
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          }
+        },
+        "effects": [],
+        "description": {
+          "chatFlavor": ""
+        },
+        "uses": {
+          "spent": 0,
+          "max": "@prof",
+          "recovery": [
+            {
+              "period": "turnStart",
+              "type": "recoverAll"
+            }
+          ]
+        },
+        "img": null,
+        "sort": 0,
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "flags": {},
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "roll": {
+          "prompt": false,
+          "visible": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "none",
+        "otherActivityAsParentType": true
+      },
+      "YasuoWindWall001": {
+        "_id": "YasuoWindWall001",
+        "type": "utility",
+        "name": "风之障壁 Wind Wall",
+        "activation": {
+          "type": "bonus",
+          "value": 1,
+          "override": false
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "activityUses",
+              "value": "1",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "uses": {
+          "max": "@prof",
+          "spent": 0,
+          "recovery": [
+            {
+              "period": "sr",
+              "type": "recoverAll"
+            }
+          ]
+        },
+        "range": {
+          "units": "self",
+          "override": false
+        },
+        "target": {
+          "affects": {
+            "type": "space",
+            "count": "",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          },
+          "prompt": true
+        },
+        "effects": [],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": null,
+        "sort": 0,
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "flags": {},
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "roll": {
+          "prompt": false,
+          "visible": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "none",
+        "otherActivityAsParentType": true
+      },
+      "YasuoLastBreath1": {
+        "_id": "YasuoLastBreath1",
+        "type": "utility",
+        "name": "狂风绝息斩 Last Breath",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "activityUses",
+              "value": "1",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "uses": {
+          "max": "1",
+          "spent": 0,
+          "recovery": [
+            {
+              "period": "sr",
+              "type": "recoverAll"
+            }
+          ]
+        },
+        "range": {
+          "units": "self",
+          "override": false
+        },
+        "target": {
+          "affects": {
+            "type": "",
+            "count": "",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          },
+          "prompt": true
+        },
+        "effects": [],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": null,
+        "sort": 0,
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "flags": {},
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "roll": {
+          "prompt": false,
+          "visible": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "none",
+        "otherActivityAsParentType": true
+      }
+    },
+    "uses": {
+      "spent": 0,
+      "recovery": []
+    },
+    "description": {
+      "value": "<p><em>武器（任何近战剑），非常稀有（需同调）</em></p><p>你使用这把魔法武器进行攻击检定与伤害检定时获得 +1 加值。它具有<strong>两用</strong>（双手使用时伤害骰为 1d10）与<strong>灵巧</strong>特性。</p><p><strong><em>浪人之道。</em></strong> 每回合中，当你首次以本武器命中一个目标、或借由其招式进行移动时，你获得 1d4 临时生命值。</p><p><strong><em>斩钢闪。</em></strong> 当你进行攻击动作时，你可以将该动作中的一次攻击替换为斩钢闪。选取一条以你为起点、长 15 尺的直线；该直线上的每个生物必须进行一次敏捷豁免（DC 等于 8 + 你的熟练加值 + 你的敏捷调整值）。豁免失败的生物受到 1d8 穿刺伤害，豁免成功则伤害减半。当你连续第三次使用斩钢闪时，被本次命中的生物被卷上空中，进入<strong>腾空</strong>状态。</p><p><strong><em>踏前斩。</em></strong> 当你进行攻击动作时，你可以将该动作中的一次攻击替换为踏前斩；你每回合至多可以如此使用与你熟练加值相等的次数。选取 15 尺内一个你能看见的生物；你穿过它并出现在它另一侧的空格，对其造成 1d4 + 你的属性调整值的挥砍伤害。此移动不会引发借机攻击。</p><p><strong><em>风之障壁。</em></strong> 你可以用一个附赠动作立起一道长 15 尺的风墙，持续 1 分钟。在风墙存在期间，处于墙线两侧 5 尺内的你与友方，针对<strong>远程武器攻击与远程法术攻击</strong>拥有全遮蔽——此类攻击对受庇护者自动失手；离开该范围即失去庇护，重新进入则再次获得。风墙不影响近战攻击，也不阻挡视线。本特性的使用次数等于你的熟练加值，并在你完成一次短休或长休后回复全部使用次数。</p><p><strong><em>狂风绝息斩。</em></strong> 你可以用一个动作，对当前处于腾空状态的每个生物发动一连串斩击，对每个目标各造成 6d8 挥砍伤害。斩击结束时，这些生物落地并受到坠落伤害。施放本特性时，场上必须至少存在一个处于腾空状态的生物。本特性在你完成一次短休或长休后回复一次使用。</p><p><strong><em>腾空。</em></strong> 处于腾空状态的生物被举至 20 尺高空：它处于无法行动状态，无法成为近战攻击的目标，且任何针对它的远程攻击均为重击。当腾空状态结束时，该生物落地并受到 2d6 钝击伤害。除非被狂风绝息斩提前终结，否则该状态持续至该生物的下一回合结束。</p><hr /><p><em>操作提示（Foundry）：装备本武器并使用任意一次招式后，本次游戏中即可使用快捷键——<strong>Q</strong> 斩钢闪、<strong>W</strong> 风之障壁、<strong>E</strong> 踏前斩、<strong>R</strong> 狂风绝息斩。按下 Q／E／R 时将鼠标悬停在目标上即自动指定该目标；按下 W 后，在地图上先点风墙中心、再点其朝向以放置。</em></p>",
+      "chat": ""
+    },
+    "identifier": "wanderers-blade",
+    "source": {
+      "custom": "",
+      "rules": "2014",
+      "revision": 1
+    },
+    "identified": true,
+    "unidentified": {
+      "description": ""
+    },
+    "container": null,
+    "quantity": 1,
+    "weight": {
+      "value": 3,
+      "units": "lb"
+    },
+    "price": {
+      "value": 0,
+      "denomination": "gp"
+    },
+    "rarity": "veryRare",
+    "attunement": "required",
+    "attuned": false,
+    "equipped": false,
+    "crew": {
+      "value": []
+    },
+    "ammunition": {},
+    "armor": {},
+    "damage": {
+      "base": {
+        "number": 1,
+        "denomination": 8,
+        "bonus": "1",
+        "types": [
+          "slashing"
+        ],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        }
+      },
+      "versatile": {
+        "types": [
+          "slashing"
+        ],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        },
+        "number": 1,
+        "denomination": 10,
+        "bonus": "1"
+      }
+    },
+    "properties": [
+      "mgc",
+      "fin",
+      "ver"
+    ],
+    "proficient": 1,
+    "range": {
+      "value": null,
+      "long": null,
+      "units": "ft",
+      "reach": 5
+    },
+    "type": {
+      "value": "martialM",
+      "baseItem": ""
+    }
+  },
+  "effects": [
+    {
+      "_id": "YasuoAirborne001",
+      "name": "腾空 Airborne",
+      "img": "icons/magic/air/wind-swirl-gray-blue.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "origin": null,
+      "description": "<p>被击飞至 20 尺高空：无法行动；无法被近战攻击命中；针对它的所有远程攻击均为重击；并在落地时受到 2d6 钝击坠落伤害。持续到它的下一回合。</p>",
+      "statuses": [
+        "incapacitated"
+      ],
+      "duration": {
+        "seconds": 6,
+        "startTime": null,
+        "combat": null
+      },
+      "changes": [
+        {
+          "key": "flags.midi-qol.grants.critical.rwak",
+          "mode": 5,
+          "value": "1",
+          "priority": 20
+        },
+        {
+          "key": "flags.midi-qol.grants.critical.rsak",
+          "mode": 5,
+          "value": "1",
+          "priority": 20
+        }
+      ],
+      "flags": {
+        "world": {
+          "yasuoAir": true
+        },
+        "effectmacro": {
+          "onCreate": {
+            "script": "(async()=>{if(!game.user?.isGM)return;try{const t=(typeof token!=='undefined')?token:null; if(t) await t.document.update({elevation:(t.document.elevation||0)+20});}catch(e){console.error('腾空 onCreate',e);}})();"
+          },
+          "onDelete": {
+            "script": "(async()=>{if(!game.user?.isGM)return;try{const t=(typeof token!=='undefined')?token:null; const ac=(typeof actor!=='undefined')?actor:null; if(t){await t.document.update({elevation:Math.max(0,(t.document.elevation||0)-20)});} if(ac){const r=new Roll('2d6');await r.evaluate();await r.toMessage({flavor:'坠地伤害（钝击）',speaker:ChatMessage.getSpeaker({actor:ac})}); try{await ac.applyDamage([{value:r.total,type:'bludgeoning'}]);}catch(e){try{await ac.applyDamage(r.total);}catch(e2){}}}}catch(e){console.error('腾空 onDelete',e);}})();"
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "system": {},
+      "tint": "#ffffff",
+      "sort": 0
+    },
+    {
+      "_id": "YasuoQMark000001",
+      "name": "斩钢闪标记",
+      "img": "icons/magic/control/debuff-chains-blue.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "origin": null,
+      "description": "<p>（结算用·瞬时移除）被斩钢闪命中的标记；当斩钢闪连续第 3 次化作旋风时，被标记者被击飞腾空。</p>",
+      "statuses": [],
+      "changes": [],
+      "flags": {
+        "world": {
+          "yasuoQ": true
+        }
+      },
+      "duration": {
+        "seconds": 6,
+        "startTime": null,
+        "combat": null
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "system": {},
+      "tint": "#ffffff",
+      "sort": 0
+    },
+    {
+      "_id": "YasuoWindCover01",
+      "name": "风墙·全遮蔽 Wind Wall Cover",
+      "img": "icons/magic/air/wind-stream-blue-gray.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "origin": null,
+      "description": "<p>风墙庇护：当你处于风墙线两侧 5 尺内时，针对你的<strong>远程武器攻击与远程法术攻击</strong>自动失手，等同于你拥有全遮蔽；近战攻击不受影响。离开风墙范围即失去此庇护。</p>",
+      "statuses": [],
+      "duration": {
+        "seconds": 60,
+        "startTime": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "changes": [
+        {
+          "key": "flags.midi-qol.grants.attack.fail.rwak",
+          "mode": 5,
+          "value": "1",
+          "priority": 20
+        },
+        {
+          "key": "flags.midi-qol.grants.attack.fail.rsak",
+          "mode": 5,
+          "value": "1",
+          "priority": 20
+        }
+      ],
+      "flags": {
+        "world": {
+          "yasuoCover": true
+        },
+        "dnd5e": {
+          "riders": {
+            "statuses": []
+          }
+        },
+        "dae": {
+          "enableCondition": "",
+          "disableCondition": "",
+          "stackable": "noneName",
+          "showIcon": false,
+          "disableIncapacitated": false,
+          "selfTarget": false,
+          "selfTargetAlways": false,
+          "dontApply": false,
+          "durationExpression": "",
+          "macroRepeat": "none",
+          "specialDuration": []
+        },
+        "core": {
+          "overlay": false
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "system": {
+        "showRadius": true,
+        "applyToSelf": true,
+        "bestFormula": "",
+        "canStack": false,
+        "collisionTypes": [
+          "move"
+        ],
+        "color": "#2385e1",
+        "combatOnly": false,
+        "disableOnHidden": true,
+        "distanceFormula": "5",
+        "disposition": 0,
+        "evaluatePreApply": false,
+        "opacity": 0.25,
+        "overrideName": "",
+        "script": "",
+        "stashedChanges": [],
+        "stashedStatuses": []
+      },
+      "tint": "#ffffff",
+      "sort": 0
+    }
+  ],
+  "folder": null,
+  "flags": {
+    "midiProperties": {
+      "confirmTargets": "default",
+      "autoTargetType": "any"
+    },
+    "midi-qol": {
+      "onUseMacroName": "[postActiveEffects]ItemMacro"
+    },
+    "dnd5e": {
+      "riders": {
+        "activity": []
+      }
+    },
+    "dae": {
+      "macro": {
+        "name": "疾风·浪客之刃 Wanderer's Blade",
+        "img": "icons/skills/melee/maneuver-sword-katana-yellow.webp",
+        "type": "script",
+        "scope": "global",
+        "command": "// 疾风·浪客之刃 — 物品宏 [postActiveEffects]\n// R 额外音效（可选）：填成你库里的剑击音效路径则每段斩击都会响；留空则用动画自带音效。\nconst R_SOUND = \"\";\n(async () => {\n  // —— QWER 键位绑定（首次用任意招式即激活；指向谁就对谁；无需世界脚本）——\n  if (!globalThis.__yasuoKeysBound) {\n    globalThis.__yasuoKeysBound = true;\n    const keyMap = { KeyQ: \"斩钢闪\", KeyW: \"风之障壁\", KeyE: \"踏前斩\", KeyR: \"狂风绝息\" };\n    document.addEventListener(\"keydown\", async (ev) => {\n      const want = keyMap[ev.code];\n      if (!want || ev.ctrlKey || ev.altKey || ev.metaKey) return;\n      const el = document.activeElement;\n      if (el && (el.tagName === \"INPUT\" || el.tagName === \"TEXTAREA\" || el.isContentEditable)) return;\n      const tk = canvas?.tokens?.controlled?.[0]; const ac = tk?.actor; if (!ac) return;\n      const blade = ac.items.find((i) => i.type === \"weapon\" && (i.name || \"\").includes(\"浪客之刃\") && i.system?.equipped);\n      if (!blade) return;\n      let act = null; try { for (const x of blade.system.activities) { if ((x.name || \"\").includes(want)) { act = x; break; } } } catch (e) {}\n      if (!act) return;\n      ev.preventDefault(); ev.stopPropagation();\n      if (ev.code !== \"KeyW\") {\n        const hov = canvas.tokens.placeables.find((t) => t.hover) ?? canvas.tokens.hover;\n        if (hov) { try { hov.setTarget(true, { releaseOthers: true, groupSelection: false }); } catch (e) {} }\n      }\n      try { await act.use(); } catch (e) { try { await blade.use({}, { activityId: act.id ?? act._id }); } catch (e2) { console.error(\"键位触发失败\", want, e, e2); } }\n    }, true);\n    console.log(\"浪客之刃 | QWER 已绑定（指向目标即可施放）\");\n  }\n\n  const me = canvas.tokens.controlled[0] ?? (typeof token !== \"undefined\" ? token : null);\n  const a = me?.actor ?? (typeof actor !== \"undefined\" ? actor : null);\n  if (!me || !a) return;\n  const theItem = (typeof item !== \"undefined\" && item) ? item : ((typeof rolledItem !== \"undefined\") ? rolledItem : null);\n\n  const gridSize = canvas.grid.size;\n  const ftPerSq = canvas.scene.grid?.distance ?? 5;\n  const cc = () => ({ x: me.center?.x ?? (me.x + me.w / 2), y: me.center?.y ?? (me.y + me.h / 2) });\n  const ctr = (tk) => ({ x: tk.center?.x ?? (tk.x + tk.w / 2), y: tk.center?.y ?? (tk.y + tk.h / 2) });\n  const distFt = (p1, p2) => { try { return canvas.grid.measurePath([p1, p2]).distance; } catch (e) { return Math.hypot(p2.x - p1.x, p2.y - p1.y) / gridSize * ftPerSq; } };\n\n  const wf = (typeof workflow !== \"undefined\" && workflow) ? workflow\n    : ((typeof MidiQOL !== \"undefined\") ? (MidiQOL.currentWorkflow ?? null) : null);\n  const hay = (((wf?.activity?.name ?? \"\") + \" \" + (wf?.activity?.identifier ?? \"\")).toLowerCase());\n  const kind =\n    (hay.includes(\"斩钢闪\") || hay.includes(\"steel\")) ? \"q\" :\n    (hay.includes(\"踏前斩\") || hay.includes(\"sweep\")) ? \"e\" :\n    (hay.includes(\"风之障壁\") || hay.includes(\"wind\")) ? \"w\" :\n    (hay.includes(\"狂风绝息\") || hay.includes(\"last\")) ? \"r\" :\n    (hay.includes(\"基础\") || hay.includes(\"basic\")) ? \"base\" : \"base\";\n\n  const wfTargets = Array.from(wf?.targets ?? []);\n  const primaryTgt = wfTargets[0] ?? Array.from(game.user.targets ?? [])[0] ?? null;\n\n  const mod = Math.max(a.system?.abilities?.str?.mod ?? 0, a.system?.abilities?.dex?.mod ?? 0);\n\n  const round = game.combat?.round ?? 0;\n  let f = foundry.utils.duplicate(a.getFlag(\"world\", \"yasuo\") ?? { round: -1, shielded: false, qCount: 0 });\n  if (f.round !== round) { f.round = round; f.shielded = false; }\n\n  const firstFound = (cands) => { for (const k of cands) { try { if (Sequencer?.Database?.entryExists?.(k)) return k; } catch (e) {} } return null; };\n  const hasSeq = typeof Sequence !== \"undefined\";\n  const playAt = (cands, loc, scale) => { try { const k = firstFound(cands); if (k && hasSeq && loc) new Sequence().effect().file(k).atLocation(loc).scaleToObject(scale || 1.2).play(); } catch (e) {} };\n  const playLine = (cands, from, to) => { try { const k = firstFound(cands); if (k && hasSeq && from && to) new Sequence().effect().file(k).atLocation(from).stretchTo(to).play(); } catch (e) {} };\n  const SLASH = [\"jb2a.melee_generic.slashing.one_handed.01.white\", \"jb2a.sword.melee.01.white\", \"jb2a.melee_generic.slash.01.white\"];\n  const SLASH_BLUE = [\"jb2a.melee_generic.slashing.one_handed.01.blue\", \"jb2a.sword.melee.01.blue\", \"jb2a.melee_generic.slash.01.blue\"];\n  const TRAIL = [\"jb2a.smoke.puff.side.02.white\", \"jb2a.energy_strands.range.standard.blue.01\", \"jb2a.bullet.01.blue\"];\n\n  const occupied = (cx, cy, ignore) => {\n    const r = new PIXI.Rectangle(cx - gridSize / 2, cy - gridSize / 2, gridSize, gridSize);\n    return canvas.tokens.placeables.some((tk) => {\n      if (ignore && tk.id === ignore.id) return false;\n      const b = new PIXI.Rectangle(tk.x, tk.y, tk.w, tk.h);\n      return r.right > b.left && r.left < b.right && r.bottom > b.top && r.top < b.bottom;\n    });\n  };\n  const moveTok = async (tk, x, y) => {\n    try { if (typeof MidiQOL?.moveToken === \"function\") return await MidiQOL.moveToken(tk, { x, y }, false); } catch (e) {}\n    try { await tk.document.update({ x: x - gridSize / 2, y: y - gridSize / 2 }); } catch (e) {}\n  };\n  const adjFree = (tk) => {\n    const tc = ctr(tk); const o = cc();\n    return [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]\n      .map(([dx, dy]) => ({ x: tc.x + dx * gridSize, y: tc.y + dy * gridSize }))\n      .filter((p) => !occupied(p.x, p.y, me))\n      .sort((p, q) => Math.hypot(p.x - o.x, p.y - o.y) - Math.hypot(q.x - o.x, q.y - o.y))[0];\n  };\n  const tryShield = async () => {\n    if (f.shielded) return; f.shielded = true;\n    try { const r = new Roll(\"1d4\"); await r.evaluate();\n      await r.toMessage({ flavor: \"浪人之道·剑气护盾（临时生命）\", speaker: ChatMessage.getSpeaker({ actor: a }) });\n      if (typeof a.applyTempHP === \"function\") await a.applyTempHP(r.total);\n      else await a.update({ \"system.attributes.hp.temp\": Math.max(a.system.attributes?.hp?.temp || 0, r.total) });\n    } catch (e) {}\n  };\n  // —— GM 代理：玩家对敌人/盟友文档无写权限，效果与伤害一律走 midi 的 GM 通道 ——\n  const gmCreateEffect = async (actorDoc, data) => {\n    try { if (typeof MidiQOL?.createEffects === \"function\") return await MidiQOL.createEffects({ actorUuid: actorDoc.uuid, effects: [data] }); } catch (e) { console.error(\"createEffects 失败\", e); }\n    try { return await actorDoc.createEmbeddedDocuments(\"ActiveEffect\", [data]); } catch (e) {}\n  };\n  const gmRemoveByFlag = async (actorDoc, flagKey) => {\n    const ids = actorDoc.effects.filter((e) => e.getFlag(\"world\", flagKey)).map((e) => e.id);\n    if (!ids.length) return;\n    try { if (typeof MidiQOL?.removeEffects === \"function\") return await MidiQOL.removeEffects({ actorUuid: actorDoc.uuid, effects: ids }); } catch (e) { console.error(\"removeEffects 失败\", e); }\n    try { await actorDoc.deleteEmbeddedDocuments(\"ActiveEffect\", ids); } catch (e) {}\n  };\n  const gmDealDamage = async (tk, amount, type) => {\n    try { if (typeof MidiQOL?.applyTokenDamage === \"function\") { await MidiQOL.applyTokenDamage([{ damage: amount, type }], amount, new Set([tk]), theItem, new Set(), {}); return; } } catch (e) { console.error(\"applyTokenDamage 失败\", e); }\n    try { await tk.actor.applyDamage([{ value: amount, type }]); } catch (e) { try { await tk.actor.applyDamage(amount); } catch (e2) {} }\n  };\n  const copyEffectTo = async (tgt, flagKey) => {\n    if (!tgt?.actor || !theItem) return;\n    const tmpl = (theItem.effects ?? []).find((e) => e.getFlag?.(\"world\", flagKey) || false);\n    if (!tmpl) return;\n    await gmRemoveByFlag(tgt.actor, flagKey);\n    const data = tmpl.toObject(); delete data._id; data.disabled = false; data.transfer = false; data.origin = a.uuid;\n    await gmCreateEffect(tgt.actor, data);\n  };\n\n  // ---- 分流 ----\n  if (kind === \"base\") {\n    await tryShield();\n  }\n  else if (kind === \"q\") {\n    const o = cc();\n    f.qCount = (f.qCount ?? 0) + 1;\n    const isThird = (f.qCount % 3 === 0);\n    const marked = canvas.tokens.placeables\n      .map((t) => { const e = t.actor?.effects?.find((x) => x.getFlag(\"world\", \"yasuoQ\")); return e ? t : null; }).filter(Boolean);\n    if (isThird && marked.length) {\n      playAt([\"jb2a.whirlwind.01.blue\", \"jb2a.template_circle.vortex.intro.blue\", \"jb2a.energy_field.02.below.blue\"], marked[0], 2.4);\n      for (const t of marked) await copyEffectTo(t, \"yasuoAir\");\n    } else if (primaryTgt) {\n      // 斩钢闪命中特效交 Automated Animations（已配穿刺），宏不再叠加挥砍特效\n    }\n    for (const t of marked) { await gmRemoveByFlag(t.actor, \"yasuoQ\"); }\n    await tryShield();\n  }\n  else if (kind === \"e\") {\n    // 次数交原生 activity 限制；只管距离上限 15 尺 + 位移 + 伤害 + 护盾。拒绝时退回这次已消耗的次数。\n    const refundE = async () => {\n      try {\n        const live = (a?.items?.get?.(theItem?.id)) ?? theItem; // 取消耗后的真实文档，避免读到使用前快照导致多退\n        const ea = live?.system?.activities?.get?.(\"YasuoSweepBld001\");\n        if (ea?.uses) await live.update({ \"system.activities.YasuoSweepBld001.uses.spent\": Math.max(0, (ea.uses.spent ?? 0) - 1) });\n      } catch (er) { console.error(\"退回踏前斩次数失败\", er); }\n    };\n    if (!primaryTgt) { ui.notifications?.warn(\"踏前斩：请先指向/指定一个 15 尺内的目标；已退回本次消耗。\"); await refundE(); }\n    else {\n      const o = cc(); const tc = ctr(primaryTgt);\n      if (distFt(o, tc) > 15.5) { ui.notifications?.warn(`踏前斩：目标太远（约 ${Math.round(distFt(o, tc))} 尺，上限 15 尺）；已退回本次消耗。`); await refundE(); }\n      else {\n        let dx = tc.x - o.x, dy = tc.y - o.y; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;\n        const cands = [{ x: tc.x + dx * gridSize, y: tc.y + dy * gridSize }];\n        for (const ang of [0.6, -0.6, 1.2, -1.2]) { const cs = Math.cos(ang), sn = Math.sin(ang); cands.push({ x: tc.x + (dx * cs - dy * sn) * gridSize, y: tc.y + (dx * sn + dy * cs) * gridSize }); }\n        const dest = cands.find((p) => !occupied(p.x, p.y, me)) ?? cands[0];\n        playLine(TRAIL, o, dest);\n        await moveTok(me, dest.x, dest.y);\n        try { const r = new Roll(`1d4 + ${mod}`); await r.evaluate();\n          await r.toMessage({ flavor: \"踏前斩 Sweeping Blade（挥砍）\", speaker: ChatMessage.getSpeaker({ actor: a }) });\n          await gmDealDamage(primaryTgt, r.total, \"slashing\");\n        } catch (e) {}\n        await tryShield();\n      }\n    }\n  }\n  else if (kind === \"w\") {\n    try {\n      const layer = canvas.app.stage;\n      const L = (15 / ftPerSq) * gridSize;\n      const g = new PIXI.Graphics(); layer.addChild(g);\n      let center = null;\n      const redraw = (cur) => {\n        g.clear();\n        if (center) {\n          const aa = Math.atan2(cur.y - center.y, cur.x - center.x);\n          const ex = center.x + Math.cos(aa) * L / 2, ey = center.y + Math.sin(aa) * L / 2;\n          const sx = center.x - Math.cos(aa) * L / 2, sy = center.y - Math.sin(aa) * L / 2;\n          g.lineStyle(gridSize * 0.6, 0x66ccff, 0.5); g.moveTo(sx, sy); g.lineTo(ex, ey);\n        } else { g.beginFill(0x66ccff, 0.5); g.drawCircle(cur.x, cur.y, 8); g.endFill(); }\n      };\n      const move = (ev) => redraw(ev.data.getLocalPosition(layer));\n      layer.on(\"pointermove\", move);\n      const click = () => new Promise((res) => { const h = (ev) => { layer.off(\"pointerdown\", h); res(ev.data.getLocalPosition(layer)); }; layer.on(\"pointerdown\", h); });\n      ui.notifications?.info(\"风之障壁：点第一下=中心，第二下=朝向（墙固定 15 尺）。\");\n      const c1 = await click(); center = canvas.grid.getSnappedPoint(c1, { mode: CONST.GRID_SNAPPING_MODES.CENTER, resolution: 1 });\n      const c2 = await click();\n      layer.off(\"pointermove\", move); layer.removeChild(g);\n      const ang = Math.atan2(c2.y - center.y, c2.x - center.x);\n      const sx = center.x - Math.cos(ang) * L / 2, sy = center.y - Math.sin(ang) * L / 2;\n      const ex = center.x + Math.cos(ang) * L / 2, ey = center.y + Math.sin(ang) * L / 2;\n      // 风墙视觉：Sequencer 持久特效——调用即广播到所有客户端（玩家自己、GM、队友都可见），无需场景写权限\n      const windName = \"yasuoWind_\" + foundry.utils.randomID();\n      try {\n        const wk = firstFound([\"jb2a.wind_stream.white\", \"jb2a.gust_of_wind.veryfast\"]);\n        if (wk && hasSeq) new Sequence().effect().file(wk).atLocation({ x: sx, y: sy }).stretchTo({ x: ex, y: ey }).persist().name(windName).fadeIn(300).fadeOut(500).play();\n      } catch (e) { console.error(\"风幕特效失败\", e); }\n      ui.notifications?.info(\"风之障壁已立起，持续 1 分钟。墙线两侧 5 尺内的友方对远程与法术攻击获得全掩护，离开即失去。\");\n      // —— 位置光环：cover 绑在墙的位置上，每 ~2 秒扫一遍，墙线两侧 5 尺内的友方动态获/失全掩护 ——\n      const gd = canvas.scene.grid; const px2ft = (px) => px / gd.size * gd.distance;\n      const distSeg = (p, A, B) => { const dx = B.x - A.x, dy = B.y - A.y; const l2 = dx * dx + dy * dy; if (l2 === 0) return Math.hypot(p.x - A.x, p.y - A.y); let t = ((p.x - A.x) * dx + (p.y - A.y) * dy) / l2; t = Math.max(0, Math.min(1, t)); return Math.hypot(p.x - (A.x + t * dx), p.y - (A.y + t * dy)); };\n      const COVER_FT = 5;\n      const isAlly = (tk) => !!tk?.actor && (tk.id === me?.id || tk.document.disposition === CONST.TOKEN_DISPOSITIONS.FRIENDLY);\n      const scanAura = async () => {\n        for (const tk of canvas.tokens.placeables) {\n          if (!isAlly(tk)) continue;\n          const within = px2ft(distSeg(tk.center, { x: sx, y: sy }, { x: ex, y: ey })) <= COVER_FT;\n          const has = tk.actor.effects.some((e) => e.getFlag(\"world\", \"yasuoCover\"));\n          if (within && !has) await copyEffectTo(tk, \"yasuoCover\");\n          else if (!within && has) await gmRemoveByFlag(tk.actor, \"yasuoCover\");\n        }\n      };\n      await scanAura();\n      const auraIv = setInterval(() => { scanAura().catch((e) => console.error(\"风墙光环扫描\", e)); }, 2000);\n      setTimeout(async () => {\n        clearInterval(auraIv);\n        try { if (hasSeq) await Sequencer.EffectManager.endEffects({ name: windName }); } catch (e) {}\n        for (const tk of canvas.tokens.placeables) { if (tk?.actor && tk.actor.effects.some((e) => e.getFlag(\"world\", \"yasuoCover\"))) await gmRemoveByFlag(tk.actor, \"yasuoCover\"); }\n      }, 60000);\n    } catch (e) { console.error(\"风墙失败\", e); }\n  }\n  else if (kind === \"r\") {\n    // 自动对所有腾空目标连斩，斩完落地（解除腾空→触发坠落伤害）\n    const airborne = canvas.tokens.placeables.filter((t) => t.actor?.effects?.some((e) => e.getFlag(\"world\", \"yasuoAir\")));\n    if (!airborne.length) {\n      ui.notifications?.warn(\"狂风绝息斩：需要至少一个腾空目标（先用斩钢闪击飞）。\");\n    } else {\n      const main = (primaryTgt && airborne.includes(primaryTgt)) ? primaryTgt : airborne[0];\n      const o = cc();\n      const dest = adjFree(main);\n      if (dest) { playLine(TRAIL, o, dest); await moveTok(me, dest.x, dest.y); }\n      try {\n        if (hasSeq) {\n          const seq = new Sequence();\n          const up = firstFound([\"jb2a.energy_field.02.below.blue\", \"jb2a.template_circle.vortex.intro.blue\", \"jb2a.whirlwind.01.blue\"]);\n          const slash = firstFound(SLASH_BLUE);\n          const big = firstFound([\"jb2a.melee_generic.slashing.two_handed.01.blue\", \"jb2a.greatsword.melee.01.blue\", \"jb2a.sword.melee.01.blue\"]);\n          const snd = R_SOUND && R_SOUND.length ? R_SOUND : null;\n          for (const t of airborne) {\n            if (up) seq.effect().file(up).atLocation(t).scaleToObject(3.0).fadeIn(150).duration(2400).fadeOut(400);\n            if (slash) for (let i = 0; i < 3; i++) { seq.effect().file(slash).atLocation(t).scaleToObject(2.4).rotate(i * 60 - 60).mirrorX(i % 2 === 0).delay(300 + 260 * i); if (snd) seq.sound().file(snd).delay(300 + 260 * i).volume(0.6); }\n            if (big) { seq.effect().file(big).atLocation(t).scaleToObject(3.6).delay(1250); if (snd) seq.sound().file(snd).delay(1250).volume(0.9); }\n          }\n          seq.play();\n        }\n      } catch (e) { console.error(\"R 动画失败\", e); }\n      for (const t of airborne) {\n        try { const r = new Roll(\"6d8\"); await r.evaluate();\n          await r.toMessage({ flavor: \"狂风绝息斩 Last Breath（挥砍）\", speaker: ChatMessage.getSpeaker({ actor: a }) });\n          await gmDealDamage(t, r.total, \"slashing\");\n        } catch (e) {}\n      }\n      // 斩击结束 → 全体落地（解除腾空，onDelete 结算坠落伤害）\n      const landToks = airborne.slice();\n      setTimeout(async () => {\n        for (const t of landToks) { await gmRemoveByFlag(t.actor, \"yasuoAir\"); }\n      }, 2600);\n    }\n    await tryShield();\n  }\n\n  await a.setFlag(\"world\", \"yasuo\", f);\n})();\n",
+        "author": "",
+        "ownership": {
+          "default": 3
+        },
+        "_id": null,
+        "folder": null,
+        "sort": 0,
+        "flags": {}
+      }
+    },
+    "scene-packer": {
+      "sourceId": "Item.4wX8KtlgpWKRHTbs",
+      "hash": "13eda2b4183ddffd6dcf65da68ddbd666298e687"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.longhua-dm-toolkit.longhua-items.Item.H59rrYGTxRz7w43T",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Item.4wX8KtlgpWKRHTbs",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788842850860,
+    "modifiedTime": 1788842851175,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

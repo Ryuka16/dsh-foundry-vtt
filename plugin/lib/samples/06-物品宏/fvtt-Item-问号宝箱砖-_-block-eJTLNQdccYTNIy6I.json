@@ -1,0 +1,259 @@
+{
+  "name": "问号宝箱砖 ? Block",
+  "type": "equipment",
+  "img": "icons/commodities/treasure/puzzle-cube.webp",
+  "system": {
+    "description": {
+      "value": "<p>一块悬浮的问号金砖飘在你头顶。用一个附赠动作向上顶击它，它会“叮”地吐出一样随机的好东西（掷 1d6）：</p><ol><li><strong>临时生命：</strong>获得 2d4+10 临时生命值，持续到你下次短休。</li><li><strong>火花：</strong>一枚可投掷的火花进入你的背包；用一个动作投向 60 尺内目标作远程攻击，命中造成 3d6 火焰伤害。</li><li><strong>蘑菇：</strong>一颗蘑菇进入你的背包；用一个动作吃下或喂给相邻生物，回复 2d6 生命。</li><li><strong>金币：</strong>叮——获得 10 枚金币。</li><li><strong>无敌星：</strong>到你下回合结束前，你对一切伤害具有抗性并散发光芒。</li><li><strong>超级跳：</strong>一枚『大跳』进入你的背包；用一个附赠动作触发，跃向 30 尺内一处落点，这次移动不引发借机攻击。</li></ol><p>本装置每日可使用 3 次，次日回满。其中<strong>火花、蘑菇与大跳</strong>为吐出的临时道具：若在你下次短休前未使用，它们便会消失。</p><p><strong>过度索取：</strong>当你用掉当日的最后一次（第 3 次）后，掷一个 d20；若结果为 1，问号砖应声<strong>碎裂、永久损坏</strong>。</p>",
+      "chat": ""
+    },
+    "source": {
+      "custom": "",
+      "rules": "2014",
+      "revision": 1
+    },
+    "identifier": "qmark-block",
+    "type": {
+      "value": "trinket",
+      "baseItem": ""
+    },
+    "properties": [
+      "mgc"
+    ],
+    "rarity": "rare",
+    "attunement": "",
+    "attuned": false,
+    "equipped": false,
+    "price": {
+      "value": 3500,
+      "denomination": "gp"
+    },
+    "weight": {
+      "value": 2,
+      "units": "lb"
+    },
+    "uses": {
+      "max": "3",
+      "spent": 0,
+      "recovery": [
+        {
+          "period": "day",
+          "type": "recoverAll"
+        }
+      ]
+    },
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "type": "utility",
+        "name": "顶击砖块",
+        "activation": {
+          "type": "bonus",
+          "value": 1,
+          "override": false,
+          "condition": ""
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "itemUses",
+              "value": "1",
+              "target": "",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": false
+        },
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "range": {
+          "units": "self",
+          "override": false,
+          "special": ""
+        },
+        "target": {
+          "affects": {
+            "type": "self",
+            "count": "",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft",
+            "type": ""
+          },
+          "prompt": true
+        },
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": "",
+        "sort": 0,
+        "effects": [],
+        "flags": {},
+        "uses": {
+          "spent": 0,
+          "recovery": [],
+          "max": ""
+        },
+        "visibility": {
+          "level": {
+            "min": null,
+            "max": null
+          },
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false,
+          "identifier": ""
+        },
+        "roll": {
+          "prompt": false,
+          "visible": false,
+          "name": "",
+          "formula": ""
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "none",
+        "otherActivityAsParentType": true
+      }
+    },
+    "identified": true,
+    "unidentified": {
+      "description": ""
+    },
+    "container": null,
+    "quantity": 1,
+    "crew": {
+      "value": []
+    },
+    "armor": {
+      "value": null,
+      "dex": null
+    },
+    "proficient": null,
+    "strength": null
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {
+    "world": {
+      "qmarkBlock": true
+    },
+    "midiProperties": {
+      "confirmTargets": "default",
+      "autoTargetType": "any"
+    },
+    "midi-qol": {
+      "onUseMacroName": "[postActiveEffects]ItemMacro"
+    },
+    "dae": {
+      "macro": {
+        "name": "问号宝箱砖 ? Block",
+        "img": "icons/containers/boxes/box-gift-yellow.webp",
+        "type": "script",
+        "scope": "global",
+        "command": "(async () => {\n  const me = canvas.tokens.controlled[0] ?? (typeof token !== \"undefined\" ? token : null);\n  const a = me?.actor ?? (typeof actor !== \"undefined\" ? actor : null);\n  if (!a) { ui.notifications.warn(\"请先选中使用者的 Token 再顶砖\"); return; }\n\n  const TEMP_FLAG = \"qblockTemp\";\n  const BLOCK_FLAG = \"qmarkBlock\";\n\n  // —— 注入的限时道具数据（火花 / 蘑菇 / 大跳）——\n  const FIRE_SPARK = {\"name\": \"火花 Fire Spark\", \"type\": \"consumable\", \"img\": \"icons/magic/fire/projectile-fireball-orange.webp\", \"system\": {\"description\": {\"value\": \"<p>从问号砖中蹦出的一缕火花。用一个动作将它投向 60 尺内一个目标，作一次<strong>远程攻击</strong>；命中造成 <strong>3d6 火焰</strong>伤害。投出即熄灭。若你下次短休前未使用，火花将自行消散。</p>\", \"chat\": \"\"}, \"type\": {\"value\": \"\", \"subtype\": \"\"}, \"quantity\": 1, \"weight\": {\"value\": 0, \"units\": \"lb\"}, \"price\": {\"value\": 0, \"denomination\": \"gp\"}, \"uses\": {\"max\": \"1\", \"spent\": 0, \"recovery\": [], \"autoDestroy\": true}, \"activities\": {\"dnd5eactivity000\": {\"_id\": \"dnd5eactivity000\", \"type\": \"attack\", \"activation\": {\"type\": \"action\", \"value\": 1, \"override\": false}, \"consumption\": {\"targets\": [{\"type\": \"itemUses\", \"value\": \"1\", \"scaling\": {}}], \"scaling\": {\"allowed\": false}, \"spellSlot\": true}, \"attack\": {\"ability\": \"dex\", \"type\": {\"value\": \"ranged\", \"classification\": \"weapon\"}, \"bonus\": \"\", \"flat\": false, \"critical\": {}}, \"damage\": {\"parts\": [{\"number\": 3, \"denomination\": 6, \"bonus\": \"\", \"types\": [\"fire\"], \"custom\": {\"enabled\": false}, \"scaling\": {\"number\": 1}}], \"critical\": {}, \"includeBase\": true}, \"range\": {\"value\": \"60\", \"units\": \"ft\", \"override\": false}, \"target\": {\"affects\": {\"type\": \"creature\", \"count\": \"1\", \"choice\": false}, \"template\": {\"contiguous\": false, \"stationary\": false, \"units\": \"ft\"}, \"override\": false, \"prompt\": true}, \"img\": null, \"sort\": 0, \"description\": {}, \"duration\": {\"units\": \"inst\", \"concentration\": false, \"override\": false}, \"effects\": [], \"flags\": {}, \"uses\": {\"spent\": 0, \"recovery\": []}, \"visibility\": {\"level\": {}, \"requireAttunement\": false, \"requireIdentification\": false, \"requireMagic\": false}, \"useConditionText\": \"\", \"useConditionReason\": \"\", \"effectConditionText\": \"\", \"macroData\": {\"name\": \"\", \"command\": \"\"}, \"ignoreTraits\": {\"idi\": false, \"idr\": false, \"idv\": false, \"ida\": false, \"idm\": false}, \"midiProperties\": {\"ignoreTraits\": [], \"triggeredActivityId\": \"none\", \"triggeredActivityConditionText\": \"\", \"triggeredActivityTargets\": \"targets\", \"triggeredActivityRollAs\": \"self\", \"triggeredActivityConsume\": true, \"triggeredActivityConfigure\": true, \"autoConsume\": false, \"forceConsumeDialog\": \"default\", \"forceRollDialog\": \"default\", \"forceDamageDialog\": \"default\", \"confirmTargets\": \"default\", \"autoTargetType\": \"any\", \"autoTargetAction\": \"default\", \"automationOnly\": false, \"otherActivityCompatible\": true, \"otherActivityAsParentType\": true, \"identifier\": \"\", \"displayActivityName\": false, \"rollMode\": \"default\", \"chooseEffects\": false, \"toggleEffect\": false, \"ignoreFullCover\": false, \"removeChatButtons\": \"default\", \"magicEffect\": false, \"magicDamage\": false, \"noConcentrationCheck\": false, \"skipConcentrationCheck\": false, \"autoCEEffects\": \"default\"}, \"isOverTimeFlag\": false, \"overTimeProperties\": {\"saveRemoves\": true, \"rollAs\": \"target\", \"preRemoveConditionText\": \"\", \"postRemoveConditionText\": \"\"}, \"otherActivityId\": \"\", \"otherActivityAsParentType\": true, \"attackMode\": \"oneHanded\", \"ammunition\": \"\", \"otherActivityUuid\": \"\", \"attackRollPerTarget\": \"default\", \"fumbleThreshold\": 1}}, \"source\": {\"rules\": \"2014\", \"revision\": 1}, \"identifier\": \"-fire-spark\", \"identified\": true, \"unidentified\": {\"description\": \"\"}, \"container\": null, \"rarity\": \"\", \"attunement\": \"\", \"attuned\": false, \"equipped\": false, \"damage\": {\"base\": {\"types\": [], \"custom\": {\"enabled\": false}, \"scaling\": {\"number\": 1}}, \"replace\": false}, \"properties\": []}, \"flags\": {\"world\": {\"qblockTemp\": true}, \"dnd5e\": {\"riders\": {\"activity\": []}}, \"autoanimations\": {\"id\": \"0a51dae7-1655-4b92-886f-a3018a692ff5\", \"label\": \"火花 Fire Spark\", \"levels3d\": {\"type\": \"explosion\", \"data\": {\"color01\": \"#FFFFFF\", \"color02\": \"#FFFFFF\", \"spritePath\": \"modules/levels-3d-preview/assets/particles/dust.png\"}, \"sound\": {\"enable\": false}, \"secondary\": {\"enable\": false, \"data\": {\"color01\": \"#FFFFFF\", \"color02\": \"#FFFFFF\", \"spritePath\": \"modules/levels-3d-preview/assets/particles/dust.png\"}}}, \"macro\": {\"enable\": false, \"playWhen\": \"0\"}, \"menu\": \"range\", \"primary\": {\"video\": {\"dbSection\": \"range\", \"menuType\": \"weapon\", \"animation\": \"flask\", \"variant\": \"01\", \"color\": \"orange\", \"enableCustom\": false, \"customPath\": \"\"}, \"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}, \"options\": {\"contrast\": 0, \"delay\": 0, \"elevation\": 1000, \"isReturning\": false, \"isWait\": false, \"onlyX\": false, \"opacity\": 1, \"playbackRate\": 1, \"repeat\": 1, \"repeatDelay\": 250, \"saturate\": 0, \"tint\": false, \"tintColor\": \"#FFFFFF\", \"zIndex\": 1}}, \"secondary\": {\"enable\": false, \"video\": {\"dbSection\": \"static\", \"menuType\": \"spell\", \"animation\": \"curewounds\", \"variant\": \"01\", \"color\": \"blue\", \"enableCustom\": false, \"customPath\": \"\"}, \"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}, \"options\": {\"addTokenWidth\": false, \"anchor\": \"0.5\", \"contrast\": 0, \"delay\": 0, \"elevation\": 1000, \"fadeIn\": 250, \"fadeOut\": 500, \"isMasked\": false, \"isRadius\": true, \"isWait\": false, \"opacity\": 1, \"repeat\": 1, \"repeatDelay\": 250, \"saturate\": 0, \"size\": 1.5, \"tint\": false, \"tintColor\": \"#FFFFFF\", \"zIndex\": 1}}, \"soundOnly\": {\"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}}, \"source\": {\"enable\": false, \"video\": {\"dbSection\": \"static\", \"menuType\": \"spell\", \"animation\": \"curewounds\", \"variant\": \"01\", \"color\": \"blue\", \"enableCustom\": false, \"customPath\": \"\"}, \"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}, \"options\": {\"addTokenWidth\": false, \"anchor\": \"0.5\", \"contrast\": 0, \"delay\": 0, \"elevation\": 1000, \"fadeIn\": 250, \"fadeOut\": 500, \"isMasked\": false, \"isRadius\": false, \"isWait\": true, \"opacity\": 1, \"repeat\": 1, \"repeatDelay\": 250, \"saturate\": 0, \"size\": 1, \"tint\": false, \"tintColor\": \"#FFFFFF\", \"zIndex\": 1}}, \"target\": {\"enable\": false, \"video\": {\"dbSection\": \"static\", \"menuType\": \"spell\", \"animation\": \"curewounds\", \"variant\": \"01\", \"color\": \"blue\", \"enableCustom\": false, \"customPath\": \"\"}, \"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}, \"options\": {\"addTokenWidth\": false, \"anchor\": \"0.5\", \"contrast\": 0, \"delay\": 0, \"elevation\": 1000, \"fadeIn\": 250, \"fadeOut\": 500, \"isMasked\": false, \"isRadius\": false, \"opacity\": 1, \"persistent\": false, \"repeat\": 1, \"repeatDelay\": 250, \"saturate\": 0, \"size\": 1, \"tint\": false, \"tintColor\": \"#FFFFFF\", \"unbindAlpha\": false, \"unbindVisibility\": false, \"zIndex\": 1}}, \"isEnabled\": true, \"isCustomized\": true, \"fromAmmo\": false, \"version\": 5}}, \"effects\": [], \"folder\": null};\n  const MUSHROOM = {\"name\": \"蘑菇 Mushroom\", \"type\": \"consumable\", \"img\": \"icons/consumables/mushrooms/convex-spotted-orange-white.webp\", \"system\": {\"description\": {\"value\": \"<p>从问号砖中蹦出的一颗蘑菇。用一个动作吃下，或递给一个相邻生物吃下，回复 <strong>2d6 生命</strong>。若你下次短休前未使用，蘑菇将腐坏消失。</p>\", \"chat\": \"\"}, \"type\": {\"value\": \"food\", \"subtype\": \"\"}, \"quantity\": 1, \"weight\": {\"value\": 0, \"units\": \"lb\"}, \"price\": {\"value\": 0, \"denomination\": \"gp\"}, \"uses\": {\"max\": \"1\", \"spent\": 0, \"recovery\": [], \"autoDestroy\": true}, \"activities\": {\"dnd5eactivity000\": {\"_id\": \"dnd5eactivity000\", \"type\": \"heal\", \"activation\": {\"type\": \"action\", \"value\": 1, \"override\": false}, \"consumption\": {\"targets\": [{\"type\": \"itemUses\", \"value\": \"1\", \"scaling\": {}}], \"scaling\": {\"allowed\": false}, \"spellSlot\": true}, \"healing\": {\"number\": 2, \"denomination\": 6, \"bonus\": \"\", \"types\": [\"healing\"], \"custom\": {\"enabled\": false}, \"scaling\": {\"number\": 1}}, \"range\": {\"units\": \"touch\", \"override\": false}, \"target\": {\"affects\": {\"type\": \"creature\", \"count\": \"1\", \"choice\": false}, \"template\": {\"contiguous\": false, \"stationary\": false, \"units\": \"ft\"}, \"override\": false, \"prompt\": true}, \"img\": null, \"sort\": 0, \"description\": {}, \"duration\": {\"units\": \"inst\", \"concentration\": false, \"override\": false}, \"effects\": [], \"flags\": {}, \"uses\": {\"spent\": 0, \"recovery\": []}, \"visibility\": {\"level\": {}, \"requireAttunement\": false, \"requireIdentification\": false, \"requireMagic\": false}, \"useConditionText\": \"\", \"useConditionReason\": \"\", \"effectConditionText\": \"\", \"macroData\": {\"name\": \"\", \"command\": \"\"}, \"ignoreTraits\": {\"idi\": false, \"idr\": false, \"idv\": false, \"ida\": false, \"idm\": false}, \"midiProperties\": {\"ignoreTraits\": [], \"triggeredActivityId\": \"none\", \"triggeredActivityConditionText\": \"\", \"triggeredActivityTargets\": \"targets\", \"triggeredActivityRollAs\": \"self\", \"triggeredActivityConsume\": true, \"triggeredActivityConfigure\": true, \"autoConsume\": false, \"forceConsumeDialog\": \"default\", \"forceRollDialog\": \"default\", \"forceDamageDialog\": \"default\", \"confirmTargets\": \"default\", \"autoTargetType\": \"any\", \"autoTargetAction\": \"default\", \"automationOnly\": false, \"otherActivityCompatible\": true, \"otherActivityAsParentType\": true, \"identifier\": \"\", \"displayActivityName\": false, \"rollMode\": \"default\", \"chooseEffects\": false, \"toggleEffect\": false, \"ignoreFullCover\": false, \"removeChatButtons\": \"default\", \"magicEffect\": false, \"magicDamage\": false, \"noConcentrationCheck\": false, \"skipConcentrationCheck\": false, \"autoCEEffects\": \"default\"}, \"isOverTimeFlag\": false, \"overTimeProperties\": {\"saveRemoves\": true, \"rollAs\": \"target\", \"preRemoveConditionText\": \"\", \"postRemoveConditionText\": \"\"}}}, \"source\": {\"rules\": \"2014\", \"revision\": 1}, \"identifier\": \"-mushroom\", \"identified\": true, \"unidentified\": {\"description\": \"\"}, \"container\": null, \"rarity\": \"\", \"attunement\": \"\", \"attuned\": false, \"equipped\": false, \"damage\": {\"base\": {\"types\": [], \"custom\": {\"enabled\": false}, \"scaling\": {\"number\": 1}}, \"replace\": false}, \"properties\": []}, \"flags\": {\"world\": {\"qblockTemp\": true}, \"dnd5e\": {\"riders\": {\"activity\": []}}, \"autoanimations\": {\"id\": \"1490b847-ce39-4259-ae48-be92f46a7c15\", \"label\": \"蘑菇 Mushroom\", \"macro\": {\"enable\": false, \"playWhen\": \"0\"}, \"menu\": \"ontoken\", \"primary\": {\"video\": {\"dbSection\": \"static\", \"menuType\": \"spell\", \"animation\": \"generichealing\", \"variant\": \"01\", \"color\": \"blue\", \"enableCustom\": false, \"customPath\": \"\"}, \"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}, \"options\": {\"addTokenWidth\": false, \"anchor\": \"0.5\", \"contrast\": 0, \"delay\": 0, \"elevation\": 1000, \"fadeIn\": 250, \"fadeOut\": 500, \"isMasked\": false, \"isRadius\": false, \"isWait\": false, \"opacity\": 1, \"persistent\": false, \"playbackRate\": 1, \"playOn\": \"default\", \"repeat\": 1, \"repeatDelay\": 250, \"saturate\": 0, \"size\": 1, \"tint\": false, \"tintColor\": \"#FFFFFF\", \"unbindAlpha\": false, \"unbindVisibility\": false, \"zIndex\": 1}}, \"secondary\": {\"enable\": false, \"video\": {\"dbSection\": \"static\", \"menuType\": \"spell\", \"animation\": \"curewounds\", \"variant\": \"01\", \"color\": \"blue\", \"enableCustom\": false, \"customPath\": \"\"}, \"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}, \"options\": {\"addTokenWidth\": false, \"anchor\": \"0.5\", \"contrast\": 0, \"delay\": 0, \"elevation\": 1000, \"fadeIn\": 250, \"fadeOut\": 500, \"isMasked\": false, \"isRadius\": true, \"isWait\": false, \"opacity\": 1, \"repeat\": 1, \"repeatDelay\": 250, \"saturate\": 0, \"size\": 1.5, \"tint\": false, \"tintColor\": \"#FFFFFF\", \"zIndex\": 1}}, \"soundOnly\": {\"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}}, \"source\": {\"enable\": false, \"video\": {\"dbSection\": \"static\", \"menuType\": \"spell\", \"animation\": \"curewounds\", \"variant\": \"01\", \"color\": \"blue\", \"enableCustom\": false, \"customPath\": \"\"}, \"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}, \"options\": {\"addTokenWidth\": false, \"anchor\": \"0.5\", \"contrast\": 0, \"delay\": 0, \"elevation\": 1000, \"fadeIn\": 250, \"fadeOut\": 500, \"isMasked\": false, \"isRadius\": false, \"isWait\": true, \"opacity\": 1, \"repeat\": 1, \"repeatDelay\": 250, \"saturate\": 0, \"size\": 1, \"tint\": false, \"tintColor\": \"#FFFFFF\", \"zIndex\": 1}}, \"target\": {\"enable\": false, \"video\": {\"dbSection\": \"static\", \"menuType\": \"spell\", \"animation\": \"curewounds\", \"variant\": \"01\", \"color\": \"blue\", \"enableCustom\": false, \"customPath\": \"\"}, \"sound\": {\"enable\": false, \"delay\": 0, \"repeat\": 1, \"repeatDelay\": 250, \"startTime\": 0, \"volume\": 0.75}, \"options\": {\"addTokenWidth\": false, \"anchor\": \"0.5\", \"contrast\": 0, \"delay\": 0, \"elevation\": 1000, \"fadeIn\": 250, \"fadeOut\": 500, \"isMasked\": false, \"isRadius\": false, \"opacity\": 1, \"persistent\": false, \"repeat\": 1, \"repeatDelay\": 250, \"saturate\": 0, \"size\": 1, \"tint\": false, \"tintColor\": \"#FFFFFF\", \"unbindAlpha\": false, \"unbindVisibility\": false, \"zIndex\": 1}}, \"isEnabled\": true, \"isCustomized\": true, \"fromAmmo\": false, \"version\": 5, \"levels3d\": {\"type\": \"explosion\", \"data\": {\"color01\": \"#FFFFFF\", \"color02\": \"#FFFFFF\", \"spritePath\": \"modules/levels-3d-preview/assets/particles/dust.png\"}, \"sound\": {\"enable\": false}, \"secondary\": {\"enable\": false, \"data\": {\"color01\": \"#FFFFFF\", \"color02\": \"#FFFFFF\", \"spritePath\": \"modules/levels-3d-preview/assets/particles/dust.png\"}}}}}, \"effects\": [], \"folder\": null};\n  const LEAP_ITEM = {\"name\": \"大跳 Super Leap\", \"type\": \"consumable\", \"img\": \"icons/magic/control/buff-flight-wings-blue.webp\", \"system\": {\"description\": {\"value\": \"<p>从问号砖中获得的一次大跳。用一个<strong>附赠动作</strong>触发，选择 30 尺内一处落点，腾空跃至该处；这次移动<strong>不引发借机攻击</strong>。若你下次短休前未使用，它便会消散。</p>\", \"chat\": \"\"}, \"type\": {\"value\": \"\", \"subtype\": \"\"}, \"quantity\": 1, \"weight\": {\"value\": 0, \"units\": \"lb\"}, \"price\": {\"value\": 0, \"denomination\": \"gp\"}, \"uses\": {\"max\": \"1\", \"spent\": 0, \"recovery\": [], \"autoDestroy\": true}, \"activities\": {\"dnd5eactivity000\": {\"_id\": \"dnd5eactivity000\", \"type\": \"utility\", \"name\": \"大跳\", \"activation\": {\"type\": \"bonus\", \"value\": 1, \"override\": false}, \"consumption\": {\"targets\": [{\"type\": \"itemUses\", \"value\": \"1\"}], \"scaling\": {\"allowed\": false}, \"spellSlot\": false}, \"duration\": {\"units\": \"inst\", \"concentration\": false, \"override\": false}, \"range\": {\"units\": \"self\", \"override\": false}, \"target\": {\"affects\": {\"type\": \"self\", \"count\": \"\", \"choice\": false, \"special\": \"\"}, \"override\": false}}}, \"source\": {\"rules\": \"2014\", \"revision\": 1}, \"identifier\": \"-super-leap\"}, \"effects\": [], \"flags\": {\"world\": {\"qblockTemp\": true}, \"midiProperties\": {\"confirmTargets\": \"default\", \"autoTargetType\": \"any\"}, \"midi-qol\": {\"onUseMacroName\": \"[postActiveEffects]ItemMacro\"}, \"dae\": {\"macro\": {\"name\": \"大跳 Super Leap\", \"img\": \"icons/magic/control/buff-flight-wings-blue.webp\", \"type\": \"script\", \"scope\": \"global\", \"command\": \"(async () => {\\n  const me = canvas.tokens.controlled[0] ?? (typeof token !== \\\"undefined\\\" ? token : null);\\n  if (!me) { ui.notifications.warn(\\\"请先选中你的 Token 再大跳\\\"); return; }\\n  const gridSize = canvas.grid.size;\\n  const ftPerSq = canvas.scene.grid?.distance ?? 5;\\n  const SNAP = CONST.GRID_SNAPPING_MODES;\\n  const RANGE_FT = 30;\\n  const TIMEOUT_MS = 20000;\\n  const cc = { x: me.center?.x ?? (me.x + me.w / 2), y: me.center?.y ?? (me.y + me.h / 2) };\\n  const ftBetween = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) / gridSize * ftPerSq;\\n  const snapC = (p) => { try { return canvas.grid.getSnappedPoint({ x: p.x, y: p.y }, { mode: SNAP.CENTER, resolution: 1 }); } catch (e) { return { x: Math.round(p.x / gridSize) * gridSize, y: Math.round(p.y / gridSize) * gridSize }; } };\\n\\n  const pick = () => new Promise((resolve) => {\\n    const maxSq = Math.max(1, Math.floor(RANGE_FT / ftPerSq));\\n    const g = new PIXI.Graphics();\\n    g.lineStyle(2, 0x66ff66, 0.9); g.beginFill(0x66ff66, 0.05);\\n    g.drawCircle(cc.x, cc.y, maxSq * gridSize); g.endFill();\\n    g.zIndex = 10000; canvas.app.stage.addChild(g);\\n    ui.notifications.info(\\\"点击落点进行大跳（不超过 \\\" + RANGE_FT + \\\" 尺）\\\");\\n    const cleanup = () => { try { canvas.app.stage.off(\\\"pointerdown\\\", h); } catch (e) {} try { canvas.app.stage.removeChild(g); } catch (e) {} };\\n    const h = (ev) => { cleanup(); let p = null; try { p = ev.data.getLocalPosition(canvas.app.stage); } catch (e) {} resolve(p ? snapC(p) : null); };\\n    canvas.app.stage.on(\\\"pointerdown\\\", h);\\n    setTimeout(() => { cleanup(); resolve(null); }, TIMEOUT_MS);\\n  });\\n\\n  const dest = await pick();\\n  if (!dest) { ui.notifications.warn(\\\"已取消大跳\\\"); return; }\\n  if (ftBetween(dest, cc) > RANGE_FT + 0.001) { ui.notifications.warn(\\\"超出 \\\" + RANGE_FT + \\\" 尺，已取消\\\"); return; }\\n\\n  // 尘土冲击：在候选 key 里挑一个库里存在的播，找不到就静默跳过（不报错）\\n  try {\\n    const cands = [\\\"jb2a.impact.ground_crack.orange.01\\\", \\\"jb2a.smoke.puff.centered.grey.1\\\", \\\"jb2a.impact.011.orange\\\", \\\"jb2a.smoke.puff.ring.01.white\\\", \\\"jb2a.dust_cloud.01\\\"];\\n    let fx = null;\\n    for (const k of cands) { try { if (Sequencer?.Database?.entryExists?.(k)) { fx = k; break; } } catch (e) {} }\\n    if (fx && typeof Sequence !== \\\"undefined\\\") {\\n      new Sequence()\\n        .effect().file(fx).atLocation({ x: cc.x, y: cc.y }).scaleToObject(1.5)\\n        .effect().file(fx).atLocation({ x: dest.x, y: dest.y }).scaleToObject(2).delay(200)\\n        .play();\\n    }\\n  } catch (e) { console.error(\\\"大跳 | 动画失败\\\", e); }\\n\\n  // 传送式移动（不引发借机攻击）\\n  try {\\n    if (typeof MidiQOL?.moveToken === \\\"function\\\") await MidiQOL.moveToken(me, { x: dest.x, y: dest.y }, false);\\n    else await me.document.update({ x: dest.x - gridSize / 2, y: dest.y - gridSize / 2 });\\n  } catch (e) { console.error(\\\"大跳 | 移动失败\\\", e); }\\n\\n  ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: me.actor }), content: \\\"<p>🦘 <strong>超级跳</strong>：\\\" + me.name + \\\" 腾空大跳、稳稳落地，期间不引发借机攻击。</p>\\\" });\\n})();\\n\", \"author\": \"\", \"ownership\": {\"default\": 3}, \"_id\": null, \"folder\": null, \"sort\": 0, \"flags\": {}}}}};\n\n  const chat = (html) => ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: a }), content: html });\n  const rollShow = async (formula, flavor) => {\n    const r = new Roll(formula); await r.evaluate();\n    await r.toMessage({ flavor, speaker: ChatMessage.getSpeaker({ actor: a }) });\n    return r.total;\n  };\n\n  // —— 短休清理钩子：首次运行自注册（会话级，无需世界脚本）——\n  if (!globalThis.__qblockRestHook) {\n    globalThis.__qblockRestHook = Hooks.on(\"dnd5e.restCompleted\", async (restActor) => {\n      try {\n        const ids = restActor.items.filter((i) => i.getFlag(\"world\", TEMP_FLAG)).map((i) => i.id);\n        if (ids.length) {\n          await restActor.deleteEmbeddedDocuments(\"Item\", ids);\n          ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: restActor }), content: \"<p>问号砖吐出的限时道具随短休消散了。</p>\" });\n        }\n      } catch (e) { console.error(\"问号砖 | 短休清理失败\", e); }\n    });\n  }\n\n  const grant = async (data) => { await a.createEmbeddedDocuments(\"Item\", [foundry.utils.deepClone(data)]); };\n\n  // —— 无敌星：抗性一切伤害 + ATL 发光（效应结束自动熄灭）——\n  const DMG = [\"acid\",\"bludgeoning\",\"cold\",\"fire\",\"force\",\"lightning\",\"necrotic\",\"piercing\",\"poison\",\"psychic\",\"radiant\",\"slashing\",\"thunder\"];\n  const starEffect = () => ({\n    name: \"无敌星 Invincibility Star\",\n    img: \"icons/magic/control/buff-flight-wings-runes-blue.webp\",\n    description: \"<p>你周身闪耀星光，到你下回合结束前对一切伤害具有抗性（伤害减半），并散发光芒。</p>\",\n    duration: { seconds: 6 }, statuses: [], origin: \"\", transfer: false, disabled: false,\n    changes: [\n      { key: \"system.traits.dr.value\", mode: 2, value: \"acid\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"bludgeoning\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"cold\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"fire\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"force\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"lightning\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"necrotic\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"piercing\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"poison\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"psychic\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"radiant\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"slashing\", priority: 20 },\n      { key: \"system.traits.dr.value\", mode: 2, value: \"thunder\", priority: 20 },\n      { key: \"ATL.light.dim\", mode: 5, value: \"20\", priority: 20 },\n      { key: \"ATL.light.bright\", mode: 5, value: \"10\", priority: 20 },\n      { key: \"ATL.light.color\", mode: 5, value: \"#ffd700\", priority: 20 },\n      { key: \"ATL.light.alpha\", mode: 5, value: \"0.45\", priority: 20 },\n      { key: \"ATL.light.animation\", mode: 5, value: '{\"type\":\"pulse\",\"speed\":5,\"intensity\":5}', priority: 20 },\n    ],\n    flags: {},\n  });\n  const dropStar = async () => {\n    const old = a.effects.filter((e) => e.name?.includes(\"无敌星\")).map((e) => e.id);\n    if (old.length) await a.deleteEmbeddedDocuments(\"ActiveEffect\", old);\n    await a.createEmbeddedDocuments(\"ActiveEffect\", [starEffect()]);\n    try {\n      const cands = [\"jb2a.twinkling_stars.points.many.purple\", \"jb2a.twinkling_stars.points.many.blue\", \"jb2a.twinkling_stars.points.four.purple\"];\n      let fx = null;\n      for (const k of cands) { try { if (Sequencer?.Database?.entryExists?.(k)) { fx = k; break; } } catch (e) {} }\n      if (fx && typeof Sequence !== \"undefined\") new Sequence().effect().file(fx).attachTo(me).scaleToObject(2.2).persist().duration(6000).fadeOut(500).name(\"qblock-star-\" + me.id).play();\n    } catch (e) {}\n  };\n\n  // —— 掷 1d6 决定产物 ——\n  const d6 = await rollShow(\"1d6\", \"🟨 问号砖 d6\");\n  let line = \"\";\n  if (d6 === 1) {\n    const t = await rollShow(\"2d4+10\", \"🛡 临时生命\");\n    if (typeof a.applyTempHP === \"function\") await a.applyTempHP(t);\n    else await a.update({ \"system.attributes.hp.temp\": Math.max(a.system.attributes?.hp?.temp || 0, t) });\n    line = \"<strong>① 临时生命</strong>：获得 \" + t + \" 点临时生命值（到短休为止）。\";\n  } else if (d6 === 2) {\n    await grant(FIRE_SPARK);\n    line = \"<strong>② 火花</strong>：一枚可投掷的火花进了你的背包（3d6 火焰·远程攻击命中）。\";\n  } else if (d6 === 3) {\n    await grant(MUSHROOM);\n    line = \"<strong>③ 蘑菇</strong>：一颗蘑菇进了你的背包（回 2d6，可给自己或相邻队友）。\";\n  } else if (d6 === 4) {\n    const gp = (a.system.currency?.gp ?? 0) + 10;\n    await a.update({ \"system.currency.gp\": gp });\n    line = \"<strong>④ 金币</strong>：叮！获得 10 枚金币（+10 gp）。\";\n  } else if (d6 === 5) {\n    await dropStar();\n    line = \"<strong>⑤ 无敌星</strong>：到你下回合结束前抗性一切伤害并发光。\";\n  } else {\n    await grant(LEAP_ITEM);\n    line = \"<strong>⑥ 超级跳</strong>：一枚『大跳』进了你的背包——附赠动作触发，点地大跳、不引发借机攻击。\";\n  }\n  await chat(\"<p>🟨 <strong>问号宝箱砖</strong> 顶出（d6=\" + d6 + \"）：<br>\" + line + \"</p>\");\n\n  // —— 第三次（当天最后一次）风险：用完后掷 1d20，出 1 砖块碎裂 ——\n  const block = a.items.find((i) => i.getFlag(\"world\", BLOCK_FLAG));\n  if (block && block.system.uses?.value === 0) {\n    const d20 = await rollShow(\"1d20\", \"💥 砖块耐久\");\n    if (d20 === 1) {\n      await chat(\"<p>💥 <strong>问号宝箱砖</strong> 发出最后一声哀鸣，<strong>碎裂消散</strong>了……（最后一次使用掷出 1）</p>\");\n      await block.delete();\n    } else {\n      await chat(\"<p>⚠ 今天最后一次使用——砖块剧烈震颤但挺住了（1d20=\" + d20 + \"，非 1）。</p>\");\n    }\n  }\n})();\n",
+        "author": "",
+        "ownership": {
+          "default": 3
+        },
+        "_id": null,
+        "folder": null,
+        "sort": 0,
+        "flags": {}
+      }
+    },
+    "dnd5e": {
+      "riders": {
+        "effect": [],
+        "activity": []
+      }
+    },
+    "scene-packer": {
+      "sourceId": "Item.eJTLNQdccYTNIy6I",
+      "hash": "71322a4c8650dfe131a19b38fd92d15a9bf04f7d",
+      "defaultPermission": 1
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.longhua-dm-toolkit.longhua-items.Item.f5bCSi16Vq2PpmCg",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Item.eJTLNQdccYTNIy6I",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788842867943,
+    "modifiedTime": 1788842868223,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 1
+  }
+}

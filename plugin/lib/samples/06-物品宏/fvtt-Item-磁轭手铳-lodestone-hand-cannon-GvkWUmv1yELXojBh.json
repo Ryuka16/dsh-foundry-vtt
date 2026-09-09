@@ -1,0 +1,496 @@
+{
+  "name": "磁轭手铳  Lodestone Hand-Cannon",
+  "type": "weapon",
+  "img": "icons/skills/ranged/rifle-scoped-gray-green.webp",
+  "system": {
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "type": "attack",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "attack": {
+          "ability": "dex",
+          "bonus": "1",
+          "type": {
+            "value": "ranged",
+            "classification": "weapon"
+          },
+          "critical": {},
+          "flat": false
+        },
+        "damage": {
+          "includeBase": true,
+          "parts": [],
+          "critical": {}
+        },
+        "img": null,
+        "sort": 0,
+        "consumption": {
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false,
+          "targets": []
+        },
+        "description": {},
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "effects": [],
+        "flags": {},
+        "range": {
+          "units": "ft",
+          "override": false
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          },
+          "affects": {
+            "choice": false
+          },
+          "override": false,
+          "prompt": true
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "automationOnly": false,
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "identifier": "",
+          "confirmTargets": "default",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "attackMode": "oneHanded",
+        "ammunition": "",
+        "otherActivityUuid": "",
+        "attackRollPerTarget": "default",
+        "fumbleThreshold": 1
+      }
+    },
+    "uses": {
+      "spent": 0,
+      "recovery": [
+        {
+          "period": "lr",
+          "type": "recoverAll"
+        }
+      ],
+      "max": "@prof"
+    },
+    "description": {
+      "value": "<p><em>武器（手铳），稀有（需同调）</em></p><p>一柄沉重的奥能科技手铳，枪管内缠绕着发烫的磁轭线圈，扣动时以磁力将压缩质量甩射而出。</p><p>你使用这把魔法武器进行的攻击检定与伤害检定具有 <strong>+1</strong> 加值。射程 60/240 尺。命中：1d10 + 敏捷调整值点穿刺伤害。</p><p>本武器以磁力线圈自行装填并加速质量，<strong>无需弹药</strong></p><p><strong>磁轭牵引。</strong>当你以本武器命中一个目标，你可以驱动磁轭，朝你指定的任意方向牵引该目标。该目标必须进行一次体质豁免（DC 等于 8 + 你的熟练加值 + 你的敏捷调整值）：豁免失败时，它被沿你指定的方向强制移动至多 15 尺；豁免成功则不受影响。由本效果造成的强制移动不会引发借机攻击。若目标在移动途中撞上墙壁、障碍或另一个生物而被迫止步，它受到 <strong>2d6 力场</strong>撞击伤害；若它撞上的是另一个生物，该生物同样受到 <strong>1d6 力场</strong>伤害。</p><p>你可以使用磁轭牵引的次数等于你的熟练加值，于一次长休后回复全部使用次数。</p><hr /><p class=\"font-claude-response-body break-words whitespace-normal\"><strong>依赖 mod</strong></p><p class=\"font-claude-response-body break-words whitespace-normal\">必需：</p><ul class=\"[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3\"><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>Midi QOL （命中触发、攻击工作流）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">midi-qol</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>libWrapper （midi 依赖）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">lib-wrapper</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>socketlib （midi 依赖）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">socketlib</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>动态主动效应 DAE （宏挂在 dae.macro）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">dae</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>World Scripter（承载 GM 代办 LHGM;缺它则牵引位移/撞击伤害不生效）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">world-scripter</code></p></li></ul><p class=\"font-claude-response-body break-words whitespace-normal\">推荐（动画用，不装也能用，仅无特效）：</p><ul class=\"[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3\"><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>音序器<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">sequencer</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>JB2A<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">jb2a_patreon</code> / <code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">JB2A_DnD5e</code></p></li></ul>",
+      "chat": ""
+    },
+    "identifier": "lodestone-hand-cannon",
+    "source": {
+      "revision": 1,
+      "rules": "2014"
+    },
+    "identified": true,
+    "unidentified": {
+      "description": ""
+    },
+    "container": null,
+    "quantity": 1,
+    "weight": {
+      "value": 4,
+      "units": "lb"
+    },
+    "price": {
+      "value": 1200,
+      "denomination": "gp"
+    },
+    "rarity": "rare",
+    "attunement": "required",
+    "crew": {
+      "value": []
+    },
+    "ammunition": {},
+    "armor": {},
+    "damage": {
+      "base": {
+        "types": [
+          "piercing"
+        ],
+        "custom": {
+          "enabled": false,
+          "formula": ""
+        },
+        "scaling": {
+          "number": null,
+          "mode": "",
+          "formula": ""
+        },
+        "number": 1,
+        "denomination": 10,
+        "bonus": ""
+      },
+      "versatile": {
+        "types": [],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        }
+      }
+    },
+    "properties": [
+      "mgc"
+    ],
+    "proficient": 1,
+    "range": {
+      "units": "ft",
+      "value": 60,
+      "long": 240,
+      "reach": null
+    },
+    "type": {
+      "value": "martialR",
+      "baseItem": "pistol"
+    },
+    "attuned": true,
+    "equipped": true,
+    "magicalBonus": "1"
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {
+    "dae": {
+      "macro": {
+        "name": "磁轭手铳",
+        "type": "script",
+        "scope": "global",
+        "command": "// 磁轭手铳 Lodestone Hand-Cannon — 物品宏 [postActiveEffects]\n// 命中后：消耗 1 次磁轭牵引（每长休 = 熟练加值 次）→ 点地图选方向 → 目标体质豁免 → 失败则被牵引最多 15 尺。\n// 落点/碰撞玩家端只读计算；移动与对敌伤害交 GM 端 LHGM。\n(async () => {\n  const me = canvas.tokens.controlled[0] ?? (typeof token !== \"undefined\" ? token : null);\n  if (!me) return;\n\n  const wf = (typeof workflow !== \"undefined\" && workflow) ? workflow\n    : ((typeof MidiQOL !== \"undefined\") ? (MidiQOL.currentWorkflow ?? null) : null);\n  const target = Array.from(wf?.hitTargets ?? [])[0]\n    ?? Array.from(wf?.targets ?? [])[0]\n    ?? Array.from(game.user.targets ?? [])[0] ?? null;\n  if (!target) return;                       // 未命中/无目标 → 不触发\n  const myItem = wf?.item ?? wf?.activity?.item ?? wf?.rolledItem ?? (typeof item !== \"undefined\" ? item : null);\n\n  // 次数限制：max = @prof，每长休回满\n  const mrd = me.actor.getRollData();\n  const profVal = Number(mrd.prof ?? mrd.attributes?.prof ?? 2);\n  const dexMod = Number(mrd.abilities?.dex?.mod ?? 0);\n  const maxUses = Math.max(1, profVal);\n  const spent = Number(myItem?.system?.uses?.spent ?? 0);\n  if (maxUses - spent <= 0) { ui.notifications.warn(\"磁轭手铳：牵引力竭，长休后回复使用次数。\"); return; }\n\n  const gridSize = canvas.grid.size;\n  const ftPerSq = canvas.scene.grid?.distance ?? 5;\n  const MAX_FT = 15;\n  const maxCells = Math.max(1, Math.round(MAX_FT / ftPerSq));\n  const cen = (tk) => ({ x: tk.center?.x ?? (tk.x + tk.w / 2), y: tk.center?.y ?? (tk.y + tk.h / 2) });\n  const tc = cen(target);\n\n  const SNAP = CONST.GRID_SNAPPING_MODES;\n  const snapCenter = (p) => {\n    try { return canvas.grid.getSnappedPoint({ x: p.x, y: p.y }, { mode: SNAP.CENTER, resolution: 1 }); }\n    catch (e) { return { x: Math.round(p.x / gridSize) * gridSize, y: Math.round(p.y / gridSize) * gridSize }; }\n  };\n  const pickPoint = () => new Promise((resolve) => {\n    const g = new PIXI.Graphics();\n    g.lineStyle(2, 0x66ccff, 0.9); g.beginFill(0x66ccff, 0.05);\n    g.drawCircle(tc.x, tc.y, maxCells * gridSize); g.endFill();\n    g.zIndex = 10000; canvas.app.stage.addChild(g);\n    ui.notifications.info(`左键点地图选牵引方向，右键取消（剩余 ${maxUses - spent} 次）`);\n    const cleanup = () => { try { canvas.app.stage.off(\"pointerdown\", h); } catch (e) {} try { canvas.app.stage.removeChild(g); } catch (e) {} };\n    const h = (ev) => {\n      const btn = ev.data?.originalEvent?.button ?? ev.data?.button ?? ev.button ?? 0;\n      cleanup();\n      if (btn === 2) return resolve(null);              // 右键取消\n      let p = null; try { p = ev.data.getLocalPosition(canvas.app.stage); } catch (e) {}\n      resolve(p ? snapCenter(p) : null);\n    };\n    canvas.app.stage.on(\"pointerdown\", h);\n    setTimeout(() => { cleanup(); resolve(null); }, 20000);\n  });\n\n  // 点方向（取消 = 不消耗次数）\n  const pt = await pickPoint();\n  if (!pt) return;\n  let vx = pt.x - tc.x, vy = pt.y - tc.y;\n  if (Math.hypot(vx, vy) < 1) return;        // 点在目标自身格 → 取消\n  const len = Math.hypot(vx, vy) || 1; vx /= len; vy /= len;\n\n  // 消耗 1 次（提交方向后）\n  try { if (myItem) await myItem.update({ \"system.uses.spent\": spent + 1 }); } catch (e) { console.error(\"手铳 | 扣次数失败\", e); }\n\n  // 磁力束动画（无 Sequencer 则跳过）\n  const hasSeq = !!game.modules.get(\"sequencer\")?.active && typeof Sequence !== \"undefined\";\n  const firstFound = (arr) => {\n    if (!window.Sequencer?.Database) return null;\n    for (const k of arr) { try { if (Sequencer.Database.entryExists(k)) return k; } catch (e) {} }\n    return null;\n  };\n  const beam = hasSeq ? firstFound([\"jb2a.energy_beam.normal.bluepink.03\", \"jb2a.chain_lightning.primary.blue\", \"jb2a.energy_strands.range.standard.blue.01\", \"jb2a.ranged.03.projectile.01.blue\", \"jb2a.lightning.03.blue\"]) : null;\n  if (beam) { try { await new Sequence().effect().atLocation(me).stretchTo(target).file(beam).play(); } catch (e) {} }\n\n  // 体质豁免（用一定存在的基元自算：con调整值 + 已熟练?熟练:0；忽略杂项豁免加值）\n  const trd = target.actor.getRollData();\n  const conMod = Number(trd.abilities?.con?.mod ?? 0);\n  const conProf = target.actor.system?.abilities?.con?.proficient ? profVal : 0;\n  const conSave = conMod + conProf;\n  const dc = 8 + profVal + dexMod;\n  let saved = false;\n  try {\n    const sv = await (new Roll(`1d20 + ${conSave}`)).evaluate();\n    await sv.toMessage({ flavor: `抵抗磁轭牵引 · 体质豁免 vs DC ${dc}`, speaker: ChatMessage.getSpeaker({ token: target.document }) });\n    saved = sv.total >= dc;\n  } catch (e) { console.error(\"手铳 | 豁免失败\", e); }\n  if (saved) { ui.notifications.info(`${target.name} 抵抗了磁轭牵引。`); return; }\n\n  // 失败 → 沿方向牵引，找生物/墙碰撞\n  const creatureAt = (c, ignore) => canvas.tokens.placeables.find((tk) => {\n    if (ignore && tk.id === ignore.id) return false;\n    return c.x >= tk.x && c.x < tk.x + tk.w && c.y >= tk.y && c.y < tk.y + tk.h;\n  });\n  const wallBetween = (a, b) => {                  // ⚠ 核心 API，字典未收录，实测；取不到则只靠生物碰撞\n    try {\n      const be = CONFIG.Canvas?.polygonBackends?.move;\n      if (be?.testCollision) return !!be.testCollision({ x: a.x, y: a.y }, { x: b.x, y: b.y }, { type: \"move\", mode: \"any\" });\n    } catch (e) {}\n    return false;\n  };\n\n  let cur = { ...tc }, final = { ...tc }, collided = false, obstacleId = null;\n  for (let i = 0; i < maxCells; i++) {\n    const next = { x: cur.x + vx * gridSize, y: cur.y + vy * gridSize };\n    const occ = creatureAt(next, target);\n    if (occ) { collided = true; obstacleId = occ.id; break; }\n    if (wallBetween(cur, next)) { collided = true; break; }\n    cur = next; final = next;\n  }\n\n  if (collided && hasSeq) {\n    const impact = firstFound([\"jb2a.impact.010.blue\", \"jb2a.static_electricity.03.blue\", \"jb2a.impact.blue.0\", \"jb2a.impact.ground_crack.blue.01\"]);\n    if (impact) { try { await new Sequence().effect().atLocation({ x: final.x, y: final.y }).file(impact).scale(0.7).play(); } catch (e) {} }\n  }\n\n  // 移动 + 对敌伤害 → GM\n  const tw = target.document?.width ?? 1, th = target.document?.height ?? 1;\n  const moved = (final.x !== tc.x || final.y !== tc.y);\n  const ops = [];\n  if (moved) ops.push({ tokenId: target.id, move: { x: Math.round(final.x - (tw * gridSize) / 2), y: Math.round(final.y - (th * gridSize) / 2), animate: true } });\n  if (collided) {\n    try {\n      const r = await (new Roll(\"2d6\")).evaluate();\n      await r.toMessage({ flavor: \"磁轭撞击 Lodestone Slam（力场）\", speaker: ChatMessage.getSpeaker({ actor: me.actor }) });\n      ops.push({ tokenId: target.id, damage: [{ value: r.total, type: \"force\" }] });\n    } catch (e) {}\n    if (obstacleId && obstacleId !== me.id) {        // 撞到自己身边 → 不扣自己血\n      try {\n        const r2 = await (new Roll(\"1d6\")).evaluate();\n        await r2.toMessage({ flavor: \"磁轭连撞（力场）\", speaker: ChatMessage.getSpeaker({ actor: me.actor }) });\n        ops.push({ tokenId: obstacleId, damage: [{ value: r2.total, type: \"force\" }] });\n      } catch (e) {}\n    }\n  }\n  if (ops.length) {\n    if (globalThis.LHGM?.request) await globalThis.LHGM.request({ sceneId: canvas.scene.id, ops });\n    else ui.notifications.warn(\"磁轭手铳：未加载 GM 代办脚本（LHGM）——位移/撞击伤害未生效。\");\n  }\n})();\n"
+      }
+    },
+    "midi-qol": {
+      "onUseMacroName": "[postActiveEffects]ItemMacro"
+    },
+    "dnd5e": {
+      "riders": {
+        "activity": []
+      },
+      "last": {
+        "dnd5eactivity000": {
+          "attackMode": "oneHanded",
+          "damageType": {
+            "0": "piercing"
+          }
+        }
+      }
+    },
+    "scene-packer": {
+      "sourceId": "Item.GvkWUmv1yELXojBh",
+      "hash": "a1e3959624685a42964310fdfb455bd58691421d",
+      "defaultPermission": 1
+    },
+    "autoanimations": {
+      "id": "690f1588-5163-4c73-9d1d-0260b7ae79ee",
+      "label": "磁轭手铳  Lodestone Hand-Cannon",
+      "levels3d": {
+        "type": "explosion",
+        "data": {
+          "color01": "#FFFFFF",
+          "color02": "#FFFFFF",
+          "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+        },
+        "sound": {
+          "enable": false
+        },
+        "secondary": {
+          "enable": false,
+          "data": {
+            "color01": "#FFFFFF",
+            "color02": "#FFFFFF",
+            "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+          }
+        }
+      },
+      "macro": {
+        "enable": false,
+        "playWhen": "0"
+      },
+      "meleeSwitch": {
+        "video": {
+          "dbSection": "range",
+          "menuType": "weapon",
+          "animation": "arrow",
+          "variant": "regular",
+          "color": "regular"
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "detect": "automatic",
+          "range": 2,
+          "returning": false,
+          "switchType": "on"
+        }
+      },
+      "menu": "melee",
+      "primary": {
+        "video": {
+          "dbSection": "melee",
+          "menuType": "generic",
+          "animation": "1hp",
+          "variant": "01",
+          "color": "white",
+          "enableCustom": true,
+          "customPath": "blfx.weapon.range.dart_blowgun1.color1"
+        },
+        "sound": {
+          "enable": true,
+          "delay": 700,
+          "file": "psfx.ranged-weapons.guns.single-fire.revolver.2",
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 1
+        },
+        "options": {
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "isWait": false,
+          "opacity": 1,
+          "playbackRate": 1,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "zIndex": 1
+        }
+      },
+      "secondary": {
+        "enable": true,
+        "video": {
+          "dbSection": "static",
+          "menuType": "generic",
+          "animation": "impact",
+          "variant": "01",
+          "color": "darkpurple",
+          "enableCustom": false,
+          "customPath": "blfx.weapon.range.dart_blowgun1.color1"
+        },
+        "sound": {
+          "enable": true,
+          "delay": 2000,
+          "file": "psfx.ranged-weapons.guns.prepare.revolver.2",
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 1
+        },
+        "options": {
+          "addTokenWidth": false,
+          "anchor": "0.5",
+          "contrast": 0,
+          "delay": 1500,
+          "elevation": 1000,
+          "fadeIn": 250,
+          "fadeOut": 500,
+          "isMasked": false,
+          "isRadius": true,
+          "isWait": false,
+          "opacity": 0.98,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1.5,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "zIndex": 1
+        }
+      },
+      "soundOnly": {
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        }
+      },
+      "source": {
+        "enable": false,
+        "video": {
+          "dbSection": "static",
+          "menuType": "spell",
+          "animation": "curewounds",
+          "variant": "01",
+          "color": "blue",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "addTokenWidth": false,
+          "anchor": "0.5",
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "fadeIn": 250,
+          "fadeOut": 500,
+          "isMasked": false,
+          "isRadius": false,
+          "isWait": true,
+          "opacity": 1,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "zIndex": 1
+        }
+      },
+      "target": {
+        "enable": false,
+        "video": {
+          "dbSection": "static",
+          "menuType": "spell",
+          "animation": "curewounds",
+          "variant": "01",
+          "color": "blue",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "addTokenWidth": false,
+          "anchor": "0.5",
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "fadeIn": 250,
+          "fadeOut": 500,
+          "isMasked": false,
+          "isRadius": false,
+          "opacity": 1,
+          "persistent": false,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "unbindAlpha": false,
+          "unbindVisibility": false,
+          "zIndex": 1
+        }
+      },
+      "isEnabled": true,
+      "isCustomized": true,
+      "fromAmmo": false,
+      "version": 5
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.longhua-dm-toolkit.longhua-items.Item.MY43nkkhVCK8mmsb",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "123",
+      "uuid": "Item.GvkWUmv1yELXojBh",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1787946279019,
+    "modifiedTime": 1787946279104,
+    "lastModifiedBy": "zrVQDwcJbxIiWGti"
+  },
+  "ownership": {
+    "default": 1
+  }
+}

@@ -1,0 +1,1454 @@
+{
+  "name": "铁须裂地者 Ironbeard Earthshaker",
+  "type": "npc",
+  "img": "modules/longhua-dm-toolkit/assets/si-she/%E9%93%81%E9%A1%BB%E8%A3%82%E5%9C%B0%E8%80%85.webp",
+  "system": {
+    "currency": {
+      "pp": 0,
+      "gp": 0,
+      "ep": 0,
+      "sp": 0,
+      "cp": 0
+    },
+    "abilities": {
+      "str": {
+        "value": 18,
+        "proficient": 1,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "dex": {
+        "value": 12,
+        "proficient": 0,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "con": {
+        "value": 16,
+        "proficient": 1,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "int": {
+        "value": 8,
+        "proficient": 0,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "wis": {
+        "value": 11,
+        "proficient": 0,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      },
+      "cha": {
+        "value": 9,
+        "proficient": 0,
+        "max": null,
+        "bonuses": {
+          "check": "",
+          "save": ""
+        },
+        "check": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        },
+        "save": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          }
+        }
+      }
+    },
+    "bonuses": {
+      "mwak": {
+        "attack": "",
+        "damage": ""
+      },
+      "rwak": {
+        "attack": "",
+        "damage": ""
+      },
+      "msak": {
+        "attack": "",
+        "damage": ""
+      },
+      "rsak": {
+        "attack": "",
+        "damage": ""
+      },
+      "abilities": {
+        "check": "",
+        "save": "",
+        "skill": ""
+      },
+      "spell": {
+        "dc": ""
+      }
+    },
+    "skills": {
+      "ath": {
+        "ability": "str",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "value": 1,
+        "bonuses": {
+          "check": "",
+          "passive": ""
+        }
+      },
+      "itm": {
+        "ability": "cha",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "value": 1,
+        "bonuses": {
+          "check": "",
+          "passive": ""
+        }
+      }
+    },
+    "tools": {},
+    "spells": {},
+    "attributes": {
+      "ac": {
+        "calc": "natural",
+        "flat": 14,
+        "formula": ""
+      },
+      "init": {
+        "ability": "",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "bonus": "0"
+      },
+      "movement": {
+        "units": "ft",
+        "hover": false,
+        "ignoredDifficultTerrain": [],
+        "walk": "35",
+        "burrow": "0",
+        "climb": "0",
+        "fly": "0",
+        "swim": "0"
+      },
+      "attunement": {
+        "max": 3
+      },
+      "senses": {
+        "ranges": {
+          "blindsight": null,
+          "darkvision": 60,
+          "tremorsense": null,
+          "truesight": null
+        },
+        "units": "ft",
+        "special": ""
+      },
+      "spellcasting": "",
+      "exhaustion": 0,
+      "concentration": {
+        "ability": "",
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "bonuses": {
+          "save": ""
+        },
+        "limit": 1
+      },
+      "loyalty": {},
+      "hd": {
+        "spent": 0
+      },
+      "hp": {
+        "max": 90,
+        "temp": null,
+        "tempmax": null,
+        "value": 90,
+        "formula": "12d8 + 36"
+      },
+      "death": {
+        "roll": {
+          "min": null,
+          "max": null,
+          "mode": 0
+        },
+        "success": 0,
+        "failure": 0,
+        "bonuses": {
+          "save": ""
+        }
+      },
+      "price": {
+        "value": null,
+        "denomination": "gp"
+      },
+      "spell": {
+        "level": 0
+      }
+    },
+    "details": {
+      "biography": {
+        "value": "<p>铁须氏族中的一名<strong>狂战士</strong>。与族中以盾墙护持同袍的<strong>铁须盾卫</strong>不同，裂地者抛弃了盾牌与纪律，只留一柄过重的<strong>巨型战锤</strong>。它惯于将战锤高举过顶、狠狠砸进地面，让冲击波撕裂脚下的岩层，把周身一圈的<strong>所有</strong>生物一并掀翻——这也意味着，盛怒之中它分不清敌我。</p><p>它拥有<strong>黑暗视觉</strong>，对<strong>毒素</strong>具有抗性。族人既倚仗它在阵线最前的爆发，又对它身旁的位置避之唯恐不及。</p>",
+        "public": ""
+      },
+      "alignment": "Chaotic Neutral",
+      "ideal": "",
+      "bond": "",
+      "flaw": "",
+      "race": null,
+      "type": {
+        "value": "humanoid",
+        "subtype": "dwarf",
+        "swarm": "",
+        "custom": ""
+      },
+      "habitat": {
+        "value": [],
+        "custom": ""
+      },
+      "cr": 4,
+      "treasure": {
+        "value": []
+      }
+    },
+    "resources": {
+      "legact": {
+        "max": 0,
+        "spent": 0
+      },
+      "legres": {
+        "max": 0,
+        "spent": 0
+      },
+      "lair": {
+        "value": false,
+        "initiative": null,
+        "inside": false
+      }
+    },
+    "source": {
+      "revision": 1,
+      "rules": "2014",
+      "license": ""
+    },
+    "traits": {
+      "size": "med",
+      "di": {
+        "value": [],
+        "custom": "",
+        "bypasses": []
+      },
+      "dr": {
+        "value": [
+          "poison"
+        ],
+        "custom": "",
+        "bypasses": []
+      },
+      "dv": {
+        "value": [],
+        "custom": "",
+        "bypasses": []
+      },
+      "dm": {
+        "amount": {},
+        "bypasses": []
+      },
+      "ci": {
+        "value": [],
+        "custom": ""
+      },
+      "languages": {
+        "value": [
+          "common",
+          "dwarvish"
+        ],
+        "custom": "",
+        "communication": {}
+      },
+      "important": false
+    }
+  },
+  "prototypeToken": {
+    "name": "铁须裂地者",
+    "displayName": 20,
+    "actorLink": false,
+    "width": 1,
+    "height": 1,
+    "texture": {
+      "src": "modules/longhua-dm-toolkit/assets/si-she/%E9%93%81%E9%A1%BB%E8%A3%82%E5%9C%B0%E8%80%85.webp",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "offsetX": 0,
+      "offsetY": 0,
+      "fit": "contain",
+      "scaleX": 0.85,
+      "scaleY": 0.85,
+      "rotation": 0,
+      "tint": "#ffffff",
+      "alphaThreshold": 0.75
+    },
+    "lockRotation": false,
+    "rotation": 0,
+    "alpha": 1,
+    "disposition": -1,
+    "displayBars": 20,
+    "bar1": {
+      "attribute": "attributes.hp"
+    },
+    "bar2": {
+      "attribute": null
+    },
+    "light": {
+      "negative": false,
+      "priority": 0,
+      "alpha": 0.5,
+      "angle": 360,
+      "bright": 0,
+      "color": null,
+      "coloration": 1,
+      "dim": 0,
+      "attenuation": 0.5,
+      "luminosity": 0.5,
+      "saturation": 0,
+      "contrast": 0,
+      "shadows": 0,
+      "animation": {
+        "type": null,
+        "speed": 5,
+        "intensity": 5,
+        "reverse": false
+      },
+      "darkness": {
+        "min": 0,
+        "max": 1
+      }
+    },
+    "sight": {
+      "enabled": false,
+      "range": 0,
+      "angle": 360,
+      "visionMode": "basic",
+      "color": null,
+      "attenuation": 0.1,
+      "brightness": 0,
+      "saturation": 0,
+      "contrast": 0
+    },
+    "detectionModes": [
+      {
+        "id": "basicSight",
+        "range": 60,
+        "enabled": true
+      }
+    ],
+    "occludable": {
+      "radius": 0
+    },
+    "ring": {
+      "enabled": false,
+      "colors": {
+        "ring": null,
+        "background": null
+      },
+      "effects": 0,
+      "subject": {
+        "scale": 1,
+        "texture": null
+      }
+    },
+    "turnMarker": {
+      "mode": 1,
+      "animation": null,
+      "src": null,
+      "disposition": false
+    },
+    "movementAction": null,
+    "flags": {
+      "monks-tokenbar": {
+        "include": "default"
+      },
+      "splatter": {
+        "bloodColor": ","
+      },
+      "wall-height": {
+        "tokenHeight": 0
+      },
+      "patrol": {
+        "enablePatrol": false,
+        "enableSpotting": false,
+        "makePatroller": false,
+        "multiPath": false,
+        "patrolPathName": "",
+        "pathNodeIndex": "0"
+      },
+      "swarm": {
+        "isSwarm": false,
+        "swarmSize": 20,
+        "swarmSpeed": 1,
+        "animation": "circular"
+      },
+      "Rideable": {
+        "issetRideableFlag": true,
+        "MaxRiderFlag": null,
+        "CustomRidingheightFlag": null,
+        "UseRidingHeightFlag": true,
+        "RidersScaleFlag": 1,
+        "RiderPositioningFlag": "RowPlacement",
+        "RiderOffsetFlag": [
+          0,
+          0
+        ],
+        "TokenFormFlag": "TokenFormCircle",
+        "InsideMovementFlag": false,
+        "SpawnRidersFlag": "",
+        "WorldMEffectOverrideFlag": false,
+        "MountingEffectsFlag": "",
+        "SelfApplyEffectsFlag": false,
+        "forMountEffectsFlag": "",
+        "CanbePilotedFlag": false,
+        "CheckPilotedCollisionFlag": false,
+        "PilotedbyDefaultFlag": false
+      },
+      "healthEstimate": {
+        "dontMarkDead": false,
+        "hideHealthEstimate": false,
+        "hideName": false
+      }
+    },
+    "randomImg": false,
+    "appendNumber": false,
+    "prependAdjective": false
+  },
+  "items": [
+    {
+      "_id": "Mt9cV6sH1dF4gJ8w",
+      "name": "多重攻击  Multiattack",
+      "type": "feat",
+      "img": "icons/skills/melee/strike-hammer-destructive-blue.webp",
+      "system": {
+        "description": {
+          "value": "<p>铁须裂地者发动一次<strong>战锤震地</strong>（范围横扫），并可追加一次<strong>战锤直击</strong>（单体）。</p><p><em>战锤震地是它的常规攻击方式——一记下劈让冲击波沿地面扩散，10尺半径内的<strong>所有</strong>生物（包括盟友）都需作出敏捷……不，力量豁免。这正是它被同族忌惮的原因：盛怒之下，它分不清敌我。</em></p>",
+          "chat": ""
+        },
+        "activities": {},
+        "source": {
+          "rules": "2014",
+          "revision": 1
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": "",
+        "type": {
+          "value": "",
+          "subtype": ""
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {},
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "Wm4rK8pQ2vL7nX3b",
+      "name": "巨型战锤  Greathammer",
+      "type": "weapon",
+      "img": "icons/weapons/hammers/hammer-war-spiked.webp",
+      "system": {
+        "equipped": true,
+        "proficient": 1,
+        "type": {
+          "value": "martialM",
+          "baseItem": "warhammer"
+        },
+        "properties": [
+          "hvy"
+        ],
+        "range": {
+          "value": null,
+          "long": null,
+          "units": "ft",
+          "reach": 5
+        },
+        "damage": {
+          "base": {
+            "number": 2,
+            "denomination": 6,
+            "bonus": "",
+            "types": [
+              "bludgeoning"
+            ],
+            "custom": {
+              "enabled": false
+            },
+            "scaling": {
+              "number": 1
+            }
+          },
+          "versatile": {
+            "types": [],
+            "custom": {
+              "enabled": false
+            },
+            "scaling": {
+              "number": 1
+            }
+          }
+        },
+        "activities": {
+          "dnd5eactivity001": {
+            "_id": "dnd5eactivity001",
+            "type": "attack",
+            "activation": {
+              "type": "action",
+              "value": 1,
+              "override": false
+            },
+            "range": {
+              "value": "5",
+              "units": "ft",
+              "override": false
+            },
+            "attack": {
+              "ability": "str",
+              "bonus": "",
+              "type": {
+                "value": "melee",
+                "classification": "weapon"
+              },
+              "critical": {},
+              "flat": false
+            },
+            "damage": {
+              "includeBase": true,
+              "parts": [],
+              "critical": {}
+            },
+            "img": null,
+            "sort": 1,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {},
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "effects": [],
+            "flags": {},
+            "target": {
+              "template": {
+                "contiguous": false,
+                "stationary": false,
+                "units": "ft"
+              },
+              "affects": {
+                "choice": false
+              },
+              "override": false,
+              "prompt": true
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": []
+            },
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "skipConcentrationCheck": false,
+              "autoCEEffects": "default"
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "rollAs": "target",
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": ""
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "attackMode": "twoHanded",
+            "ammunition": "",
+            "otherActivityUuid": "",
+            "attackRollPerTarget": "default",
+            "fumbleThreshold": 1,
+            "name": "战锤直击 Hammer Strike"
+          }
+        },
+        "source": {
+          "rules": "2014",
+          "revision": 1
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "description": {
+          "value": "<p><strong>战锤震地（常规攻击 · 范围）：</strong>铁须裂地者高举巨锤狠狠砸向地面，冲击波以自身为中心向 <strong>10尺半径</strong>扩散。该范围内<strong>所有</strong>生物（含盟友）须作 <strong>力量豁免 DC 14</strong>，失败受到 <strong>2d12 + 4 钝击伤害</strong>，成功减半。</p><p><strong>战锤直击（单体）：</strong>对 5 尺内单一目标进行一次近战武器攻击，命中造成 2d6 + 4 钝击伤害（可受狂暴加值）。</p><p><em>面板顶部的范围豁免即它的招牌攻击；单体直击为补充手段。</em></p>",
+          "chat": ""
+        },
+        "identifier": "",
+        "identified": true,
+        "unidentified": {
+          "description": ""
+        },
+        "container": null,
+        "quantity": 1,
+        "weight": {
+          "value": 0,
+          "units": "lb"
+        },
+        "price": {
+          "value": 0,
+          "denomination": "gp"
+        },
+        "rarity": "",
+        "attunement": "",
+        "attuned": false,
+        "crew": {
+          "value": []
+        },
+        "ammunition": {},
+        "armor": {}
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "dnd5e": {
+          "riders": {
+            "effect": [],
+            "activity": []
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "Fz7yB3nR5kT2mQ9x",
+      "name": "狂暴  Frenzy",
+      "type": "feat",
+      "img": "icons/magic/control/buff-strength-muscle-damage-red.webp",
+      "system": {
+        "description": {
+          "value": "<p>（附赠动作）铁须裂地者陷入狂暴，持续至其下一回合开始：</p><ul><li>它的<strong>近战武器直击</strong>额外造成 <strong>+1d6</strong> 伤害；</li><li>它的<strong>近战武器攻击</strong>具有<strong>优势</strong>（鲁莽进攻）；</li><li>代价：针对它的攻击检定也具有<strong>优势</strong>（门户大开）；</li><li>立即获得 <strong>10 点临时生命值</strong>（由物品宏自动施加）。</li></ul><p><em>以上四项均已全自动：前三项为回合时长的 Active Effect（midi-qol / DAE key），临时生命值由 itemacro 在使用后写入。注意 +1d6 与攻击优势仅作用于“战锤直击”（mwak 单体），范围震地为豁免攻击，不受这两条加值影响，但狂暴期间它往往更倾向于直接抡向落单目标。</em></p>",
+          "chat": ""
+        },
+        "activities": {
+          "dnd5eactivity000": {
+            "_id": "dnd5eactivity000",
+            "type": "utility",
+            "name": "开启狂暴 Enter Frenzy",
+            "activation": {
+              "type": "bonus",
+              "value": 1,
+              "override": false
+            },
+            "duration": {
+              "value": "1",
+              "units": "round",
+              "concentration": false,
+              "override": false
+            },
+            "range": {
+              "units": "self",
+              "override": false
+            },
+            "target": {
+              "template": {
+                "contiguous": false,
+                "stationary": false,
+                "units": "ft"
+              },
+              "affects": {
+                "type": "self",
+                "choice": false
+              },
+              "override": false,
+              "prompt": true
+            },
+            "effects": [
+              {
+                "_id": "Fa2eD9uK5jH7bP4m",
+                "level": {}
+              },
+              {
+                "_id": "Fc5tH8mD2kW6nQ1r",
+                "level": {}
+              },
+              {
+                "_id": "Fb8sW3qZ6tY1rN5c",
+                "level": {}
+              }
+            ],
+            "img": null,
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {},
+            "flags": {},
+            "uses": {
+              "spent": 0,
+              "recovery": []
+            },
+            "visibility": {
+              "level": {},
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "skipConcentrationCheck": false,
+              "autoCEEffects": "default"
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "rollAs": "target",
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": ""
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "roll": {
+              "prompt": false,
+              "visible": false
+            }
+          }
+        },
+        "source": {
+          "rules": "2014",
+          "revision": 1
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": "",
+        "type": {
+          "value": "",
+          "subtype": ""
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [
+        {
+          "_id": "Fa2eD9uK5jH7bP4m",
+          "name": "狂暴 (近战 +1d6 伤害)",
+          "img": "icons/magic/control/buff-strength-muscle-damage-red.webp",
+          "type": "base",
+          "transfer": false,
+          "disabled": false,
+          "origin": null,
+          "statuses": [],
+          "changes": [
+            {
+              "key": "system.bonuses.mwak.damage",
+              "mode": 2,
+              "value": "1d6",
+              "priority": 20
+            }
+          ],
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "rounds": 1
+          },
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "system": {},
+          "description": "",
+          "tint": "#ffffff",
+          "sort": 0,
+          "flags": {}
+        },
+        {
+          "_id": "Fc5tH8mD2kW6nQ1r",
+          "name": "狂暴 (近战攻击优势)",
+          "img": "icons/magic/control/buff-strength-muscle-damage-red.webp",
+          "type": "base",
+          "transfer": false,
+          "disabled": false,
+          "origin": null,
+          "statuses": [],
+          "changes": [
+            {
+              "key": "flags.midi-qol.advantage.attack.mwak",
+              "mode": 0,
+              "value": "1",
+              "priority": 20
+            }
+          ],
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "rounds": 1
+          },
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "system": {},
+          "description": "",
+          "tint": "#ffffff",
+          "sort": 0,
+          "flags": {}
+        },
+        {
+          "_id": "Fb8sW3qZ6tY1rN5c",
+          "name": "狂暴 (被攻击优势 · 代价)",
+          "img": "icons/magic/control/buff-strength-muscle-damage-red.webp",
+          "type": "base",
+          "transfer": false,
+          "disabled": false,
+          "origin": null,
+          "statuses": [],
+          "changes": [
+            {
+              "key": "flags.midi-qol.grants.advantage.attack.all",
+              "mode": 0,
+              "value": "1",
+              "priority": 20
+            }
+          ],
+          "duration": {
+            "startTime": null,
+            "combat": null,
+            "rounds": 1
+          },
+          "_stats": {
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null,
+            "coreVersion": "13.351",
+            "systemId": "dnd5e",
+            "systemVersion": "5.3.3",
+            "lastModifiedBy": null
+          },
+          "system": {},
+          "description": "",
+          "tint": "#ffffff",
+          "sort": 0,
+          "flags": {}
+        }
+      ],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "midi-qol": {
+          "onUseMacroName": "[postActiveEffects]ItemMacro"
+        },
+        "itemacro": {
+          "macro": {
+            "name": "狂暴临时生命",
+            "type": "script",
+            "scope": "global",
+            "command": "(async () => { const a = (typeof actor !== \"undefined\" && actor) ? actor : (typeof token !== \"undefined\" && token && token.actor) ? token.actor : (canvas.tokens.controlled[0] && canvas.tokens.controlled[0].actor); if (!a) return; const tempGain = 10; const cur = a.system.attributes.hp.temp || 0; if (tempGain > cur) { await a.update({ \"system.attributes.hp.temp\": tempGain }); } ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: a }), content: a.name + \" 陷入狂暴，皮糙肉厚，获得 \" + tempGain + \" 点临时生命值！\" });})();"
+          }
+        },
+        "dae": {
+          "macro": {
+            "name": "狂暴临时生命",
+            "img": "icons/magic/control/buff-strength-muscle-damage-red.webp",
+            "type": "script",
+            "scope": "global",
+            "command": "(async () => { const a = (typeof actor !== \"undefined\" && actor) ? actor : (typeof token !== \"undefined\" && token && token.actor) ? token.actor : (canvas.tokens.controlled[0] && canvas.tokens.controlled[0].actor); if (!a) return; const tempGain = 10; const cur = a.system.attributes.hp.temp || 0; if (tempGain > cur) { await a.update({ \"system.attributes.hp.temp\": tempGain }); } ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: a }), content: a.name + \" 陷入狂暴，皮糙肉厚，获得 \" + tempGain + \" 点临时生命值！\" });})();"
+          }
+        }
+      },
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "_id": "Dr6pL4wG8hN1vC3z",
+      "name": "矮人坚韧  Dwarven Resilience",
+      "type": "feat",
+      "img": "icons/magic/defensive/armor-stone-skin.webp",
+      "system": {
+        "description": {
+          "value": "<p>铁须裂地者对<strong>毒素伤害</strong>具有抗性（已写入抗性栏，自动生效）。</p><p><em>原版“对抵抗中毒的豁免具有优势”因属情境触发、且无专用于“仅毒”的已验证 midi flag，未做成常驻自动化，以免误把优势套到所有体质豁免上；如需自动化此条，请在 Foundry 中导出一条该效果的参考 Active Effect 以便补入规范 key 表。</em></p>",
+          "chat": ""
+        },
+        "activities": {},
+        "source": {
+          "rules": "2014",
+          "revision": 1
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "identifier": "",
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": "",
+        "type": {
+          "value": "",
+          "subtype": ""
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {},
+      "ownership": {
+        "default": 0
+      }
+    },
+    {
+      "type": "feat",
+      "name": "战锤震地",
+      "_id": "preymI2RGfXGTVZa",
+      "img": "icons/weapons/hammers/hammer-double-glowing-yellow.webp",
+      "system": {
+        "activities": {
+          "NCo0dEx2WvCMHR4t": {
+            "type": "save",
+            "activation": {
+              "type": "action",
+              "value": 1,
+              "override": false,
+              "condition": ""
+            },
+            "range": {
+              "units": "self",
+              "override": false,
+              "special": "",
+              "value": ""
+            },
+            "save": {
+              "ability": [
+                "str"
+              ],
+              "dc": {
+                "calculation": "",
+                "formula": "14"
+              }
+            },
+            "damage": {
+              "onSave": "half",
+              "critical": {
+                "allow": false
+              },
+              "parts": [
+                {
+                  "custom": {
+                    "enabled": false,
+                    "formula": ""
+                  },
+                  "number": 2,
+                  "denomination": 12,
+                  "bonus": "4",
+                  "types": [
+                    "bludgeoning"
+                  ],
+                  "scaling": {
+                    "number": 1
+                  }
+                }
+              ]
+            },
+            "effects": [],
+            "img": "",
+            "sort": 0,
+            "consumption": {
+              "scaling": {
+                "allowed": false
+              },
+              "spellSlot": true,
+              "targets": []
+            },
+            "description": {
+              "chatFlavor": ""
+            },
+            "duration": {
+              "units": "inst",
+              "concentration": false,
+              "override": false
+            },
+            "flags": {
+              "region-attacher": {
+                "attachRegionToTemplate": false
+              }
+            },
+            "target": {
+              "template": {
+                "type": "circle",
+                "size": "10",
+                "units": "ft",
+                "contiguous": false,
+                "stationary": false,
+                "count": ""
+              },
+              "affects": {
+                "choice": false,
+                "type": "creature",
+                "count": "",
+                "special": "-self"
+              },
+              "override": false,
+              "prompt": true
+            },
+            "uses": {
+              "spent": 0,
+              "recovery": [],
+              "max": ""
+            },
+            "visibility": {
+              "level": {
+                "min": null,
+                "max": null
+              },
+              "requireAttunement": false,
+              "requireIdentification": false,
+              "requireMagic": false,
+              "identifier": ""
+            },
+            "useConditionText": "",
+            "useConditionReason": "",
+            "effectConditionText": "",
+            "macroData": {
+              "name": "",
+              "command": ""
+            },
+            "ignoreTraits": {
+              "idi": false,
+              "idr": false,
+              "idv": false,
+              "ida": false,
+              "idm": false
+            },
+            "midiProperties": {
+              "ignoreTraits": [],
+              "triggeredActivityId": "none",
+              "triggeredActivityConditionText": "",
+              "triggeredActivityTargets": "targets",
+              "triggeredActivityRollAs": "self",
+              "triggeredActivityConsume": true,
+              "triggeredActivityConfigure": true,
+              "autoConsume": false,
+              "forceConsumeDialog": "default",
+              "forceRollDialog": "default",
+              "forceDamageDialog": "default",
+              "confirmTargets": "default",
+              "autoTargetType": "any",
+              "autoTargetAction": "default",
+              "automationOnly": false,
+              "otherActivityCompatible": true,
+              "otherActivityAsParentType": true,
+              "identifier": "",
+              "displayActivityName": false,
+              "rollMode": "default",
+              "chooseEffects": false,
+              "toggleEffect": false,
+              "ignoreFullCover": false,
+              "removeChatButtons": "default",
+              "magicEffect": false,
+              "magicDamage": false,
+              "noConcentrationCheck": false,
+              "skipConcentrationCheck": false,
+              "autoCEEffects": "default"
+            },
+            "isOverTimeFlag": false,
+            "overTimeProperties": {
+              "saveRemoves": true,
+              "rollAs": "target",
+              "preRemoveConditionText": "",
+              "postRemoveConditionText": ""
+            },
+            "otherActivityId": "",
+            "otherActivityAsParentType": true,
+            "friendlySave": "default",
+            "name": "战锤震地 Earthshatter Slam",
+            "_id": "NCo0dEx2WvCMHR4t"
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "advancement": {},
+        "description": {
+          "value": "<p><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial\">战锤震地（常规攻击 · 范围）：</span><span style=\"color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial;display:inline !important;float:none\">铁须裂地者高举巨锤狠狠砸向地面，冲击波以自身为中心向</span><span><span style=\"color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial;display:inline !important;float:none\"> </span></span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial\">10尺半径</span><span style=\"color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial;display:inline !important;float:none\">扩散。该范围内</span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial\">所有</span><span style=\"color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial;display:inline !important;float:none\">生物（含盟友）须作</span><span><span style=\"color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial;display:inline !important;float:none\"> </span></span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial\">力量豁免 DC 14</span><span style=\"color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial;display:inline !important;float:none\">，失败受到</span><span><span style=\"color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial;display:inline !important;float:none\"> </span></span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial\">2d12 + 4 钝击伤害</span><span style=\"color:rgb(255, 255, 255);font-family:'Roboto Condensed', Roboto, Arial, sans-serif;font-size:13px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial;display:inline !important;float:none\">，成功减半。</span></p>",
+          "chat": ""
+        },
+        "identifier": "-",
+        "source": {
+          "revision": 1,
+          "rules": "2014"
+        },
+        "crewed": false,
+        "enchant": {},
+        "prerequisites": {
+          "items": [],
+          "repeatable": false
+        },
+        "properties": [],
+        "requirements": "",
+        "type": {
+          "value": "monster",
+          "subtype": ""
+        }
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "flags": {
+        "scene-packer": {
+          "hash": "ac510a031924492ce2f7235df2978c123953cb65"
+        },
+        "walledtemplates": {
+          "wallsBlock": "globalDefault",
+          "wallRestriction": "globalDefault",
+          "snapCenter": true,
+          "snapCorner": true,
+          "snapSideMidpoint": true,
+          "hideBorder": "globalDefault",
+          "hideHighlighting": "globalDefault",
+          "showOnHover": "globalDefault",
+          "noAutotarget": false,
+          "addTokenSize": false,
+          "attachToken": "na"
+        },
+        "dnd5e": {
+          "riders": {
+            "activity": []
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": 0
+      }
+    }
+  ],
+  "effects": [],
+  "folder": "e1i71Gr1gAuDC744",
+  "flags": {
+    "tidy5e-sheet": {
+      "sheet-theme-settings": {
+        "accentColor": "",
+        "useHeaderBackground": true,
+        "headerColor": "",
+        "actorHeaderBackground": "",
+        "itemSidebarBackground": "",
+        "portraitShape": "token",
+        "rarityColors": {},
+        "spellPreparationMethodColors": {}
+      }
+    },
+    "dnd5e": {
+      "showTokenPortrait": true
+    },
+    "scene-packer": {
+      "sourceId": "Actor.oewnjKqc7bLLXpR8",
+      "hash": "77d954b1253bfe843c95f516a09c52be795ab3ab"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Actor.oewnjKqc7bLLXpR8",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788842066266,
+    "modifiedTime": 1788842066266,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

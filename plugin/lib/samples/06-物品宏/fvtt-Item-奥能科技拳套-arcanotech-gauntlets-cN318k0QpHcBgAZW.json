@@ -1,0 +1,932 @@
+{
+  "name": "奥能科技拳套 Arcanotech Gauntlets",
+  "type": "weapon",
+  "img": "icons/equipment/hand/gauntlet-armored-leather-steel-blue.webp",
+  "system": {
+    "description": {
+      "value": "<p><em>需同调。</em>一对奥能科技驱动的重型拳套，曾属于某位以拳破壁的执法者。本武器为 <strong>+2</strong> 魔法武器，并<strong>视为徒手打击</strong>。</p><p><strong>破甲 Denting Blows（被动）：</strong>你每以本武器命中一个目标，其护甲等级便降低 1（可叠加，最多 3 层，持续 1 分钟）；当叠至第 3 层时，目标立即额外受到 2d8 钝击伤害。冲拳、范围重拳、强袭追击命中亦触发。</p><p><strong>冲拳 Vault Breaker：</strong>（每短休你的熟练加值次）选 20 尺内一个目标，你冲至其身旁。它须作力量豁免（DC 8+你的熟练加值+敏捷调整值），失败则受 2d8 钝击、被击退 10 尺并倒地，成功减半且不被击退。</p><p><strong>范围重拳 Excessive Force：</strong>（每短休你的熟练加值次）一记重拳轰出 15 尺直线。线上每个生物作敏捷豁免，失败受 2d8 钝击并被击退 10 尺，成功减半。</p><p><strong>强袭追击 Assault and Battery：</strong>（每日 1 次）锁定 30 尺内一个目标，势不可挡地冲至其面前并轰下重拳。它须作力量豁免，失败受 6d8 钝击并倒地，成功减半。</p><p><strong>爆能护盾 Blast Shield（被动）：</strong>每当你使用冲拳、范围重拳或强袭追击，你获得 2d6 临时生命值。</p><hr /><p class=\"font-claude-response-body break-words whitespace-normal\">适用版本：D&amp;D 5e 系统 5.3.3 / Foundry VTT core 13</p><p class=\"font-claude-response-body break-words whitespace-normal\"><strong>必需依赖</strong>（缺少则招式无法运作）：</p><ul class=\"[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3\"><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>Midi QOL<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">midi-qol</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>libWrapper<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">lib-wrapper</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>socketlib<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">socketlib</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>动态主动效应（DAE）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">dae</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>效果宏<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">effectmacro</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>时间限制<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">times-up</code></p></li></ul><p class=\"font-claude-response-body break-words whitespace-normal\"><strong>推荐依赖</strong>（用于动画，不装也能正常使用，仅无特效）：</p><ul class=\"[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3\"><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>音序器<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">sequencer</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>JB2A （或免费版 ）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">jb2a_patreonJB2A_DnD5e</code></p></li></ul><p class=\"font-claude-response-body break-words whitespace-normal\"><strong>安装后请确认：</strong> 在 Midi QOL 设置中开启掷骰自动化（工作流设为完全自动化），否则物品宏不会触发，招式将无响应。</p><p class=\"font-claude-response-body break-words whitespace-normal\"><strong>使用提示：</strong> 装备并同调本武器后，点击对应招式卡使用——基础拳击、冲拳（冲锋击退）、范围重拳（直线击退）、强袭追击（每日一次的强力突进）。命中会层叠<strong>破甲</strong>（目标 −1 AC，最多 3 层），叠满 3 层时触发一次爆发伤害;被动<strong>爆能护盾</strong>会在出手时提供临时生命值。</p>",
+      "chat": ""
+    },
+    "source": {
+      "custom": "",
+      "rules": "2014",
+      "revision": 1
+    },
+    "identifier": "arcanotech-gauntlets",
+    "type": {
+      "value": "simpleM",
+      "baseItem": ""
+    },
+    "properties": [
+      "mgc",
+      "fin",
+      "lgt"
+    ],
+    "rarity": "veryRare",
+    "attunement": "required",
+    "attuned": false,
+    "equipped": false,
+    "proficient": 1,
+    "price": {
+      "value": 48000,
+      "denomination": "gp"
+    },
+    "weight": {
+      "value": 4,
+      "units": "lb"
+    },
+    "damage": {
+      "base": {
+        "number": 1,
+        "denomination": 8,
+        "bonus": "2",
+        "types": [
+          "bludgeoning"
+        ],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        }
+      },
+      "versatile": {
+        "types": [],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        }
+      }
+    },
+    "range": {
+      "value": null,
+      "long": null,
+      "units": "ft",
+      "reach": 5
+    },
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "type": "attack",
+        "name": "基础拳击",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "attack": {
+          "ability": "",
+          "type": {
+            "value": "melee",
+            "classification": "weapon"
+          },
+          "bonus": "2",
+          "flat": false,
+          "critical": {}
+        },
+        "damage": {
+          "includeBase": true,
+          "parts": [],
+          "critical": {}
+        },
+        "range": {
+          "units": "ft",
+          "override": false
+        },
+        "target": {
+          "affects": {
+            "type": "creature",
+            "count": "1",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          },
+          "prompt": true
+        },
+        "effects": [
+          {
+            "_id": "ArcDentingBlow01",
+            "level": {}
+          }
+        ],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": null,
+        "sort": 0,
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "flags": {},
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "attackMode": "oneHanded",
+        "ammunition": "",
+        "otherActivityUuid": "",
+        "attackRollPerTarget": "default",
+        "fumbleThreshold": 1
+      },
+      "ArcGauntletQ0001": {
+        "_id": "ArcGauntletQ0001",
+        "type": "save",
+        "name": "冲拳 Vault Breaker",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "activityUses",
+              "value": "1",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "uses": {
+          "max": "@prof",
+          "spent": 0,
+          "recovery": [
+            {
+              "period": "sr",
+              "type": "recoverAll"
+            }
+          ]
+        },
+        "save": {
+          "ability": [
+            "str"
+          ],
+          "dc": {
+            "calculation": "",
+            "formula": "8 + @prof + @abilities.dex.mod"
+          }
+        },
+        "damage": {
+          "onSave": "half",
+          "parts": [
+            {
+              "number": 2,
+              "denomination": 8,
+              "bonus": "",
+              "types": [
+                "bludgeoning"
+              ],
+              "custom": {
+                "enabled": false
+              },
+              "scaling": {
+                "number": 1
+              }
+            }
+          ],
+          "critical": {
+            "allow": false
+          }
+        },
+        "range": {
+          "value": "20",
+          "units": "ft",
+          "override": false
+        },
+        "target": {
+          "affects": {
+            "type": "creature",
+            "count": "1",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "prompt": true,
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          }
+        },
+        "effects": [
+          {
+            "_id": "ArcMarkVaultBr01",
+            "level": {},
+            "onSave": false
+          },
+          {
+            "_id": "ArcDentingBlow01",
+            "level": {},
+            "onSave": false
+          }
+        ],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": null,
+        "sort": 0,
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "flags": {},
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "friendlySave": "default"
+      },
+      "ArcGauntletE0001": {
+        "_id": "ArcGauntletE0001",
+        "type": "save",
+        "name": "范围重拳 Excessive Force",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "activityUses",
+              "value": "1",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "uses": {
+          "max": "@prof",
+          "spent": 0,
+          "recovery": [
+            {
+              "period": "sr",
+              "type": "recoverAll"
+            }
+          ]
+        },
+        "save": {
+          "ability": [
+            "dex"
+          ],
+          "dc": {
+            "calculation": "",
+            "formula": "8 + @prof + @abilities.dex.mod"
+          }
+        },
+        "damage": {
+          "onSave": "half",
+          "parts": [
+            {
+              "number": 2,
+              "denomination": 8,
+              "bonus": "",
+              "types": [
+                "bludgeoning"
+              ],
+              "custom": {
+                "enabled": false
+              },
+              "scaling": {
+                "number": 1
+              }
+            }
+          ],
+          "critical": {
+            "allow": false
+          }
+        },
+        "range": {
+          "units": "self",
+          "override": false
+        },
+        "target": {
+          "template": {
+            "type": "line",
+            "size": "15",
+            "width": "5",
+            "units": "ft",
+            "contiguous": false,
+            "stationary": false
+          },
+          "affects": {
+            "type": "creature",
+            "count": "",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "prompt": true
+        },
+        "effects": [
+          {
+            "_id": "ArcMarkExForce01",
+            "level": {},
+            "onSave": false
+          },
+          {
+            "_id": "ArcDentingBlow01",
+            "level": {},
+            "onSave": false
+          }
+        ],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": null,
+        "sort": 0,
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "flags": {},
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "friendlySave": "default"
+      },
+      "ArcGauntletR0001": {
+        "_id": "ArcGauntletR0001",
+        "type": "save",
+        "name": "强袭追击 Assault and Battery",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "activityUses",
+              "value": "1",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "uses": {
+          "max": "1",
+          "spent": 0,
+          "recovery": [
+            {
+              "period": "day",
+              "type": "recoverAll"
+            }
+          ]
+        },
+        "save": {
+          "ability": [
+            "str"
+          ],
+          "dc": {
+            "calculation": "",
+            "formula": "8 + @prof + @abilities.dex.mod"
+          }
+        },
+        "damage": {
+          "onSave": "half",
+          "parts": [
+            {
+              "number": 6,
+              "denomination": 8,
+              "bonus": "",
+              "types": [
+                "bludgeoning"
+              ],
+              "custom": {
+                "enabled": false
+              },
+              "scaling": {
+                "number": 1
+              }
+            }
+          ],
+          "critical": {
+            "allow": false
+          }
+        },
+        "range": {
+          "value": "30",
+          "units": "ft",
+          "override": false
+        },
+        "target": {
+          "affects": {
+            "type": "creature",
+            "count": "1",
+            "choice": false,
+            "special": ""
+          },
+          "override": false,
+          "prompt": true,
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          }
+        },
+        "effects": [
+          {
+            "_id": "ArcMarkAssault01",
+            "level": {},
+            "onSave": false
+          },
+          {
+            "_id": "ArcDentingBlow01",
+            "level": {},
+            "onSave": false
+          }
+        ],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": null,
+        "sort": 0,
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "flags": {},
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "friendlySave": "default"
+      }
+    },
+    "uses": {
+      "spent": 0,
+      "recovery": []
+    },
+    "identified": true,
+    "unidentified": {
+      "description": ""
+    },
+    "container": null,
+    "quantity": 1,
+    "crew": {
+      "value": []
+    },
+    "ammunition": {},
+    "armor": {}
+  },
+  "effects": [
+    {
+      "_id": "ArcDentingBlow01",
+      "name": "破甲 Denting Blows",
+      "img": "icons/skills/melee/strike-hammer-destructive-blue.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "origin": null,
+      "description": "<p>被奥能科技拳套击中：护甲等级降低 1（可叠加，最多 3 层，持续 1 分钟）。当叠至第 3 层时，目标立即额外受到 2d8 钝击伤害（满层迸发）。</p>",
+      "statuses": [],
+      "duration": {
+        "seconds": 60,
+        "startTime": null,
+        "combat": null
+      },
+      "changes": [
+        {
+          "key": "system.attributes.ac.bonus",
+          "mode": 2,
+          "value": "-1",
+          "priority": 20
+        }
+      ],
+      "flags": {
+        "world": {
+          "viDent": true
+        },
+        "effectmacro": {
+          "onCreate": {
+            "script": "(async () => { try { const tgt = (typeof actor !== 'undefined') ? actor : null; if (!tgt) return; const stacks = tgt.effects.filter(e => e.getFlag && e.getFlag('world','viDent')); const n = stacks.length; if (n > 3) { const self = (typeof effect !== 'undefined') ? effect : null; if (self) setTimeout(() => { try { self.delete(); } catch(e){} }, 0); return; } if (n === 3) { const r = new Roll('2d8'); await r.evaluate(); await r.toMessage({ flavor: '破甲连击·满层迸发（钝击）', speaker: ChatMessage.getSpeaker({ actor: tgt }) });   try { await tgt.applyDamage([{ value: r.total, type: 'bludgeoning' }]); } catch(e){ try { await tgt.applyDamage(r.total); } catch(e2){} } }} catch (e) { console.error('破甲 onCreate', e); } })();"
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "system": {},
+      "tint": "#ffffff",
+      "sort": 0
+    },
+    {
+      "_id": "ArcMarkVaultBr01",
+      "name": "冲拳标记",
+      "img": "icons/magic/control/debuff-chains-blue.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "origin": null,
+      "description": "<p>（结算用·瞬时移除）被奥能科技拳套的招式击中、豁免失败的标记。</p>",
+      "statuses": [],
+      "changes": [],
+      "flags": {
+        "world": {
+          "viMark": "q"
+        }
+      },
+      "duration": {
+        "seconds": 6,
+        "startTime": null,
+        "combat": null
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "system": {},
+      "tint": "#ffffff",
+      "sort": 0
+    },
+    {
+      "_id": "ArcMarkExForce01",
+      "name": "范围拳标记",
+      "img": "icons/magic/control/debuff-chains-blue.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "origin": null,
+      "description": "<p>（结算用·瞬时移除）被奥能科技拳套的招式击中、豁免失败的标记。</p>",
+      "statuses": [],
+      "changes": [],
+      "flags": {
+        "world": {
+          "viMark": "e"
+        }
+      },
+      "duration": {
+        "seconds": 6,
+        "startTime": null,
+        "combat": null
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "system": {},
+      "tint": "#ffffff",
+      "sort": 0
+    },
+    {
+      "_id": "ArcMarkAssault01",
+      "name": "强袭标记",
+      "img": "icons/magic/control/debuff-chains-blue.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "origin": null,
+      "description": "<p>（结算用·瞬时移除）被奥能科技拳套的招式击中、豁免失败的标记。</p>",
+      "statuses": [],
+      "changes": [],
+      "flags": {
+        "world": {
+          "viMark": "r"
+        }
+      },
+      "duration": {
+        "seconds": 6,
+        "startTime": null,
+        "combat": null
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "system": {},
+      "tint": "#ffffff",
+      "sort": 0
+    }
+  ],
+  "folder": null,
+  "flags": {
+    "midiProperties": {
+      "confirmTargets": "default",
+      "autoTargetType": "any"
+    },
+    "midi-qol": {
+      "onUseMacroName": "[postActiveEffects]ItemMacro"
+    },
+    "dae": {
+      "macro": {
+        "name": "奥能科技拳套 Arcanotech Gauntlets",
+        "img": "icons/equipment/hand/gauntlet-armored-leather-steel-blue.webp",
+        "type": "script",
+        "scope": "global",
+        "command": "// 奥能科技拳套 Arcanotech Gauntlets — 物品宏 [postActiveEffects]\n// 对自身的操作(冲过去/护盾)本地执行；对敌人的操作(击退/倒地/清标记)打包交给 GM 端通用代办 LHGM，避免玩家权限报错。\n(async () => {\n  const me = canvas.tokens.controlled[0] ?? (typeof token !== \"undefined\" ? token : null);\n  const a = me?.actor ?? (typeof actor !== \"undefined\" ? actor : null);\n  if (!me || !a) return;\n\n  const MARK = \"viMark\";\n  const gridSize = canvas.grid.size;\n  const ftPerSq = canvas.scene.grid?.distance ?? 5;\n  const sceneId = canvas.scene.id;\n  const cc = () => ({ x: me.center?.x ?? (me.x + me.w / 2), y: me.center?.y ?? (me.y + me.h / 2) });\n  const ctr = (tk) => ({ x: tk.center?.x ?? (tk.x + tk.w / 2), y: tk.center?.y ?? (tk.y + tk.h / 2) });\n  const dist = (tk, o) => { const c = ctr(tk); return Math.hypot(c.x - o.x, c.y - o.y); };\n\n  const marked = canvas.tokens.placeables\n    .map((t) => { const e = t.actor?.effects?.find((x) => x.getFlag(\"world\", MARK)); return e ? { t, kind: e.getFlag(\"world\", MARK) } : null; })\n    .filter(Boolean);\n\n  const wf = (typeof workflow !== \"undefined\" && workflow) ? workflow\n    : ((typeof MidiQOL !== \"undefined\") ? (MidiQOL.currentWorkflow ?? null) : null);\n\n  const hay = (((wf?.activity?.name ?? \"\") + \" \" + (wf?.activity?.identifier ?? \"\")).toLowerCase());\n  let kind =\n    (hay.includes(\"冲拳\") || hay.includes(\"vault\")) ? \"q\" :\n    (hay.includes(\"范围重拳\") || hay.includes(\"excessive\")) ? \"e\" :\n    (hay.includes(\"强袭\") || hay.includes(\"assault\")) ? \"r\" : null;\n  if (!kind && marked.length) kind = marked[0].kind;\n\n  const wfTargets = Array.from(wf?.targets ?? []);\n  const primaryTgt = wfTargets[0] ?? Array.from(game.user.targets ?? [])[0] ?? marked[0]?.t ?? null;\n\n  const firstFound = (cands) => { for (const k of cands) { try { if (Sequencer?.Database?.entryExists?.(k)) return k; } catch (e) {} } return null; };\n  const hasSeq = typeof Sequence !== \"undefined\";\n\n  try {\n    const punch = firstFound([\"jb2a.melee_generic.creature_attack.fist.01.white\", \"jb2a.unarmed_strike.physical.01.white\", \"jb2a.impact.010.orange\", \"jb2a.impact.ground_crack.orange.01\"]);\n    if (primaryTgt && punch && hasSeq) new Sequence().effect().file(punch).atLocation(primaryTgt).scaleToObject(1.3).play();\n  } catch (e) {}\n\n  if (!kind) return;\n\n  const occupied = (cx, cy, ignore) => {\n    const r = new PIXI.Rectangle(cx - gridSize / 2, cy - gridSize / 2, gridSize, gridSize);\n    return canvas.tokens.placeables.some((tk) => {\n      if (ignore && tk.id === ignore.id) return false;\n      const b = new PIXI.Rectangle(tk.x, tk.y, tk.w, tk.h);\n      return r.right > b.left && r.left < b.right && r.bottom > b.top && r.top < b.bottom;\n    });\n  };\n\n  // 自身冲锋：移到目标旁空格（自身拥有 → 本地执行，带动画，无弃用写法）\n  const chargeTo = async (tk) => {\n    if (!tk) return;\n    const tc = ctr(tk); const o = cc();\n    const dest = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]\n      .map(([dx, dy]) => ({ x: tc.x + dx * gridSize, y: tc.y + dy * gridSize }))\n      .filter((p) => !occupied(p.x, p.y, me))\n      .sort((p, q) => Math.hypot(p.x - o.x, p.y - o.y) - Math.hypot(q.x - o.x, q.y - o.y))[0];\n    if (!dest) return;\n    try { const trail = firstFound([\"jb2a.smoke.puff.side.02.white\", \"jb2a.energy_strands.range.standard.blue.01\", \"jb2a.bullet.01.blue\"]); if (trail && hasSeq) new Sequence().effect().file(trail).atLocation(o).stretchTo(dest).play(); } catch (e) {}\n    const tw = me.document?.width ?? 1, th = me.document?.height ?? 1;\n    try { await me.document.update({ x: Math.round(dest.x - (tw * gridSize) / 2), y: Math.round(dest.y - (th * gridSize) / 2) }, { animate: true }); }\n    catch (e) { console.error(\"拳套 | 自身冲锋失败\", e); }\n  };\n\n  // 只计算击退落点(中心)，不在玩家端实际移动敌人\n  const pushDest = (tk, distFt) => {\n    const o = cc(); const tc = ctr(tk);\n    let vx = tc.x - o.x, vy = tc.y - o.y; const len = Math.hypot(vx, vy) || 1; vx /= len; vy /= len;\n    const cells = Math.max(1, Math.round(distFt / ftPerSq));\n    let fx = tc.x, fy = tc.y;\n    for (let i = 1; i <= cells; i++) { const nx = tc.x + vx * gridSize * i, ny = tc.y + vy * gridSize * i; if (occupied(nx, ny, tk)) break; fx = nx; fy = ny; }\n    return { x: fx, y: fy };\n  };\n\n  // 收集对敌操作 → 交给 GM 端 LHGM\n  const opMap = new Map();\n  const opFor = (id) => { if (!opMap.has(id)) opMap.set(id, { tokenId: id }); return opMap.get(id); };\n  const addMove = (tk, center) => { const tw = tk.document?.width ?? 1, th = tk.document?.height ?? 1; opFor(tk.id).move = { x: Math.round(center.x - (tw * gridSize) / 2), y: Math.round(center.y - (th * gridSize) / 2), animate: true }; };\n  const addProne = (tk) => { const o = opFor(tk.id); o.addStatuses = Array.from(new Set([...(o.addStatuses ?? []), \"prone\"])); };\n  const addClear = (tk) => { opFor(tk.id).deleteFlag = { scope: \"world\", key: MARK }; };\n\n  if (kind === \"q\" || kind === \"r\") await chargeTo(primaryTgt);\n  if (kind === \"q\") { for (const { t } of marked) { addMove(t, pushDest(t, 10)); addProne(t); } }\n  else if (kind === \"e\") { const o = cc(); for (const { t } of marked.slice().sort((A, B) => dist(B.t, o) - dist(A.t, o))) addMove(t, pushDest(t, 10)); }\n  else if (kind === \"r\") { for (const { t } of marked) addProne(t); }\n  for (const { t } of marked) addClear(t);\n\n  if (opMap.size) {\n    if (globalThis.LHGM?.request) await globalThis.LHGM.request({ sceneId, ops: Array.from(opMap.values()) });\n    else ui.notifications.warn(\"奥能拳套：未加载 GM 代办脚本（LHGM）——请把『通用GM代办』脚本放进 world-scripter，否则击退/倒地/清标记不生效。\");\n  }\n\n  // 爆能护盾（自身临时生命，本地执行）\n  try {\n    const sh = new Roll(\"2d6\"); await sh.evaluate();\n    await sh.toMessage({ flavor: \"爆能护盾 Blast Shield（临时生命）\", speaker: ChatMessage.getSpeaker({ actor: a }) });\n    if (typeof a.applyTempHP === \"function\") await a.applyTempHP(sh.total);\n    else await a.update({ \"system.attributes.hp.temp\": Math.max(a.system.attributes?.hp?.temp || 0, sh.total) });\n  } catch (e) { console.error(\"拳套 | 护盾失败\", e); }\n})();\n",
+        "author": "",
+        "ownership": {
+          "default": 3
+        },
+        "_id": null,
+        "folder": null,
+        "sort": 0,
+        "flags": {}
+      }
+    },
+    "dnd5e": {},
+    "scene-packer": {
+      "sourceId": "Item.cN318k0QpHcBgAZW",
+      "hash": "4354d424950c691de85e3fb0c08539cff419bb6e"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.longhua-dm-toolkit.longhua-items.Item.KttcseRYWK7aatHT",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "chushi",
+      "uuid": "Item.cN318k0QpHcBgAZW",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1781755717088,
+    "modifiedTime": 1781756535246,
+    "lastModifiedBy": "WSmz8rIxvwraatE3"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

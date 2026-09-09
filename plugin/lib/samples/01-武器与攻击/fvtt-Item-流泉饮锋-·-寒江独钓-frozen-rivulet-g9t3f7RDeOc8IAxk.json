@@ -1,0 +1,1020 @@
+{
+  "name": "流泉饮锋 · 寒江独钓 Frozen Rivulet",
+  "type": "weapon",
+  "img": "modules/longhua-dm-toolkit/assets/wu-pin/01392333-d604-4347-942f-b191621f09d4-api_oss_1-1.png",
+  "system": {
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "type": "attack",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false,
+          "condition": ""
+        },
+        "range": {
+          "value": "5",
+          "units": "ft",
+          "override": false
+        },
+        "attack": {
+          "ability": "str",
+          "bonus": "",
+          "type": {
+            "value": "melee",
+            "classification": "weapon"
+          },
+          "critical": {
+            "threshold": null
+          },
+          "flat": false
+        },
+        "damage": {
+          "includeBase": true,
+          "parts": [],
+          "critical": {
+            "bonus": ""
+          }
+        },
+        "img": "modules/longhua-dm-toolkit/assets/wu-pin/01392333-d604-4347-942f-b191621f09d4-api_oss_1-1.png",
+        "sort": 0,
+        "consumption": {
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false,
+          "targets": []
+        },
+        "description": {
+          "chatFlavor": ""
+        },
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "effects": [],
+        "flags": {
+          "autoanimations": {
+            "id": "7e603401-43a5-4095-aaf6-cfc47f4e39bc",
+            "label": "攻击",
+            "levels3d": {
+              "type": "explosion",
+              "data": {
+                "color01": "#FFFFFF",
+                "color02": "#FFFFFF",
+                "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+              },
+              "sound": {
+                "enable": false
+              },
+              "secondary": {
+                "enable": false,
+                "data": {
+                  "color01": "#FFFFFF",
+                  "color02": "#FFFFFF",
+                  "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+                }
+              }
+            },
+            "macro": {
+              "enable": false,
+              "playWhen": "0"
+            },
+            "meleeSwitch": {
+              "video": {
+                "dbSection": "range",
+                "menuType": "weapon",
+                "animation": "arrow",
+                "variant": "regular",
+                "color": "regular"
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "detect": "automatic",
+                "range": 2,
+                "returning": false,
+                "switchType": "on"
+              }
+            },
+            "menu": "melee",
+            "primary": {
+              "video": {
+                "dbSection": "melee",
+                "menuType": "weapon",
+                "animation": "falchion",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": true,
+                "customPath": "jb2a.melee_attack.04.katana.01.0"
+              },
+              "sound": {
+                "enable": true,
+                "delay": 0,
+                "file": "modules/psfx/library/conditions/boon/boon-001-01.ogg",
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "isWait": false,
+                "opacity": 1,
+                "playbackRate": 1,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "zIndex": 1
+              }
+            },
+            "secondary": {
+              "enable": false,
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": true,
+                "isWait": false,
+                "opacity": 1,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1.5,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "zIndex": 1
+              }
+            },
+            "soundOnly": {
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              }
+            },
+            "source": {
+              "enable": false,
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": false,
+                "isWait": true,
+                "opacity": 1,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "zIndex": 1
+              }
+            },
+            "target": {
+              "enable": false,
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": false,
+                "opacity": 1,
+                "persistent": false,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "unbindAlpha": false,
+                "unbindVisibility": false,
+                "zIndex": 1
+              }
+            },
+            "isEnabled": true,
+            "isCustomized": true,
+            "fromAmmo": false,
+            "version": 5
+          }
+        },
+        "target": {
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft",
+            "type": ""
+          },
+          "affects": {
+            "choice": false,
+            "type": ""
+          },
+          "override": false,
+          "prompt": true
+        },
+        "uses": {
+          "spent": null,
+          "recovery": [],
+          "max": ""
+        },
+        "visibility": {
+          "level": {
+            "min": null,
+            "max": null
+          },
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false,
+          "identifier": ""
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "otherActivityCompatible": false,
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "automationOnly": false,
+          "otherActivityAsParentType": false,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "otherActivityId": "",
+        "attackMode": "oneHanded",
+        "fumbleThreshold": 1,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityAsParentType": false,
+        "ammunition": "",
+        "otherActivityUuid": "",
+        "attackRollPerTarget": "default",
+        "name": ""
+      },
+      "dnd5eactivity001": {
+        "_id": "dnd5eactivity001",
+        "type": "utility",
+        "name": "千杯不醉",
+        "activation": {
+          "type": "bonus",
+          "value": 1,
+          "override": false,
+          "condition": ""
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "activityUses",
+              "value": "1",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false
+        },
+        "range": {
+          "units": "self",
+          "override": true,
+          "special": ""
+        },
+        "target": {
+          "affects": {
+            "type": "self",
+            "choice": false,
+            "special": ""
+          },
+          "override": true,
+          "prompt": false,
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft",
+            "type": ""
+          }
+        },
+        "duration": {
+          "value": "1",
+          "units": "round",
+          "concentration": false,
+          "override": false
+        },
+        "effects": [
+          {
+            "_id": "fpDrunkHazeV2016",
+            "level": {
+              "min": null,
+              "max": null
+            }
+          }
+        ],
+        "img": "icons/magic/water/wave-water-blue.webp",
+        "sort": 1,
+        "description": {
+          "chatFlavor": ""
+        },
+        "flags": {
+          "autoanimations": {
+            "id": "d552d85d-d32e-4e7b-a6b6-b7d474c1c49a",
+            "label": "千杯不醉",
+            "levels3d": {
+              "type": "explosion",
+              "data": {
+                "color01": "#FFFFFF",
+                "color02": "#FFFFFF",
+                "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+              },
+              "sound": {
+                "enable": false
+              },
+              "secondary": {
+                "enable": false,
+                "data": {
+                  "color01": "#FFFFFF",
+                  "color02": "#FFFFFF",
+                  "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+                }
+              }
+            },
+            "macro": {
+              "enable": false,
+              "playWhen": "0"
+            },
+            "menu": "ontoken",
+            "primary": {
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": true,
+                "customPath": "jb2a.aura_themed.01.orbit.loop.nature.01.blue"
+              },
+              "sound": {
+                "enable": true,
+                "delay": 0,
+                "file": "modules/psfx/library/casting/water/cast-water-03.ogg",
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": false,
+                "isWait": false,
+                "opacity": 1,
+                "persistent": false,
+                "playbackRate": 1,
+                "playOn": "default",
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "unbindAlpha": false,
+                "unbindVisibility": false,
+                "zIndex": 1
+              }
+            },
+            "secondary": {
+              "enable": false,
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": true,
+                "isWait": false,
+                "opacity": 1,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1.5,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "zIndex": 1
+              }
+            },
+            "soundOnly": {
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              }
+            },
+            "source": {
+              "enable": false,
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": false,
+                "isWait": true,
+                "opacity": 1,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "zIndex": 1
+              }
+            },
+            "target": {
+              "enable": false,
+              "video": {
+                "dbSection": "static",
+                "menuType": "spell",
+                "animation": "curewounds",
+                "variant": "01",
+                "color": "blue",
+                "enableCustom": false,
+                "customPath": ""
+              },
+              "sound": {
+                "enable": false,
+                "delay": 0,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "startTime": 0,
+                "volume": 0.75
+              },
+              "options": {
+                "addTokenWidth": false,
+                "anchor": "0.5",
+                "contrast": 0,
+                "delay": 0,
+                "elevation": 1000,
+                "fadeIn": 250,
+                "fadeOut": 500,
+                "isMasked": false,
+                "isRadius": false,
+                "opacity": 1,
+                "persistent": false,
+                "repeat": 1,
+                "repeatDelay": 250,
+                "saturate": 0,
+                "size": 1,
+                "tint": false,
+                "tintColor": "#FFFFFF",
+                "unbindAlpha": false,
+                "unbindVisibility": false,
+                "zIndex": 1
+              }
+            },
+            "isEnabled": true,
+            "isCustomized": true,
+            "fromAmmo": false,
+            "version": 5
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": [
+            {
+              "period": "recharge",
+              "formula": "5",
+              "type": "recoverAll"
+            }
+          ],
+          "max": "1"
+        },
+        "visibility": {
+          "level": {
+            "min": null,
+            "max": null
+          },
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false,
+          "identifier": ""
+        },
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "otherActivityCompatible": false,
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "automationOnly": false,
+          "otherActivityAsParentType": false,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "otherActivityId": "",
+        "roll": {
+          "prompt": false,
+          "visible": false,
+          "formula": "",
+          "name": ""
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityAsParentType": true
+      }
+    },
+    "uses": {
+      "spent": null,
+      "recovery": [],
+      "max": ""
+    },
+    "description": {
+      "value": "<p><strong>流泉饮锋 · 寒江独钓 Frozen Rivulet</strong></p><p><em>珍稀魔法物品（长剑），需同调</em></p><p>这把长剑的剑身泛着清冷的霜色光泽，仿佛将一弯冬日的寒泉凝于铁中。挥动时在空中留下丝丝白雾般的轨迹，如同山间溪流的涟漪——轻而致命。剑柄处系着一截褪色的红绳，据说是初代主人在断崖边垂钓时，从江面浮起的日轮中取下的丝缕。</p><p>与之配套的白色葫芦悬于剑鞘一侧，壶身微透，内里琼浆如月下清溪般流转，散发着淡淡的梅花与雪松香气。壶口处以朱砂符纸封口，上绣一枚古字——「醉」。</p><p><strong>传说</strong>：相传此剑出自一位隐世剑豪之手。他在某个大雪封山的夜晚，于寒江之畔独饮葫芦中的雪泉酒，以剑代笔、以雪为墨，在冰面上刻下三百六十式剑谱。当最后一式落定，冰面忽然裂作万千碎玉，而那柄刻剑竟于葫中自行凝出。他将此剑命名为【寒江独钓】钓尽世间不平。</p><p><strong>魔法特性</strong></p><ul><li>你使用此魔法武器进行的攻击检定与伤害掷骰获得 <strong>+2</strong> 加值。</li></ul><p><strong>千杯不醉 [充能 5-6]</strong>：你可以用一个<strong>附赠动作</strong>饮用葫芦，让一缕寒泉酒香缠绕于舌间。直到你的<strong>下回合结束</strong>，你使用此武器进行的近战攻击检定具有<strong>优势</strong>，且每次命中时额外造成 <strong>1d4 寒冷</strong>伤害，并使你恢复 <strong>1d4+1</strong> 点生命值。</p>",
+      "chat": ""
+    },
+    "identifier": "---frozen-rivulet",
+    "source": {
+      "revision": 1,
+      "rules": "2014"
+    },
+    "identified": true,
+    "unidentified": {
+      "description": "<p>一把泛着霜色光泽的精致长剑，剑柄系着一截褪色的红绳。剑鞘上悬着一个白色小葫芦。</p>"
+    },
+    "container": null,
+    "quantity": 1,
+    "weight": {
+      "value": 3,
+      "units": "lb"
+    },
+    "price": {
+      "value": 2500,
+      "denomination": "gp"
+    },
+    "rarity": "rare",
+    "attunement": "required",
+    "attuned": false,
+    "equipped": false,
+    "crew": {
+      "value": []
+    },
+    "ammunition": {},
+    "armor": {},
+    "damage": {
+      "base": {
+        "types": [
+          "slashing"
+        ],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        },
+        "number": 1,
+        "denomination": 8,
+        "bonus": ""
+      },
+      "versatile": {
+        "types": [
+          "slashing"
+        ],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        },
+        "number": 1,
+        "denomination": 10,
+        "bonus": ""
+      }
+    },
+    "properties": [
+      "mgc",
+      "ver"
+    ],
+    "proficient": 1,
+    "range": {
+      "units": "ft",
+      "value": null,
+      "long": null,
+      "reach": null
+    },
+    "type": {
+      "value": "martialM",
+      "baseItem": "longsword"
+    },
+    "magicalBonus": "2"
+  },
+  "effects": [
+    {
+      "_id": "fpDrunkHazeV2016",
+      "name": "千杯不醉 Frozen Rivulet Drunken Haze",
+      "img": "icons/magic/water/wave-water-blue.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "origin": null,
+      "duration": {
+        "rounds": 1,
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "statuses": [],
+      "changes": [
+        {
+          "key": "flags.midi-qol.advantage.attack.mwak",
+          "mode": 0,
+          "value": "1",
+          "priority": 20
+        },
+        {
+          "key": "system.bonuses.mwak.damage",
+          "mode": 2,
+          "value": "1d4[cold]",
+          "priority": 20
+        }
+      ],
+      "description": "<p>因千杯不醉的效果：你使用流泉饮锋进行的近战攻击检定具有优势，且每次命中额外造成 1d4 寒冷伤害。命中后恢复 1d4+1 点生命值。持续至你的下回合结束。</p>",
+      "system": {},
+      "tint": "#99ccff",
+      "sort": 0,
+      "flags": {
+        "dnd5e": {
+          "riders": {
+            "statuses": []
+          }
+        },
+        "dae": {
+          "stackable": "noneName",
+          "showIcon": true,
+          "selfTarget": false,
+          "selfTargetAlways": true,
+          "dontApply": false,
+          "macroRepeat": "none",
+          "specialDuration": [],
+          "enableCondition": "",
+          "disableCondition": "",
+          "disableIncapacitated": false,
+          "durationExpression": ""
+        },
+        "core": {
+          "overlay": false
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      }
+    }
+  ],
+  "folder": "CwWuGgZ1sO5f8NIn",
+  "flags": {
+    "midi-qol": {
+      "onUseMacroName": "[postDamageRoll]ItemMacro"
+    },
+    "itemacro": {
+      "macro": {
+        "command": "const actor = workflow?.actor;\nif (!actor) return;\n\nconst drunkEffect = actor.effects.find(e => (e.name.includes('千杯不醉') || e.name.includes('Drunken Haze')) && !e.disabled);\nif (!drunkEffect) return;\n\nconst healRoll = await new Roll('1d4 + 1').evaluate();\nconst healTotal = healRoll.total;\nconst hp = actor.system.attributes.hp;\nconst newHp = Math.min(hp.value + healTotal, hp.max);\nawait actor.update({ 'system.attributes.hp.value': newHp });\n\nawait healRoll.toMessage({\n    speaker: ChatMessage.getSpeaker({ actor: actor }),\n    flavor: `<b>${actor.name}</b> —— 恢复 <b>${healTotal}</b> 点生命值`\n});",
+        "name": "流泉饮锋 · 寒江独钓 Frozen Rivulet",
+        "img": "modules/longhua-dm-toolkit/assets/wu-pin/01392333-d604-4347-942f-b191621f09d4-api_oss_1-1.png",
+        "type": "script",
+        "scope": "global",
+        "_id": null,
+        "author": "34cT0UflLomCQ0PU",
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 3
+        },
+        "flags": {},
+        "_stats": {
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.3.3",
+          "lastModifiedBy": null,
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null
+        }
+      }
+    },
+    "dae": {
+      "macro": {
+        "name": "流泉饮锋 · 寒江独钓 Frozen Rivulet",
+        "img": "modules/longhua-dm-toolkit/assets/wu-pin/01392333-d604-4347-942f-b191621f09d4-api_oss_1-1.png",
+        "type": "script",
+        "scope": "global",
+        "command": "const actor = workflow?.actor;\nif (!actor) return;\n\nconst drunkEffect = actor.effects.find(e => (e.name.includes('千杯不醉') || e.name.includes('Drunken Haze')) && !e.disabled);\nif (!drunkEffect) return;\n\nconst healRoll = await new Roll('1d4 + 1').evaluate();\nconst healTotal = healRoll.total;\nconst hp = actor.system.attributes.hp;\nconst newHp = Math.min(hp.value + healTotal, hp.max);\nawait actor.update({ 'system.attributes.hp.value': newHp });\n\nawait healRoll.toMessage({\n    speaker: ChatMessage.getSpeaker({ actor: actor }),\n    flavor: `<b>${actor.name}</b> —— 恢复 <b>${healTotal}</b> 点生命值`\n});",
+        "author": "34cT0UflLomCQ0PU",
+        "ownership": {
+          "default": 3
+        },
+        "_id": null,
+        "folder": null,
+        "sort": 0,
+        "flags": {},
+        "_stats": {
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.3.3",
+          "lastModifiedBy": null,
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null
+        }
+      }
+    },
+    "dnd5e": {
+      "riders": {
+        "activity": []
+      }
+    },
+    "autoanimations": {
+      "id": "lqyfBladeAnim001",
+      "label": "寒江独钓",
+      "macro": {
+        "enable": false,
+        "playWhen": "0"
+      },
+      "menu": "melee",
+      "isEnabled": true,
+      "isCustomized": true,
+      "fromAmmo": false,
+      "version": 5,
+      "soundOnly": {
+        "sound": {
+          "enable": false
+        }
+      },
+      "melee": {
+        "primary": {
+          "enable": true,
+          "video": {
+            "dbSection": "melee",
+            "menuType": "weapon",
+            "animation": "sword",
+            "variant": "01",
+            "color": "blue",
+            "enableCustom": false,
+            "customPath": ""
+          },
+          "sound": {
+            "enable": true,
+            "file": "modules/psfx/library/conditions/boon/boon-001-01.ogg",
+            "volume": 0.75
+          }
+        },
+        "secondary": {
+          "enable": false
+        },
+        "source": {
+          "enable": false
+        },
+        "target": {
+          "enable": false
+        },
+        "meleeSwitch": {
+          "enable": false
+        }
+      }
+    },
+    "scene-packer": {
+      "sourceId": "Item.g9t3f7RDeOc8IAxk",
+      "hash": "b290c308efa36f22b800d7d3b548ffe4e5c23e29"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.longhua-dm-toolkit.longhua-items.Item.LpnGQiPqob0rSqbY",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Item.g9t3f7RDeOc8IAxk",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788841929798,
+    "modifiedTime": 1788841929798,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

@@ -1,0 +1,466 @@
+{
+  "name": "传送门装置 Portal Device",
+  "type": "equipment",
+  "img": "icons/skills/targeting/target-glowing-yellow.webp",
+  "effects": [
+    {
+      "_id": "PortalFailMrk001",
+      "name": "传送吸附 Portal Lock",
+      "img": "icons/magic/movement/trail-streak-impact-blue.webp",
+      "type": "base",
+      "transfer": false,
+      "disabled": false,
+      "origin": null,
+      "description": "<p>被传送门装置锁定，正被拽向红色出口。（此标记仅用于结算，瞬时移除）</p>",
+      "statuses": [],
+      "changes": [],
+      "flags": {
+        "world": {
+          "portalDeviceFailed": true
+        }
+      },
+      "duration": {
+        "seconds": 6,
+        "startTime": null,
+        "combat": null
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "system": {},
+      "tint": "#ffffff",
+      "sort": 0
+    }
+  ],
+  "folder": "6D3wTj6e0t45QTFy",
+  "flags": {
+    "midiProperties": {
+      "confirmTargets": "default",
+      "autoFailFriendly": true,
+      "autoTargetType": "any"
+    },
+    "midi-qol": {
+      "onUseMacroName": "[postActiveEffects]ItemMacro"
+    },
+    "dnd5e": {
+      "riders": {
+        "activity": []
+      }
+    },
+    "dae": {
+      "macro": {
+        "name": "传送门装置 Portal Device",
+        "img": "icons/magic/movement/portal-vortex-blue.webp",
+        "type": "script",
+        "scope": "global",
+        "command": "// 传送门装置 Portal Device — ItemMacro，触发时机 [postActiveEffects]\n// 流程：① 永远布门（点入口蓝/出口红两点）② 体质豁免失败的被瞄准目标 → 偏移到出口旁（方案A）\n// 造/删 Region 需 GM 权限：GM 直接造；玩家用 game.socket 委托 GM（需常驻登记脚本配合）\n(async () => {\n  const ENTRY_COLOR = \"#42d4f4\";   // 蓝 入口\n  const EXIT_COLOR  = \"#e6194b\";   // 红 出口\n  const RANGE_FT    = 60;          // 入口/出口落点距使用者上限（尺）\n  const DURATION_MS = 60000;       // 传送门持续 1 分钟\n  const TIMEOUT_MS  = 20000;       // 单次点击超时\n  const MARK_FLAG   = \"portalDeviceFailed\"; // 豁免失败标记（由 save activity 在失败时挂上）\n  const SOCK_NS     = \"module.longhua-dm-toolkit\";\n\n  const gridSize = canvas.grid.size;\n  const ftPerSq  = canvas.scene.grid?.distance ?? 5;\n  const SNAP     = CONST.GRID_SNAPPING_MODES;\n\n  const caster = canvas.tokens.controlled[0] ?? token;\n  if (!caster) { ui.notifications.warn(\"请先选中使用者的 Token 再使用传送门装置\"); return; }\n  const cc = { x: caster.center?.x ?? (caster.x + caster.w / 2), y: caster.center?.y ?? (caster.y + caster.h / 2) };\n\n  const ftBetween = (a, b) => Math.hypot(a.x - b.x, a.y - b.y) / gridSize * ftPerSq;\n  const snapCenter = (p) => {\n    try { return canvas.grid.getSnappedPoint({ x: p.x, y: p.y }, { mode: SNAP.CENTER, resolution: 1 }); }\n    catch (e) { return { x: Math.round(p.x / gridSize) * gridSize, y: Math.round(p.y / gridSize) * gridSize }; }\n  };\n\n  // —— 单次点击取格心（带范围高亮圈），null=超时 ——\n  const pickPoint = (label) => new Promise((resolve) => {\n    const maxSq = Math.max(1, Math.floor(RANGE_FT / ftPerSq));\n    const g = new PIXI.Graphics();\n    g.lineStyle(2, 0x66ccff, 0.9); g.beginFill(0x66ccff, 0.05);\n    g.drawCircle(cc.x, cc.y, maxSq * gridSize); g.endFill();\n    g.zIndex = 10000; canvas.app.stage.addChild(g);\n    ui.notifications.info(`请在高亮范围内点击【${label}】落点（≤ ${RANGE_FT} 尺）`);\n    const cleanup = () => { try { canvas.app.stage.off(\"pointerdown\", h); } catch (e) {} try { canvas.app.stage.removeChild(g); } catch (e) {} };\n    const h = (ev) => { cleanup(); let p = null; try { p = ev.data.getLocalPosition(canvas.app.stage); } catch (e) {} resolve(p ? snapCenter(p) : null); };\n    canvas.app.stage.on(\"pointerdown\", h);\n    setTimeout(() => { cleanup(); resolve(null); }, TIMEOUT_MS);\n  });\n  const askInRange = async (label) => {\n    while (true) {\n      const p = await pickPoint(label);\n      if (!p) { ui.notifications.warn(\"未检测到点击，已取消\"); return null; }\n      if (ftBetween(p, cc) > RANGE_FT + 0.001) { ui.notifications.warn(`超出 ${RANGE_FT} 尺，请重选【${label}】`); continue; }\n      return p;\n    }\n  };\n\n  const entry = await askInRange(\"入口·蓝\");\n  if (!entry) return;\n  const exit = await askInRange(\"出口·红\");\n  if (!exit) return;\n\n  // —— 占位检测 + 找出口旁最近空格（方案A：从门里走出来）——\n  const occupied = (cx, cy) => {\n    const r = new PIXI.Rectangle(cx - gridSize / 2, cy - gridSize / 2, gridSize, gridSize);\n    return canvas.tokens.placeables.some((t) => {\n      const b = new PIXI.Rectangle(t.x, t.y, t.w, t.h);\n      return r.right > b.left && r.left < b.right && r.bottom > b.top && r.top < b.bottom;\n    });\n  };\n  const freeNear = (c) => {\n    if (!occupied(c.x, c.y)) return c;\n    const offs = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1], [2, 0], [-2, 0], [0, 2], [0, -2]];\n    for (const [dx, dy] of offs) { const p = { x: c.x + dx * gridSize, y: c.y + dy * gridSize }; if (!occupied(p.x, p.y)) return p; }\n    return c;\n  };\n\n  // —— 收集\"被瞄准且豁免失败\"的目标：算好出口旁落点(左上角坐标,适配体型)与待清失败标记，交给 GM 端执行 ——\n  // 玩家无权限移动/删除他人 token 上的内容，故这里只收集，实际传送与删标记由常驻脚本在 GM 端做。\n  const warps = [];\n  const warped = [];\n  const targets = Array.from(game.user.targets ?? []).filter((t) => t.id !== caster.id);\n  for (const tk of targets) {\n    const failedEffects = (tk.actor?.effects?.filter((e) => e.getFlag(\"world\", MARK_FLAG))) ?? [];\n    if (!failedEffects.length) continue;\n    const center = freeNear({ x: exit.x, y: exit.y });\n    const tw = tk.document?.width ?? 1, th = tk.document?.height ?? 1;\n    const destTL = { x: Math.round(center.x - (tw * gridSize) / 2), y: Math.round(center.y - (th * gridSize) / 2) };\n    warps.push({ tokenId: tk.id, dest: destTL, effectIds: failedEffects.map((e) => e.id) });\n    warped.push(tk.name);\n  }\n\n  // —— 造门（永远执行 = 方案B）。格子左上角 = 格心 - 半格 ——\n  const tl = (c) => ({ x: Math.round(c.x - gridSize / 2), y: Math.round(c.y - gridSize / 2) });\n  const payload = {\n    pairId: \"pd_\" + foundry.utils.randomID(6),\n    sceneId: canvas.scene.id,\n    entry: tl(entry), exit: tl(exit), size: gridSize,\n    entryColor: ENTRY_COLOR, exitColor: EXIT_COLOR,\n    deviceId: caster.actor?.id ?? caster.id, durationMs: DURATION_MS,\n    warps,\n  };\n\n  if (!globalThis.PortalDevice?.makePair) {\n    ui.notifications.error(\"未加载传送门常驻脚本（请把『传送门装置-常驻登记』脚本放进 world-scripter）\");\n    return;\n  }\n  if (game.user.isGM) {\n    await globalThis.PortalDevice.makePair(payload);\n  } else {\n    game.socket.emit(SOCK_NS, { action: \"portalDeviceCreate\", payload });\n    ui.notifications.info(\"已请求 GM 端开启传送门\");\n  }\n\n  ChatMessage.create({\n    content: `<p><strong>传送门装置</strong>：开启 <span style=\"color:${ENTRY_COLOR}\">蓝色入口</span> ↔ <span style=\"color:${EXIT_COLOR}\">红色出口</span>，持续 1 分钟。`\n      + (warped.length ? ` 已将 ${warped.join(\"、\")} 送出红口。` : \"\") + `</p>`,\n  });\n})();\n",
+        "author": "",
+        "ownership": {
+          "default": 3
+        },
+        "_id": null,
+        "folder": null,
+        "sort": 0,
+        "flags": {}
+      }
+    },
+    "scene-packer": {
+      "hash": "990cdf4d9beac639fc5b0f2aa7f2d921a4ea8153",
+      "sourceId": "Item.rCAItnQMBwOAvyHa"
+    }
+  },
+  "system": {
+    "description": {
+      "value": "<p><em>需同调。</em>这件奇物能在空间中凿出一对相连的传送门。</p><p>将一个动作用于本装置并消耗一次充能，选择 60 尺内你能看见的两处地点，分别开启一道<strong>蓝色入口</strong>与一道<strong>红色出口</strong>，二者持续 1 分钟。其间任何生物或物体可踏入一道门、自另一道门走出（<strong>双向</strong>）。每次使用都会重新布置这对门——你可以随时改变它们的位置。</p><p>使用时你可以选择是否同时传送一个目标：</p><ul><li><strong>仅布置传送门：</strong>不指定任何目标，直接选定两处地点放下门即可。</li><li><strong>同时传送一个目标：</strong>指定 60 尺内一个目标（生物或物体）。自愿的目标直接被送出红色出口、现身于其旁；<strong>不情愿的生物</strong>须作一次<strong>体质豁免（DC 8 + 你的熟练加值）</strong>，失败则被吸往红色出口、出现在出口旁最近的空地，成功则不受影响、留在原处。</li></ul><p><strong>动能：</strong>穿门时保留的速度、动量与坠落由 DM 裁定。</p><p><strong>半途关闭：</strong>若传送门在某生物正穿越的一瞬间关闭（时限耗尽，或被关闭），该生物不会卡在中途、也不会漏到对侧，而是退回它进入的那一道门一侧（落点由 DM 裁定）。</p><p>本装置每日可使用 3 次。</p><p>依赖：midi-qol、DAE、world-scripter（<strong>必装并贴入常驻脚本</strong>）。<strong>灵感来源</strong>:P ortal</p>",
+      "chat": ""
+    },
+    "source": {
+      "custom": "",
+      "rules": "2014",
+      "revision": 1
+    },
+    "identifier": "portal-device",
+    "type": {
+      "value": "trinket",
+      "baseItem": ""
+    },
+    "properties": [
+      "mgc"
+    ],
+    "rarity": "veryRare",
+    "attunement": "required",
+    "price": {
+      "value": 24000,
+      "denomination": "gp"
+    },
+    "weight": {
+      "value": 1,
+      "units": "lb"
+    },
+    "uses": {
+      "max": "3",
+      "spent": 0,
+      "recovery": [
+        {
+          "period": "day",
+          "type": "recoverAll"
+        }
+      ]
+    },
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "type": "save",
+        "name": "开启传送门",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false,
+          "condition": ""
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "itemUses",
+              "value": "1",
+              "target": "",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": false
+        },
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "range": {
+          "units": "ft",
+          "value": "60",
+          "override": false,
+          "special": ""
+        },
+        "target": {
+          "prompt": false,
+          "affects": {
+            "type": "",
+            "count": "",
+            "choice": false,
+            "special": ""
+          },
+          "template": {
+            "type": "",
+            "units": "ft",
+            "contiguous": false,
+            "stationary": false
+          },
+          "override": false
+        },
+        "save": {
+          "ability": [
+            "con"
+          ],
+          "dc": {
+            "calculation": "",
+            "formula": "8 + @prof"
+          }
+        },
+        "damage": {
+          "onSave": "none",
+          "parts": [],
+          "critical": {
+            "allow": false
+          }
+        },
+        "effects": [
+          {
+            "_id": "PortalFailMrk001",
+            "onSave": false,
+            "level": {
+              "min": null,
+              "max": null
+            }
+          }
+        ],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": "",
+        "sort": 0,
+        "flags": {},
+        "uses": {
+          "spent": 0,
+          "recovery": [],
+          "max": ""
+        },
+        "visibility": {
+          "level": {
+            "min": null,
+            "max": null
+          },
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false,
+          "identifier": ""
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "friendlySave": "default"
+      },
+      "h73nSeYociOZ8SEX": {
+        "type": "save",
+        "name": "对人",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false,
+          "condition": ""
+        },
+        "consumption": {
+          "targets": [
+            {
+              "type": "itemUses",
+              "value": "1",
+              "target": "",
+              "scaling": {}
+            }
+          ],
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": false
+        },
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "range": {
+          "units": "ft",
+          "value": "60",
+          "override": false,
+          "special": ""
+        },
+        "target": {
+          "prompt": false,
+          "affects": {
+            "type": "creature",
+            "count": "1",
+            "choice": false,
+            "special": ""
+          },
+          "template": {
+            "type": "",
+            "units": "ft",
+            "contiguous": false,
+            "stationary": false
+          },
+          "override": false
+        },
+        "save": {
+          "ability": [
+            "con"
+          ],
+          "dc": {
+            "calculation": "",
+            "formula": "8 + @prof"
+          }
+        },
+        "damage": {
+          "onSave": "none",
+          "parts": [],
+          "critical": {
+            "allow": false
+          }
+        },
+        "effects": [
+          {
+            "_id": "PortalFailMrk001",
+            "onSave": false,
+            "level": {
+              "min": null,
+              "max": null
+            }
+          }
+        ],
+        "description": {
+          "chatFlavor": ""
+        },
+        "img": "",
+        "sort": 100000,
+        "flags": {},
+        "uses": {
+          "spent": 0,
+          "recovery": [],
+          "max": ""
+        },
+        "visibility": {
+          "level": {
+            "min": null,
+            "max": null
+          },
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false,
+          "identifier": ""
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "friendlySave": "default",
+        "_id": "h73nSeYociOZ8SEX"
+      }
+    },
+    "identified": true,
+    "unidentified": {
+      "description": ""
+    },
+    "container": null,
+    "quantity": 1,
+    "crew": {
+      "value": []
+    },
+    "armor": {
+      "value": null,
+      "dex": null
+    },
+    "proficient": null,
+    "strength": null,
+    "attuned": true,
+    "equipped": true
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.longhua-dm-toolkit.longhua-items.Item.kgD0NpbryC1FBRKb",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Item.rCAItnQMBwOAvyHa",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788843626666,
+    "modifiedTime": 1788843626666,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

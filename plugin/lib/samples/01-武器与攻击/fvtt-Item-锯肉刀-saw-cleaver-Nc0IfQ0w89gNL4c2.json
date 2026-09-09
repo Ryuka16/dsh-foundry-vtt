@@ -1,0 +1,486 @@
+{
+  "effects": [
+    {
+      "_id": "bleedOT000000001",
+      "changes": [
+        {
+          "key": "flags.midi-qol.OverTime",
+          "mode": 0,
+          "priority": 20,
+          "value": "turn=start,damageRoll=1d4,damageType=slashing,saveDC=11,saveAbility=con,saveCount=1-,label=流血"
+        }
+      ],
+      "description": "<p>伤口流血不止：每回合开始受到 1d4 挥砍伤害，可重复进行 DC 11 体质豁免，成功即止血。</p>",
+      "disabled": false,
+      "duration": {
+        "combat": null,
+        "rounds": null,
+        "seconds": 60,
+        "startRound": null,
+        "startTime": null,
+        "startTurn": null,
+        "turns": null
+      },
+      "flags": {
+        "core": {
+          "overlay": false
+        },
+        "dae": {
+          "disableCondition": "",
+          "disableIncapacitated": false,
+          "dontApply": false,
+          "durationExpression": "",
+          "enableCondition": "",
+          "macroRepeat": "none",
+          "selfTarget": false,
+          "selfTargetAlways": false,
+          "showIcon": false,
+          "specialDuration": [],
+          "stackable": "noneName"
+        }
+      },
+      "img": "icons/skills/wounds/blood-drip-droplet-red.webp",
+      "name": "流血 Bleeding",
+      "origin": null,
+      "sort": 0,
+      "statuses": [],
+      "system": {},
+      "tint": "#ffffff",
+      "transfer": false,
+      "type": "base",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      }
+    }
+  ],
+  "flags": {
+    "scene-packer": {
+      "hash": "d0fd0f7f7bcc26e072877c5efe4ae3922d9a1f4a",
+      "sourceId": "Item.Nc0IfQ0w89gNL4c2"
+    },
+    "dnd5e": {
+      "riders": {
+        "activity": []
+      }
+    }
+  },
+  "img": "icons/weapons/axes/cleaver-black.webp",
+  "name": "锯肉刀 Saw Cleaver",
+  "system": {
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "activation": {
+          "condition": "",
+          "override": false,
+          "type": "action",
+          "value": 1
+        },
+        "ammunition": "",
+        "attack": {
+          "ability": "str",
+          "bonus": "",
+          "critical": {
+            "threshold": null
+          },
+          "flat": false,
+          "type": {
+            "classification": "weapon",
+            "value": "melee"
+          }
+        },
+        "attackMode": "oneHanded",
+        "attackRollPerTarget": "default",
+        "consumption": {
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": true,
+          "targets": []
+        },
+        "damage": {
+          "critical": {
+            "bonus": ""
+          },
+          "includeBase": true,
+          "parts": []
+        },
+        "description": {
+          "chatFlavor": ""
+        },
+        "duration": {
+          "concentration": false,
+          "override": false,
+          "special": "",
+          "units": "inst",
+          "value": ""
+        },
+        "effectConditionText": "",
+        "effects": [],
+        "flags": {},
+        "fumbleThreshold": 1,
+        "ignoreTraits": {
+          "ida": false,
+          "idi": false,
+          "idm": false,
+          "idr": false,
+          "idv": false
+        },
+        "img": null,
+        "isOverTimeFlag": false,
+        "macroData": {
+          "command": "",
+          "name": ""
+        },
+        "midiProperties": {
+          "autoCEEffects": "default",
+          "autoConsume": false,
+          "autoTargetAction": "default",
+          "autoTargetType": "any",
+          "automationOnly": false,
+          "chooseEffects": false,
+          "confirmTargets": "default",
+          "displayActivityName": false,
+          "forceConsumeDialog": "default",
+          "forceDamageDialog": "default",
+          "forceRollDialog": "default",
+          "identifier": "",
+          "ignoreFullCover": false,
+          "ignoreTraits": [],
+          "magicDamage": false,
+          "magicEffect": false,
+          "noConcentrationCheck": false,
+          "otherActivityAsParentType": true,
+          "otherActivityCompatible": true,
+          "removeChatButtons": "default",
+          "rollMode": "default",
+          "skipConcentrationCheck": false,
+          "toggleEffect": false,
+          "triggeredActivityConditionText": "",
+          "triggeredActivityConfigure": true,
+          "triggeredActivityConsume": true,
+          "triggeredActivityId": "none",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityTargets": "targets"
+        },
+        "otherActivityAsParentType": true,
+        "otherActivityId": "dnd5eactivity100",
+        "otherActivityUuid": "",
+        "overTimeProperties": {
+          "postRemoveConditionText": "",
+          "preRemoveConditionText": "",
+          "rollAs": "target",
+          "saveRemoves": true
+        },
+        "range": {
+          "override": false,
+          "special": "",
+          "units": "ft",
+          "value": "5"
+        },
+        "sort": 0,
+        "target": {
+          "affects": {
+            "choice": false,
+            "count": "",
+            "special": "",
+            "type": "creature"
+          },
+          "override": false,
+          "prompt": true,
+          "template": {
+            "contiguous": false,
+            "count": "",
+            "height": "",
+            "size": "",
+            "stationary": false,
+            "type": "",
+            "units": "ft",
+            "width": ""
+          }
+        },
+        "type": "attack",
+        "useConditionReason": "",
+        "useConditionText": "",
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": 0
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        }
+      },
+      "dnd5eactivity100": {
+        "_id": "dnd5eactivity100",
+        "activation": {
+          "condition": "",
+          "override": false,
+          "type": "special",
+          "value": null
+        },
+        "consumption": {
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": true,
+          "targets": []
+        },
+        "damage": {
+          "critical": {
+            "allow": false
+          },
+          "onSave": "none",
+          "parts": []
+        },
+        "description": {
+          "chatFlavor": "被锯肉刀砍中的目标必须进行一次 DC 11 体质豁免，失败则流血（每回合 1d4 挥砍）。"
+        },
+        "duration": {
+          "concentration": false,
+          "override": false,
+          "special": "",
+          "units": "inst",
+          "value": ""
+        },
+        "effectConditionText": "",
+        "effects": [
+          {
+            "_id": "bleedOT000000001",
+            "level": {},
+            "onSave": false
+          }
+        ],
+        "ignoreTraits": {
+          "ida": false,
+          "idi": false,
+          "idm": false,
+          "idr": false,
+          "idv": false
+        },
+        "isOverTimeFlag": false,
+        "macroData": {
+          "command": "",
+          "name": ""
+        },
+        "midiProperties": {
+          "autoCEEffects": "default",
+          "autoConsume": false,
+          "autoTargetAction": "default",
+          "autoTargetType": "any",
+          "automationOnly": false,
+          "chooseEffects": false,
+          "confirmTargets": "default",
+          "displayActivityName": false,
+          "forceConsumeDialog": "default",
+          "forceDamageDialog": "default",
+          "forceRollDialog": "default",
+          "identifier": "",
+          "ignoreFullCover": false,
+          "ignoreTraits": [],
+          "magicDamage": false,
+          "magicEffect": false,
+          "noConcentrationCheck": false,
+          "otherActivityAsParentType": true,
+          "otherActivityCompatible": true,
+          "removeChatButtons": "default",
+          "rollMode": "default",
+          "skipConcentrationCheck": false,
+          "toggleEffect": false,
+          "triggeredActivityConditionText": "",
+          "triggeredActivityConfigure": true,
+          "triggeredActivityConsume": true,
+          "triggeredActivityId": "none",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityTargets": "targets"
+        },
+        "name": "流血·体质豁免",
+        "otherActivityAsParentType": true,
+        "otherActivityId": "",
+        "overTimeProperties": {
+          "postRemoveConditionText": "",
+          "preRemoveConditionText": "",
+          "rollAs": "target",
+          "saveRemoves": true
+        },
+        "range": {
+          "override": false,
+          "special": "",
+          "units": "self",
+          "value": ""
+        },
+        "save": {
+          "ability": [
+            "con"
+          ],
+          "dc": {
+            "calculation": "flat",
+            "formula": "11"
+          }
+        },
+        "sort": 100000,
+        "target": {
+          "affects": {
+            "choice": false,
+            "count": "",
+            "special": "",
+            "type": "creature"
+          },
+          "override": false,
+          "prompt": true,
+          "template": {
+            "contiguous": false,
+            "count": "",
+            "height": "",
+            "size": "",
+            "stationary": false,
+            "type": "",
+            "units": "ft",
+            "width": ""
+          }
+        },
+        "type": "save",
+        "useConditionReason": "",
+        "useConditionText": "",
+        "uses": {
+          "max": "",
+          "recovery": [],
+          "spent": 0
+        },
+        "img": null,
+        "flags": {},
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "friendlySave": "default"
+      }
+    },
+    "ammunition": {},
+    "armor": {
+      "value": 10
+    },
+    "attuned": false,
+    "attunement": "",
+    "container": null,
+    "cover": null,
+    "crew": {
+      "value": []
+    },
+    "damage": {
+      "base": {
+        "bonus": "",
+        "custom": {
+          "enabled": false,
+          "formula": ""
+        },
+        "denomination": 6,
+        "number": 1,
+        "scaling": {
+          "formula": "",
+          "mode": "",
+          "number": null
+        },
+        "types": [
+          "slashing"
+        ]
+      },
+      "versatile": {
+        "types": [],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        }
+      }
+    },
+    "description": {
+      "chat": "",
+      "value": "<p>沾满血渍的锯齿切肉刀。命中后目标须通过 DC 11 体质豁免，失败则流血：每回合开始受 1d4 挥砍伤害，之后每回合可再豁免，成功即止血。</p>"
+    },
+    "equipped": true,
+    "hp": {
+      "conditions": "",
+      "dt": null,
+      "max": 0,
+      "value": 0
+    },
+    "identified": true,
+    "identifier": "saw-cleaver",
+    "mastery": "",
+    "price": {
+      "denomination": "gp",
+      "value": 10
+    },
+    "proficient": 1,
+    "properties": [],
+    "quantity": 1,
+    "range": {
+      "long": null,
+      "reach": 5,
+      "units": "ft",
+      "value": 5
+    },
+    "rarity": "",
+    "source": {
+      "book": "",
+      "custom": "",
+      "license": "",
+      "page": "",
+      "rules": "2014",
+      "revision": 1
+    },
+    "type": {
+      "baseItem": "",
+      "value": "simpleM"
+    },
+    "unidentified": {
+      "description": ""
+    },
+    "uses": {
+      "max": "",
+      "recovery": [],
+      "spent": 0
+    },
+    "weight": {
+      "units": "lb",
+      "value": 3
+    }
+  },
+  "type": "weapon",
+  "folder": null,
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Item.Nc0IfQ0w89gNL4c2",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788840111058,
+    "modifiedTime": 1788840145657,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

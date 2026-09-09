@@ -1,0 +1,939 @@
+{
+  "name": "篡位者的死颅  Usurper's Death Skull",
+  "type": "weapon",
+  "img": "modules/boss-loot-adventures-premium/artwork/058-ogre-brothers/art-transparent-background-for-journal-ogres-headbutt-600x600.webp",
+  "system": {
+    "description": {
+      "value": "<p><em>武器（巨锤），传说（需同调）</em></p><p>这柄巨锤的顶端是叛徒兽人酋长萨鲁克那颗硕大的头颅，被厚重的黑铁支架与钢铁铆钉钉死，如同一顶野蛮的王冠；握柄是雷击过的黑铁木，缠着血喉流浪十五年间佩戴的生锈镣铐。被囚于其中的魂灵躁动难安，竟使这柄沉重的巨锤挥舞起来异常迅捷。</p><p>你使用这把魔法武器进行的攻击检定与伤害检定具有 <strong>+2</strong> 加值。本武器具有<strong>灵巧</strong>属性。命中目标时，额外造成 <strong>1d10 暗蚀</strong>伤害。</p><p><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;font-weight:600\"><strong style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text\">幸存者的盛宴 (Feast of the Survivor)</strong></span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;margin:16px 0px 12px;white-space:pre-wrap\">：</span></p><p style=\"box-sizing:border-box;margin:0.5rem 0px;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;font:400 13px / 18px 'Roboto Condensed', Roboto, Arial, sans-serif;color:rgb(255, 255, 255);letter-spacing:normal;orphans:2;text-indent:0px;text-transform:none;widows:2;word-spacing:0px;-webkit-text-stroke-width:0px;white-space:normal;background-color:rgb(11, 10, 19);text-decoration-thickness:initial;text-decoration-style:initial;text-decoration-color:initial;text-align:start\"><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif\">当你将一个生物的生命值降至 0 时，可以使用萨鲁克的头颅会做出“吞噬”的动作，汲取死者的生命力。</span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;margin-top:0.25em\">你获得</span><span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;margin-top:0.25em\"> </span></span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;font-weight:600\"><strong style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text\">10 + 你的体质调整值</strong></span><span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;margin-top:0.25em\"> </span></span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;margin-top:0.25em\">的</span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;font-weight:600\"><strong style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text\">临时生命值</strong></span><span style=\"box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0);user-select:text;--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scroll-snap-strictness:proximity;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;border-width:0px;border-style:solid;border-color:rgb(229, 231, 235);font-family:AlibabaPuHuiTi, -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;margin-top:0.25em\">。</span></p><p><strong>王冠晶槽。</strong> 钉在萨鲁克头盖骨上的黑铁王冠上凿有数个晶槽，其数量等同于你主属性（力量或敏捷中较高者）的调整值，且至少为 3。这顶王冠贪食黄金：在一次长休结束时，你可以向一个空置的晶槽喂入金币，王冠会将其吞噬、于槽中凝结出一颗魔晶——凝结每颗魔晶所需的金币等同于该魔晶的市价。你可以在不同晶槽中凝结同一种魔晶；无法取出，若你以一颗新的魔晶取代某槽原有者，被取代者便就此碎裂消散，无法取回。</p><p><strong>释放魔晶。</strong> 当你以本武器进行攻击动作时，你可以放弃其中一次攻击，转而消耗一颗已嵌入的魔晶、释放其蕴含之力。每颗魔晶各有其效果，依其自身描述结算。当某颗魔晶的效果需要豁免时，其豁免DC等同于你的豁免DC。被消耗的魔晶随即从晶槽中消失、留下空槽，直到你在下一次长休时重新嵌入。</p><hr /><p><strong>诅咒：不甘的低语（Whispers of the Betrayer）。</strong> 萨鲁克的灵魂并未消散，而是被囚禁在这颗头颅之中。它的智力为 8、感知为 12、魅力为 10，秉性混乱邪恶。那张早已没有声带的嘴依靠魔法的震动开合，能用通用语与兽人语大声叫嚷，嗓音如同两块墓碑相互摩擦。它会不停地嘲讽与之同调者，或在战斗的关键时刻发出扰人的尖啸。</p><p><em>副作用：</em>若你在战斗中单轮未能造成任何伤害，萨鲁克的讥笑会令你心烦意乱——你下一回合的第一次攻击检定具有劣势，除非你用一个附赠动作狠狠敲一下它的脑袋，让它闭嘴。</p>",
+      "chat": ""
+    },
+    "type": {
+      "value": "martialM",
+      "baseItem": "maul"
+    },
+    "properties": [
+      "mgc",
+      "fin",
+      "two"
+    ],
+    "rarity": "legendary",
+    "attunement": "required",
+    "attuned": true,
+    "identified": true,
+    "price": {
+      "value": 88800,
+      "denomination": "gp"
+    },
+    "weight": {
+      "value": 10,
+      "units": "lb"
+    },
+    "range": {
+      "value": null,
+      "long": null,
+      "units": "ft",
+      "reach": 5
+    },
+    "damage": {
+      "base": {
+        "number": 2,
+        "denomination": 6,
+        "bonus": "2",
+        "types": [
+          "bludgeoning"
+        ],
+        "custom": {
+          "enabled": false,
+          "formula": ""
+        },
+        "scaling": {
+          "mode": "whole",
+          "number": 1,
+          "formula": ""
+        }
+      },
+      "versatile": {
+        "types": [],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        }
+      }
+    },
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "type": "attack",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "range": {
+          "units": "ft",
+          "override": false
+        },
+        "attack": {
+          "ability": "",
+          "bonus": "2",
+          "type": {
+            "value": "melee",
+            "classification": "weapon"
+          },
+          "critical": {},
+          "flat": false
+        },
+        "damage": {
+          "includeBase": true,
+          "parts": [
+            {
+              "number": 1,
+              "denomination": 10,
+              "bonus": "",
+              "types": [
+                "necrotic"
+              ],
+              "custom": {
+                "enabled": false,
+                "formula": ""
+              },
+              "scaling": {
+                "mode": "whole",
+                "number": 1,
+                "formula": ""
+              }
+            }
+          ],
+          "critical": {}
+        },
+        "img": null,
+        "sort": 0,
+        "consumption": {
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false,
+          "targets": []
+        },
+        "description": {},
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "effects": [],
+        "flags": {},
+        "target": {
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          },
+          "affects": {
+            "choice": false
+          },
+          "override": false,
+          "prompt": true
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "automationOnly": false,
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "identifier": "",
+          "confirmTargets": "default",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "attackMode": "oneHanded",
+        "ammunition": "",
+        "otherActivityUuid": "",
+        "attackRollPerTarget": "default",
+        "fumbleThreshold": 1
+      },
+      "Mq6qfOmXBrM1FnzV": {
+        "_id": "Mq6qfOmXBrM1FnzV",
+        "type": "attack",
+        "name": "狂暴攻击  Berserk Attack",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "range": {
+          "units": "ft",
+          "override": false
+        },
+        "attack": {
+          "ability": "",
+          "bonus": "2",
+          "type": {
+            "value": "melee",
+            "classification": "weapon"
+          },
+          "critical": {},
+          "flat": false
+        },
+        "damage": {
+          "includeBase": true,
+          "parts": [
+            {
+              "number": null,
+              "denomination": null,
+              "bonus": "@scale.barbarian.baoshang",
+              "types": [
+                "slashing"
+              ],
+              "custom": {
+                "enabled": false,
+                "formula": ""
+              },
+              "scaling": {
+                "mode": "whole",
+                "number": 1,
+                "formula": ""
+              }
+            },
+            {
+              "number": 1,
+              "denomination": 10,
+              "bonus": "",
+              "types": [
+                "necrotic"
+              ],
+              "custom": {
+                "enabled": false,
+                "formula": ""
+              },
+              "scaling": {
+                "mode": "whole",
+                "number": 1,
+                "formula": ""
+              }
+            }
+          ],
+          "critical": {}
+        },
+        "img": null,
+        "sort": 0,
+        "consumption": {
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": false,
+          "targets": []
+        },
+        "description": {},
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "effects": [],
+        "flags": {},
+        "target": {
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          },
+          "affects": {
+            "choice": false
+          },
+          "override": false,
+          "prompt": true
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "automationOnly": false,
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "identifier": "",
+          "confirmTargets": "default",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "attackMode": "oneHanded",
+        "ammunition": "",
+        "otherActivityUuid": "",
+        "attackRollPerTarget": "default",
+        "fumbleThreshold": 1
+      },
+      "Ur4atDwtqkB1mLts": {
+        "_id": "Ur4atDwtqkB1mLts",
+        "type": "heal",
+        "name": "吞噬  Devour",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": true,
+          "condition": ""
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "chatFlavor": ""
+        },
+        "duration": {
+          "units": "inst",
+          "override": true,
+          "concentration": false,
+          "value": ""
+        },
+        "effects": [],
+        "img": "",
+        "sort": 2,
+        "flags": {},
+        "range": {
+          "override": true,
+          "units": "self",
+          "special": ""
+        },
+        "target": {
+          "prompt": false,
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "stationary": false,
+            "count": "",
+            "type": "",
+            "size": ""
+          },
+          "affects": {
+            "choice": false,
+            "count": "",
+            "type": "self",
+            "special": ""
+          },
+          "override": true
+        },
+        "healing": {
+          "number": null,
+          "denomination": null,
+          "bonus": "10 + @abilities.con.mod",
+          "types": [
+            "temphp"
+          ],
+          "custom": {
+            "enabled": false,
+            "formula": ""
+          },
+          "scaling": {
+            "mode": "whole",
+            "number": 1,
+            "formula": ""
+          }
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": [],
+          "max": ""
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "automationOnly": false,
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "identifier": "",
+          "confirmTargets": "default",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "visibility": {
+          "level": {
+            "min": null,
+            "max": null
+          },
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false,
+          "identifier": ""
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        }
+      },
+      "5wJt2Hm7K0c6vqh8": {
+        "_id": "5wJt2Hm7K0c6vqh8",
+        "type": "utility",
+        "name": "装填/查看魔晶石  Materia Loader",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": true,
+          "condition": ""
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "chatFlavor": ""
+        },
+        "duration": {
+          "units": "inst",
+          "override": true,
+          "concentration": false,
+          "value": ""
+        },
+        "effects": [],
+        "img": "icons/commodities/gems/gem-cut-faceted-square-purple.webp",
+        "sort": 3,
+        "flags": {},
+        "range": {
+          "override": true,
+          "units": "self",
+          "special": ""
+        },
+        "target": {
+          "prompt": false,
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "stationary": false,
+            "count": "",
+            "type": "",
+            "size": ""
+          },
+          "affects": {
+            "choice": false,
+            "count": "",
+            "type": "self",
+            "special": ""
+          },
+          "override": true
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "automationOnly": false,
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "identifier": "",
+          "confirmTargets": "default",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "roll": {
+          "prompt": false,
+          "visible": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "none",
+        "otherActivityAsParentType": true
+      }
+    },
+    "source": {
+      "rules": "2014",
+      "revision": 1
+    },
+    "uses": {
+      "max": "1",
+      "spent": 0,
+      "recovery": [
+        {
+          "period": "lr",
+          "type": "recoverAll"
+        }
+      ]
+    },
+    "identifier": "usurpers-death-skull",
+    "unidentified": {
+      "description": ""
+    },
+    "container": null,
+    "quantity": 1,
+    "crew": {
+      "value": []
+    },
+    "ammunition": {},
+    "armor": {},
+    "equipped": true,
+    "proficient": null
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {
+    "dnd5e": {
+      "riders": {
+        "activity": []
+      }
+    },
+    "world": {
+      "isMateriaBlade": true
+    },
+    "itemacro": {
+      "macro": {
+        "name": "魔晶石装填器",
+        "type": "script",
+        "scope": "global",
+        "command": "// === 食人魔猛击 FX · 攻击行动触发（分时序：漩涡→1s锤子→2.3s裂地）===\ntry {\n  const _wf = (typeof workflow !== \"undefined\" && workflow) ? workflow : null;\n  if (_wf && _wf.activity && _wf.activity.type === \"attack\") {\n    // 防双播：ItemMacro自动钩子 + midi onUse 会各触发一次，同一次攻击只放行一次\n    const _k = _wf.id || _wf.uuid || _wf.itemUuid;\n    if (_k) {\n      globalThis.__ogreSlamFired = globalThis.__ogreSlamFired || new Set();\n      if (globalThis.__ogreSlamFired.has(_k)) return;\n      globalThis.__ogreSlamFired.add(_k);\n      setTimeout(() => { try { globalThis.__ogreSlamFired.delete(_k); } catch (e) {} }, 6000);\n    }\n    const _src = (_wf.token && (_wf.token.object || _wf.token))\n              || canvas.tokens.get(_wf.tokenId)\n              || (typeof token !== \"undefined\" && token && (token.object || token))\n              || null;\n    const _pool = (_wf.hitTargets && _wf.hitTargets.size) ? _wf.hitTargets\n                 : (_wf.targets && _wf.targets.size ? _wf.targets : []);\n    const _tgts = [..._pool].map(t => t.object || t).filter(Boolean);\n    if (_src && typeof Sequence !== \"undefined\") {\n      const _seq = new Sequence();\n      // t=0：火焰漩涡（落我身上）+ 增益音\n      _seq.effect().file(\"blfx.spell.cast.swirl1.fire1.orange\").atLocation(_src).scale(0.7);\n      _seq.sound().file(\"blfx.sound.spell.cast.buff.1\").volume(1.0);\n      for (const _t of (_tgts.length ? _tgts : [null])) {\n        // t=1.0s：巨棒挥砸音（满音量 + 错开40ms叠一层）\n        _seq.sound().file(\"blfx.sound.weapon.melee.greatclub.attack2\").volume(1.0).delay(1000);\n        _seq.sound().file(\"blfx.sound.weapon.melee.greatclub.attack2\").volume(1.0).delay(1040);\n        // t=1.0s：砸击——居中落目标、放大6倍、mirrorX掰正基础朝向（此资源美术偏心，不旋转）\n        _seq.effect()\n          .file(\"blfx.weapon.melee.greatclub1.attack1.slam.trail1.blue\")\n          .atLocation(_t || _src)\n          .scaleToObject(6)\n          .mirrorX()\n          .delay(1000);\n        // t=1.0s：命中音\n        if (_t) {\n          _seq.sound().file(\"blfx.sound.spell.cast.entangle.roots.1\").volume(1.0).delay(1000);\n          _seq.sound().file(\"blfx.sound.spell.cast.entangle.roots.1\").volume(0.9).delay(1040);\n        }\n        // t=2.3s：裂地（锤子后1.3秒），jb2a一次性、目标2倍大\n        if (_t) _seq.effect()\n          .file(\"jb2a.impact.ground_crack.orange.01\")\n          .atLocation(_t)\n          .scaleToObject(2)\n          .delay(2300);\n      }\n      _seq.play();\n    }\n    return; // 攻击分支到此为止，不进入装填器\n  }\n} catch (_e) { console.error(\"OgreSlamFX |\", _e); }\n\n\n// 魔晶石装填器 · 剑内置物品宏\ntry {\n  // 仅「装填」行动触发；挥砍等其它行动忽略\n  const wf = (typeof workflow !== \"undefined\" && workflow) ? workflow : null;\n  if (wf && wf.activity && !(wf.activity.name || \"\").includes(\"装填\")) return;\n\n  const blade = item;\n  const WID = blade.id;\n  const SLOTS = Math.max(3, actor.system.abilities?.str?.mod ?? 0, actor.system.abilities?.dex?.mod ?? 0);  // 槽数=主属性(力/敏取高)调整值, 至少3\n  const maxTok = Number(blade.system.uses?.max) || 1;\n  const editAvail = (blade.system.uses?.spent ?? 0) < maxTok;\n\n  const slotted = {};\n  for (const it of actor.items) {\n    const m = it.getFlag(\"world\", \"materiaSlot\");\n    if (m && m.weapon === WID) slotted[m.slot] = it;\n  }\n  const templates = game.items.filter(i => i.getFlag(\"world\", \"materiaStoneId\"));\n  const tplOpts = templates.map(t => `<option value=\"${t.id}\">${t.name}（${t.system.price?.value ?? 0} GP）</option>`).join(\"\");\n  const gp = actor.system.currency?.gp ?? 0;\n\n  let content = `<p style=\"margin:.3em 0\">为 <b>${blade.name}</b> 管理魔晶石（${SLOTS} 槽，可重复装同一种）。当前金币：<b>${gp} GP</b>。</p>`;\n  content += editAvail\n    ? `<p style=\"font-size:.85em;opacity:.8\">本次长休可装填：每装 1 颗按该魔晶石的标价扣费；替换或清空会销毁原石（不退回）。</p>`\n    : `<p style=\"color:#a55;font-size:.85em\">本次长休的装填额度已用完——下次长休后可再改。当前为只读查看。</p>`;\n  for (let n = 1; n <= SLOTS; n++) {\n    const cur = slotted[n] ? `<b>${slotted[n].name}</b>` : `<i>空</i>`;\n    content += `<div style=\"margin:.35em 0;padding:.35em;border:1px solid #0003;border-radius:6px\"><div>晶槽 ${n} — 当前：${cur}</div>`;\n    if (editAvail) {\n      content += `<select name=\"slot${n}\" style=\"width:100%;margin-top:.25em\"><option value=\"\">— 保持当前 —</option>`\n        + (slotted[n] ? `<option value=\"__clear__\">— 清空本槽（销毁原石）—</option>` : ``)\n        + tplOpts + `</select>`;\n    }\n    content += `</div>`;\n  }\n  if (editAvail && !templates.length)\n    content += `<p style=\"color:#a55\">没找到魔晶石模板，请先把 8 颗石头导入「物品」目录。</p>`;\n\n  async function applyLoad(event, button, dialog) {\n    const root = dialog.element;\n    let changed = false;\n    let gpLeft = actor.system.currency?.gp ?? 0;\n    const dc = actor.system.attributes?.spelldc ?? 13;\n    for (let n = 1; n <= SLOTS; n++) {\n      const pick = root.querySelector(`[name=\"slot${n}\"]`)?.value;\n      if (!pick) continue;\n      if (slotted[n]) { try { await slotted[n].delete(); } catch (_) {} }\n      if (pick === \"__clear__\") { changed = true; continue; }\n      const tpl = templates.find(t => t.id === pick);\n      if (!tpl) continue;\n      const cost = tpl.system.price?.value ?? 0;\n      if (gpLeft < cost) { ui.notifications.warn(`金币不足（需 ${cost} GP），晶槽 ${n} 未装填。`); continue; }\n      gpLeft -= cost;\n      const data = tpl.toObject();\n      delete data._id;\n      data.name = `〔晶槽${n}〕` + tpl.name;\n      foundry.utils.setProperty(data, \"flags.world.materiaSlot\", { weapon: WID, slot: n });\n      for (const ef of (data.effects || [])) {\n        for (const ch of (ef.changes || [])) {\n          if (ch.key === \"flags.midi-qol.OverTime\")\n            ch.value = String(ch.value).replace(/saveDC=\\d+/, `saveDC=${dc}`);\n        }\n      }\n      await actor.createEmbeddedDocuments(\"Item\", [data]);\n      changed = true;\n    }\n    if (changed) {\n      await actor.update({ \"system.currency.gp\": gpLeft });\n      await blade.update({ \"system.uses.spent\": maxTok });\n      ui.notifications.info(`${blade.name}：装填完成，剩余 ${gpLeft} GP。`);\n    }\n  }\n\n  const buttons = editAvail\n    ? [{ action: \"save\", icon: \"fa-solid fa-gem\", label: \"确认装填\", default: true, callback: applyLoad },\n       { action: \"cancel\", icon: \"fa-solid fa-xmark\", label: \"取消\" }]\n    : [{ action: \"ok\", icon: \"fa-solid fa-eye\", label: \"关闭\", default: true }];\n\n  new foundry.applications.api.DialogV2({ window: { title: `魔晶石装填器 · ${blade.name}` }, content, buttons }).render(true);\n} catch (err) { console.error(\"MateriaLoader |\", err); }"
+      }
+    },
+    "dae": {
+      "macro": {
+        "name": "魔晶石装填器",
+        "type": "script",
+        "scope": "global",
+        "command": "// === 食人魔猛击 FX · 攻击行动触发（分时序：漩涡→1s锤子→2.3s裂地）===\ntry {\n  const _wf = (typeof workflow !== \"undefined\" && workflow) ? workflow : null;\n  if (_wf && _wf.activity && _wf.activity.type === \"attack\") {\n    // 防双播：ItemMacro自动钩子 + midi onUse 会各触发一次，同一次攻击只放行一次\n    const _k = _wf.id || _wf.uuid || _wf.itemUuid;\n    if (_k) {\n      globalThis.__ogreSlamFired = globalThis.__ogreSlamFired || new Set();\n      if (globalThis.__ogreSlamFired.has(_k)) return;\n      globalThis.__ogreSlamFired.add(_k);\n      setTimeout(() => { try { globalThis.__ogreSlamFired.delete(_k); } catch (e) {} }, 6000);\n    }\n    const _src = (_wf.token && (_wf.token.object || _wf.token))\n              || canvas.tokens.get(_wf.tokenId)\n              || (typeof token !== \"undefined\" && token && (token.object || token))\n              || null;\n    const _pool = (_wf.hitTargets && _wf.hitTargets.size) ? _wf.hitTargets\n                 : (_wf.targets && _wf.targets.size ? _wf.targets : []);\n    const _tgts = [..._pool].map(t => t.object || t).filter(Boolean);\n    if (_src && typeof Sequence !== \"undefined\") {\n      const _seq = new Sequence();\n      // t=0：火焰漩涡（落我身上）+ 增益音\n      _seq.effect().file(\"blfx.spell.cast.swirl1.fire1.orange\").atLocation(_src).scale(0.7);\n      _seq.sound().file(\"blfx.sound.spell.cast.buff.1\").volume(1.0);\n      for (const _t of (_tgts.length ? _tgts : [null])) {\n        // t=1.0s：巨棒挥砸音（满音量 + 错开40ms叠一层）\n        _seq.sound().file(\"blfx.sound.weapon.melee.greatclub.attack2\").volume(1.0).delay(1000);\n        _seq.sound().file(\"blfx.sound.weapon.melee.greatclub.attack2\").volume(1.0).delay(1040);\n        // t=1.0s：砸击——居中落目标、放大6倍、mirrorX掰正基础朝向（此资源美术偏心，不旋转）\n        _seq.effect()\n          .file(\"blfx.weapon.melee.greatclub1.attack1.slam.trail1.blue\")\n          .atLocation(_t || _src)\n          .scaleToObject(6)\n          .mirrorX()\n          .delay(1000);\n        // t=1.0s：命中音\n        if (_t) {\n          _seq.sound().file(\"blfx.sound.spell.cast.entangle.roots.1\").volume(1.0).delay(1000);\n          _seq.sound().file(\"blfx.sound.spell.cast.entangle.roots.1\").volume(0.9).delay(1040);\n        }\n        // t=2.3s：裂地（锤子后1.3秒），jb2a一次性、目标2倍大\n        if (_t) _seq.effect()\n          .file(\"jb2a.impact.ground_crack.orange.01\")\n          .atLocation(_t)\n          .scaleToObject(2)\n          .delay(2300);\n      }\n      _seq.play();\n    }\n    return; // 攻击分支到此为止，不进入装填器\n  }\n} catch (_e) { console.error(\"OgreSlamFX |\", _e); }\n\n\n// 魔晶石装填器 · 剑内置物品宏\ntry {\n  // 仅「装填」行动触发；挥砍等其它行动忽略\n  const wf = (typeof workflow !== \"undefined\" && workflow) ? workflow : null;\n  if (wf && wf.activity && !(wf.activity.name || \"\").includes(\"装填\")) return;\n\n  const blade = item;\n  const WID = blade.id;\n  const SLOTS = Math.max(3, actor.system.abilities?.str?.mod ?? 0, actor.system.abilities?.dex?.mod ?? 0);  // 槽数=主属性(力/敏取高)调整值, 至少3\n  const maxTok = Number(blade.system.uses?.max) || 1;\n  const editAvail = (blade.system.uses?.spent ?? 0) < maxTok;\n\n  const slotted = {};\n  for (const it of actor.items) {\n    const m = it.getFlag(\"world\", \"materiaSlot\");\n    if (m && m.weapon === WID) slotted[m.slot] = it;\n  }\n  const templates = game.items.filter(i => i.getFlag(\"world\", \"materiaStoneId\"));\n  const tplOpts = templates.map(t => `<option value=\"${t.id}\">${t.name}（${t.system.price?.value ?? 0} GP）</option>`).join(\"\");\n  const gp = actor.system.currency?.gp ?? 0;\n\n  let content = `<p style=\"margin:.3em 0\">为 <b>${blade.name}</b> 管理魔晶石（${SLOTS} 槽，可重复装同一种）。当前金币：<b>${gp} GP</b>。</p>`;\n  content += editAvail\n    ? `<p style=\"font-size:.85em;opacity:.8\">本次长休可装填：每装 1 颗按该魔晶石的标价扣费；替换或清空会销毁原石（不退回）。</p>`\n    : `<p style=\"color:#a55;font-size:.85em\">本次长休的装填额度已用完——下次长休后可再改。当前为只读查看。</p>`;\n  for (let n = 1; n <= SLOTS; n++) {\n    const cur = slotted[n] ? `<b>${slotted[n].name}</b>` : `<i>空</i>`;\n    content += `<div style=\"margin:.35em 0;padding:.35em;border:1px solid #0003;border-radius:6px\"><div>晶槽 ${n} — 当前：${cur}</div>`;\n    if (editAvail) {\n      content += `<select name=\"slot${n}\" style=\"width:100%;margin-top:.25em\"><option value=\"\">— 保持当前 —</option>`\n        + (slotted[n] ? `<option value=\"__clear__\">— 清空本槽（销毁原石）—</option>` : ``)\n        + tplOpts + `</select>`;\n    }\n    content += `</div>`;\n  }\n  if (editAvail && !templates.length)\n    content += `<p style=\"color:#a55\">没找到魔晶石模板，请先把 8 颗石头导入「物品」目录。</p>`;\n\n  async function applyLoad(event, button, dialog) {\n    const root = dialog.element;\n    let changed = false;\n    let gpLeft = actor.system.currency?.gp ?? 0;\n    const dc = actor.system.attributes?.spelldc ?? 13;\n    for (let n = 1; n <= SLOTS; n++) {\n      const pick = root.querySelector(`[name=\"slot${n}\"]`)?.value;\n      if (!pick) continue;\n      if (slotted[n]) { try { await slotted[n].delete(); } catch (_) {} }\n      if (pick === \"__clear__\") { changed = true; continue; }\n      const tpl = templates.find(t => t.id === pick);\n      if (!tpl) continue;\n      const cost = tpl.system.price?.value ?? 0;\n      if (gpLeft < cost) { ui.notifications.warn(`金币不足（需 ${cost} GP），晶槽 ${n} 未装填。`); continue; }\n      gpLeft -= cost;\n      const data = tpl.toObject();\n      delete data._id;\n      data.name = `〔晶槽${n}〕` + tpl.name;\n      foundry.utils.setProperty(data, \"flags.world.materiaSlot\", { weapon: WID, slot: n });\n      for (const ef of (data.effects || [])) {\n        for (const ch of (ef.changes || [])) {\n          if (ch.key === \"flags.midi-qol.OverTime\")\n            ch.value = String(ch.value).replace(/saveDC=\\d+/, `saveDC=${dc}`);\n        }\n      }\n      await actor.createEmbeddedDocuments(\"Item\", [data]);\n      changed = true;\n    }\n    if (changed) {\n      await actor.update({ \"system.currency.gp\": gpLeft });\n      await blade.update({ \"system.uses.spent\": maxTok });\n      ui.notifications.info(`${blade.name}：装填完成，剩余 ${gpLeft} GP。`);\n    }\n  }\n\n  const buttons = editAvail\n    ? [{ action: \"save\", icon: \"fa-solid fa-gem\", label: \"确认装填\", default: true, callback: applyLoad },\n       { action: \"cancel\", icon: \"fa-solid fa-xmark\", label: \"取消\" }]\n    : [{ action: \"ok\", icon: \"fa-solid fa-eye\", label: \"关闭\", default: true }];\n\n  new foundry.applications.api.DialogV2({ window: { title: `魔晶石装填器 · ${blade.name}` }, content, buttons }).render(true);\n} catch (err) { console.error(\"MateriaLoader |\", err); }"
+      }
+    },
+    "midi-qol": {
+      "onUseMacroName": "[postActiveEffects]ItemMacro"
+    },
+    "autoanimations": {
+      "id": "edb033a8-2778-4d4d-ba5f-70b344854c1a",
+      "label": "篡位者的死颅",
+      "levels3d": {
+        "type": "explosion",
+        "data": {
+          "color01": "#FFFFFF",
+          "color02": "#FFFFFF",
+          "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+        },
+        "sound": {
+          "enable": false
+        },
+        "secondary": {
+          "enable": false,
+          "data": {
+            "color01": "#FFFFFF",
+            "color02": "#FFFFFF",
+            "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+          }
+        }
+      },
+      "macro": {
+        "enable": false,
+        "playWhen": "0"
+      },
+      "meleeSwitch": {
+        "video": {
+          "dbSection": "range",
+          "menuType": "weapon",
+          "animation": "arrow",
+          "variant": "regular",
+          "color": "regular"
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "detect": "automatic",
+          "range": 2,
+          "returning": false,
+          "switchType": "on"
+        }
+      },
+      "menu": "melee",
+      "primary": {
+        "video": {
+          "dbSection": "melee",
+          "menuType": "weapon",
+          "animation": "maul",
+          "variant": "01",
+          "color": "orange",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "isWait": false,
+          "opacity": 1,
+          "playbackRate": 1,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "zIndex": 1
+        }
+      },
+      "secondary": {
+        "enable": false,
+        "video": {
+          "dbSection": "static",
+          "menuType": "spell",
+          "animation": "curewounds",
+          "variant": "01",
+          "color": "blue",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "addTokenWidth": false,
+          "anchor": "0.5",
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "fadeIn": 250,
+          "fadeOut": 500,
+          "isMasked": false,
+          "isRadius": true,
+          "isWait": false,
+          "opacity": 1,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1.5,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "zIndex": 1
+        }
+      },
+      "soundOnly": {
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        }
+      },
+      "source": {
+        "enable": false,
+        "video": {
+          "dbSection": "static",
+          "menuType": "spell",
+          "animation": "curewounds",
+          "variant": "01",
+          "color": "blue",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "addTokenWidth": false,
+          "anchor": "0.5",
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "fadeIn": 250,
+          "fadeOut": 500,
+          "isMasked": false,
+          "isRadius": false,
+          "isWait": true,
+          "opacity": 1,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "zIndex": 1
+        }
+      },
+      "target": {
+        "enable": true,
+        "video": {
+          "dbSection": "static",
+          "menuType": "impact",
+          "animation": "groundcrack",
+          "variant": "01",
+          "color": "orange",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "addTokenWidth": false,
+          "anchor": "0.5",
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "fadeIn": 250,
+          "fadeOut": 500,
+          "isMasked": false,
+          "isRadius": false,
+          "opacity": 1,
+          "persistent": false,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "unbindAlpha": false,
+          "unbindVisibility": false,
+          "zIndex": 1
+        }
+      },
+      "isEnabled": false,
+      "isCustomized": false,
+      "fromAmmo": false,
+      "version": 5
+    },
+    "scene-packer": {
+      "sourceId": "Item.xajKxzAxUo7YF7sq",
+      "hash": "a9526550fadb6767d47854d11527b8db903d4705"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.longhua-dm-toolkit.longhua-items.Item.ndCmycHAWM7bPVyk",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Item.xajKxzAxUo7YF7sq",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788843600287,
+    "modifiedTime": 1788843600605,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

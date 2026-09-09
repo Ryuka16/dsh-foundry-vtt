@@ -1,0 +1,630 @@
+{
+  "name": "魔晶石巨剑 Materia Greatblade",
+  "type": "weapon",
+  "img": "icons/weapons/swords/greatsword-guard-split-eyes.webp",
+  "system": {
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "type": "attack",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": false
+        },
+        "range": {
+          "units": "ft",
+          "override": false
+        },
+        "attack": {
+          "ability": "str",
+          "bonus": "1",
+          "type": {
+            "value": "melee",
+            "classification": "weapon"
+          },
+          "critical": {},
+          "flat": false
+        },
+        "damage": {
+          "includeBase": true,
+          "parts": [],
+          "critical": {}
+        },
+        "img": null,
+        "sort": 0,
+        "consumption": {
+          "scaling": {
+            "allowed": false
+          },
+          "spellSlot": true,
+          "targets": []
+        },
+        "description": {},
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "effects": [],
+        "flags": {},
+        "target": {
+          "template": {
+            "contiguous": false,
+            "stationary": false,
+            "units": "ft"
+          },
+          "affects": {
+            "choice": false
+          },
+          "override": false,
+          "prompt": true
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "midiProperties": {
+          "ignoreTraits": [],
+          "triggeredActivityId": "none",
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "automationOnly": false,
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "identifier": "",
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "",
+        "otherActivityAsParentType": true,
+        "attackMode": "oneHanded",
+        "ammunition": "",
+        "otherActivityUuid": "",
+        "attackRollPerTarget": "default",
+        "fumbleThreshold": 1
+      },
+      "AaBrPKWB499SKNQz": {
+        "_id": "AaBrPKWB499SKNQz",
+        "type": "utility",
+        "name": "装填/查看魔晶石  Materia Loader",
+        "activation": {
+          "type": "action",
+          "value": 1,
+          "override": true,
+          "condition": ""
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": false
+        },
+        "description": {
+          "chatFlavor": ""
+        },
+        "duration": {
+          "units": "inst",
+          "override": true,
+          "concentration": false,
+          "value": ""
+        },
+        "effects": [],
+        "img": "icons/commodities/gems/gem-cut-faceted-square-purple.webp",
+        "sort": 1,
+        "flags": {},
+        "range": {
+          "override": true,
+          "units": "self",
+          "special": ""
+        },
+        "target": {
+          "prompt": false,
+          "template": {
+            "contiguous": false,
+            "units": "ft",
+            "stationary": false,
+            "count": "",
+            "type": "",
+            "size": ""
+          },
+          "affects": {
+            "choice": false,
+            "count": "",
+            "type": "self",
+            "special": ""
+          },
+          "override": true
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "visibility": {
+          "level": {},
+          "requireAttunement": false,
+          "requireIdentification": false,
+          "requireMagic": false
+        },
+        "useConditionText": "",
+        "useConditionReason": "",
+        "effectConditionText": "",
+        "macroData": {
+          "name": "",
+          "command": ""
+        },
+        "midiProperties": {
+          "automationOnly": false,
+          "autoTargetType": "any",
+          "autoTargetAction": "default",
+          "identifier": "",
+          "triggeredActivityId": "none",
+          "ignoreTraits": [],
+          "triggeredActivityConditionText": "",
+          "triggeredActivityTargets": "targets",
+          "triggeredActivityRollAs": "self",
+          "triggeredActivityConsume": true,
+          "triggeredActivityConfigure": true,
+          "autoConsume": false,
+          "forceConsumeDialog": "default",
+          "forceRollDialog": "default",
+          "forceDamageDialog": "default",
+          "confirmTargets": "default",
+          "otherActivityCompatible": true,
+          "otherActivityAsParentType": true,
+          "displayActivityName": false,
+          "rollMode": "default",
+          "chooseEffects": false,
+          "toggleEffect": false,
+          "ignoreFullCover": false,
+          "removeChatButtons": "default",
+          "magicEffect": false,
+          "magicDamage": false,
+          "noConcentrationCheck": false,
+          "skipConcentrationCheck": false,
+          "autoCEEffects": "default"
+        },
+        "roll": {
+          "prompt": false,
+          "visible": false
+        },
+        "ignoreTraits": {
+          "idi": false,
+          "idr": false,
+          "idv": false,
+          "ida": false,
+          "idm": false
+        },
+        "isOverTimeFlag": false,
+        "overTimeProperties": {
+          "saveRemoves": true,
+          "rollAs": "target",
+          "preRemoveConditionText": "",
+          "postRemoveConditionText": ""
+        },
+        "otherActivityId": "none",
+        "otherActivityAsParentType": true
+      }
+    },
+    "uses": {
+      "spent": 0,
+      "recovery": [
+        {
+          "period": "lr",
+          "type": "recoverAll"
+        }
+      ],
+      "max": "1"
+    },
+    "description": {
+      "value": "<p><em>武器（巨剑），极珍惜（需同调）</em></p><p class=\"font-claude-response-body break-words whitespace-normal\">你使用这把魔法武器进行的攻击检定与伤害检定具有 +1 加值。</p><p class=\"font-claude-response-body break-words whitespace-normal\"><strong>晶槽。</strong> 这柄巨剑的剑脊上凿有三个晶槽。在一次长休结束时，你可以将魔晶嵌入空置的晶槽——每槽一颗，嵌入每颗魔晶需花费等同于其市价的金币。你可以在不同晶槽中重复嵌入同一种魔晶。若你以一颗新的魔晶替换某槽中原有者，被替换的魔晶就此损毁，无法取回。</p><p class=\"font-claude-response-body break-words whitespace-normal\"><strong>释放魔晶。</strong> 当你以本武器进行攻击动作时，你可以放弃其中一次攻击，转而消耗一颗已嵌入的魔晶、释放其蕴含之力。每颗魔晶各有其效果，依其自身描述结算——无论是召唤、瞬现，抑或直击敌人。当某颗魔晶的效果需要豁免时，其豁免DC等同于你的法术豁免DC。被消耗的魔晶随即从晶槽中消失、留下空槽，直到你在下一次长休时重新嵌入。</p><p class=\"font-claude-response-body break-words whitespace-normal\">当三个晶槽皆为空时，本武器即为一柄 +1 巨剑。</p><p class=\"font-claude-response-body break-words whitespace-normal\">核完毕。依赖严格按 JSON 里真实用到的来——注意：你那把浪客之刃用的是 ，但这套魔晶系统<strong>没用 effectmacro</strong>（长休那块我们改用了原生 uses+lr 恢复），改用的是 ;另外闪现晶用到了 。下面这份两把通用（剑和锤共用同一套魔晶系统），可直接贴：<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">effectmacroitemacrochris-premades</code></p><hr class=\"border-border-200 border-t-0.5 my-3 mx-1.5\" /><p class=\"font-claude-response-body break-words whitespace-normal\"><strong>魔晶石巨剑 Materia Greatblade &amp; 篡位者的死颅·灵巧巨锤 篡位者的死亡骷髅 — 安装说明</strong></p><p class=\"font-claude-response-body break-words whitespace-normal\">适用版本：D&amp;D 5e 系统 5.3.3 / Foundry VTT core 13（版本相差较大可能需要小幅调整）</p><p class=\"font-claude-response-body break-words whitespace-normal\">必需依赖（缺少则装填器或魔晶无法运作）：</p><ul class=\"[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3\"><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>Midi QOL<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">midi-qol</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>libWrapper<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">lib-wrapper</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>socketlib<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">socketlib</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>动态主动效应（DAE）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">dae</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>物品宏（物品宏）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">itemacro</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>时间限制<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">times-up</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>Chris's Premades（CPR）—— <strong>仅闪现晶需要</strong>;不使用闪现晶可不装<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">chris-premades</code></p></li></ul><p class=\"font-claude-response-body break-words whitespace-normal\">推荐依赖（用于动画/音效，不装也能正常使用，仅无特效）：</p><ul class=\"[li_&amp;]:mb-0 [li_&amp;]:mt-1 [li_&amp;]:gap-1 [&amp;:not(:last-child)_ul]:pb-1 [&amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3\"><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>音序器<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">sequencer</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>JB2A（或免费版）<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">jb2a_patreon</code> / <code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">JB2A_DnD5e</code></p></li><li class=\"font-claude-response-body whitespace-normal break-words pl-2\"><p>自动化动画<code class=\"bg-text-200/5 border border-0.5 border-border-300 text-danger-000 whitespace-pre-wrap rounded-[0.4rem] px-1 py-px text-[0.9rem]\">autoanimations</code></p><hr /><p>安装后请确认： 在 Midi QOL 设置中开启掷骰自动化（工作流设为完全自动化），否则装填器物品宏不会触发，魔晶的豁免、多目标与持续伤害也不会自动结算。</p><p class=\"font-claude-response-body break-words whitespace-normal\">使用提示： 装备并同调本武器后，使用其「装填/查看魔晶石」动作打开装填面板。在一次长休结束时把魔晶嵌入空置晶槽——每槽一颗、花费等同其市价的金币（额度用完面板转为只读，长休恢复）；晶槽数：固定 3 个，释放时：进行攻击动作时放弃其中一次攻击，使用对应晶槽中魔晶的动作即可释放其效果；需豁免的效果，其豁免 DC 等同于你的法术豁免 DC。召唤晶需先在 FVTT 内为其配置召唤目标（原生 dnd5e 召唤）。</p></li></ul>",
+      "chat": ""
+    },
+    "identifier": "-materia-greatblade",
+    "source": {
+      "revision": 1,
+      "rules": "2014"
+    },
+    "identified": true,
+    "unidentified": {
+      "description": ""
+    },
+    "container": null,
+    "quantity": 1,
+    "weight": {
+      "value": 6,
+      "units": "lb"
+    },
+    "price": {
+      "value": 8500,
+      "denomination": "gp"
+    },
+    "rarity": "veryRare",
+    "attunement": "required",
+    "attuned": true,
+    "equipped": true,
+    "crew": {
+      "value": []
+    },
+    "ammunition": {},
+    "armor": {},
+    "damage": {
+      "base": {
+        "types": [
+          "slashing"
+        ],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        },
+        "number": 2,
+        "denomination": 6,
+        "bonus": "1"
+      },
+      "versatile": {
+        "types": [],
+        "custom": {
+          "enabled": false
+        },
+        "scaling": {
+          "number": 1
+        }
+      }
+    },
+    "properties": [
+      "mgc",
+      "hvy",
+      "two"
+    ],
+    "proficient": null,
+    "range": {
+      "units": "ft",
+      "value": null,
+      "long": null,
+      "reach": 5
+    },
+    "type": {
+      "value": "martialM",
+      "baseItem": "greatsword"
+    }
+  },
+  "effects": [],
+  "folder": "JayycBcNRysALvom",
+  "flags": {
+    "scene-packer": {
+      "hash": "0903589cc19d00eff6980e92c99d1ec12e6185cd",
+      "sourceId": "Item.g8ulBOVQ1hD918j8"
+    },
+    "dnd5e": {
+      "last": {
+        "dnd5eactivity000": {
+          "attackMode": "twoHanded",
+          "damageType": {
+            "0": "slashing"
+          }
+        }
+      },
+      "riders": {
+        "activity": []
+      }
+    },
+    "world": {
+      "isMateriaBlade": true
+    },
+    "item-piles": {
+      "item": {},
+      "version": "2.4.17"
+    },
+    "itemacro": {
+      "macro": {
+        "name": "魔晶石装填器",
+        "type": "script",
+        "scope": "global",
+        "command": "// 魔晶石装填器 · 剑内置物品宏\ntry {\n  // 仅「装填」行动触发；挥砍等其它行动忽略\n  const wf = (typeof workflow !== \"undefined\" && workflow) ? workflow : null;\n  if (wf && wf.activity && !(wf.activity.name || \"\").includes(\"装填\")) return;\n\n  const blade = item;\n  const WID = blade.id;\n  const SLOTS = 3;\n  const maxTok = Number(blade.system.uses?.max) || 1;\n  const editAvail = (blade.system.uses?.spent ?? 0) < maxTok;\n\n  const slotted = {};\n  for (const it of actor.items) {\n    const m = it.getFlag(\"world\", \"materiaSlot\");\n    if (m && m.weapon === WID) slotted[m.slot] = it;\n  }\n  const templates = game.items.filter(i => i.getFlag(\"world\", \"materiaStoneId\"));\n  const tplOpts = templates.map(t => `<option value=\"${t.id}\">${t.name}（${t.system.price?.value ?? 0} GP）</option>`).join(\"\");\n  const gp = actor.system.currency?.gp ?? 0;\n\n  let content = `<p style=\"margin:.3em 0\">为 <b>${blade.name}</b> 管理魔晶石（3 槽，可重复装同一种）。当前金币：<b>${gp} GP</b>。</p>`;\n  content += editAvail\n    ? `<p style=\"font-size:.85em;opacity:.8\">本次长休可装填：每装 1 颗按该魔晶石的标价扣费；替换或清空会销毁原石（不退回）。</p>`\n    : `<p style=\"color:#a55;font-size:.85em\">本次长休的装填额度已用完——下次长休后可再改。当前为只读查看。</p>`;\n  for (let n = 1; n <= SLOTS; n++) {\n    const cur = slotted[n] ? `<b>${slotted[n].name}</b>` : `<i>空</i>`;\n    content += `<div style=\"margin:.35em 0;padding:.35em;border:1px solid #0003;border-radius:6px\"><div>晶槽 ${n} — 当前：${cur}</div>`;\n    if (editAvail) {\n      content += `<select name=\"slot${n}\" style=\"width:100%;margin-top:.25em\"><option value=\"\">— 保持当前 —</option>`\n        + (slotted[n] ? `<option value=\"__clear__\">— 清空本槽（销毁原石）—</option>` : ``)\n        + tplOpts + `</select>`;\n    }\n    content += `</div>`;\n  }\n  if (editAvail && !templates.length)\n    content += `<p style=\"color:#a55\">没找到魔晶石模板，请先把 8 颗石头导入「物品」目录。</p>`;\n\n  async function applyLoad(event, button, dialog) {\n    const root = dialog.element;\n    let changed = false;\n    let gpLeft = actor.system.currency?.gp ?? 0;\n    const dc = actor.system.attributes?.spelldc ?? 13;\n    for (let n = 1; n <= SLOTS; n++) {\n      const pick = root.querySelector(`[name=\"slot${n}\"]`)?.value;\n      if (!pick) continue;\n      if (slotted[n]) { try { await slotted[n].delete(); } catch (_) {} }\n      if (pick === \"__clear__\") { changed = true; continue; }\n      const tpl = templates.find(t => t.id === pick);\n      if (!tpl) continue;\n      const cost = tpl.system.price?.value ?? 0;\n      if (gpLeft < cost) { ui.notifications.warn(`金币不足（需 ${cost} GP），晶槽 ${n} 未装填。`); continue; }\n      gpLeft -= cost;\n      const data = tpl.toObject();\n      delete data._id;\n      data.name = `〔晶槽${n}〕` + tpl.name;\n      foundry.utils.setProperty(data, \"flags.world.materiaSlot\", { weapon: WID, slot: n });\n      for (const ef of (data.effects || [])) {\n        for (const ch of (ef.changes || [])) {\n          if (ch.key === \"flags.midi-qol.OverTime\")\n            ch.value = String(ch.value).replace(/saveDC=\\d+/, `saveDC=${dc}`);\n        }\n      }\n      await actor.createEmbeddedDocuments(\"Item\", [data]);\n      changed = true;\n    }\n    if (changed) {\n      await actor.update({ \"system.currency.gp\": gpLeft });\n      await blade.update({ \"system.uses.spent\": maxTok });\n      ui.notifications.info(`${blade.name}：装填完成，剩余 ${gpLeft} GP。`);\n    }\n  }\n\n  const buttons = editAvail\n    ? [{ action: \"save\", icon: \"fa-solid fa-gem\", label: \"确认装填\", default: true, callback: applyLoad },\n       { action: \"cancel\", icon: \"fa-solid fa-xmark\", label: \"取消\" }]\n    : [{ action: \"ok\", icon: \"fa-solid fa-eye\", label: \"关闭\", default: true }];\n\n  new foundry.applications.api.DialogV2({ window: { title: `魔晶石装填器 · ${blade.name}` }, content, buttons }).render(true);\n} catch (err) { console.error(\"MateriaLoader |\", err); }"
+      }
+    },
+    "dae": {
+      "macro": {
+        "name": "魔晶石装填器",
+        "type": "script",
+        "scope": "global",
+        "command": "// 魔晶石装填器 · 剑内置物品宏\ntry {\n  // 仅「装填」行动触发；挥砍等其它行动忽略\n  const wf = (typeof workflow !== \"undefined\" && workflow) ? workflow : null;\n  if (wf && wf.activity && !(wf.activity.name || \"\").includes(\"装填\")) return;\n\n  const blade = item;\n  const WID = blade.id;\n  const SLOTS = 3;\n  const maxTok = Number(blade.system.uses?.max) || 1;\n  const editAvail = (blade.system.uses?.spent ?? 0) < maxTok;\n\n  const slotted = {};\n  for (const it of actor.items) {\n    const m = it.getFlag(\"world\", \"materiaSlot\");\n    if (m && m.weapon === WID) slotted[m.slot] = it;\n  }\n  const templates = game.items.filter(i => i.getFlag(\"world\", \"materiaStoneId\"));\n  const tplOpts = templates.map(t => `<option value=\"${t.id}\">${t.name}（${t.system.price?.value ?? 0} GP）</option>`).join(\"\");\n  const gp = actor.system.currency?.gp ?? 0;\n\n  let content = `<p style=\"margin:.3em 0\">为 <b>${blade.name}</b> 管理魔晶石（3 槽，可重复装同一种）。当前金币：<b>${gp} GP</b>。</p>`;\n  content += editAvail\n    ? `<p style=\"font-size:.85em;opacity:.8\">本次长休可装填：每装 1 颗按该魔晶石的标价扣费；替换或清空会销毁原石（不退回）。</p>`\n    : `<p style=\"color:#a55;font-size:.85em\">本次长休的装填额度已用完——下次长休后可再改。当前为只读查看。</p>`;\n  for (let n = 1; n <= SLOTS; n++) {\n    const cur = slotted[n] ? `<b>${slotted[n].name}</b>` : `<i>空</i>`;\n    content += `<div style=\"margin:.35em 0;padding:.35em;border:1px solid #0003;border-radius:6px\"><div>晶槽 ${n} — 当前：${cur}</div>`;\n    if (editAvail) {\n      content += `<select name=\"slot${n}\" style=\"width:100%;margin-top:.25em\"><option value=\"\">— 保持当前 —</option>`\n        + (slotted[n] ? `<option value=\"__clear__\">— 清空本槽（销毁原石）—</option>` : ``)\n        + tplOpts + `</select>`;\n    }\n    content += `</div>`;\n  }\n  if (editAvail && !templates.length)\n    content += `<p style=\"color:#a55\">没找到魔晶石模板，请先把 8 颗石头导入「物品」目录。</p>`;\n\n  async function applyLoad(event, button, dialog) {\n    const root = dialog.element;\n    let changed = false;\n    let gpLeft = actor.system.currency?.gp ?? 0;\n    const dc = actor.system.attributes?.spelldc ?? 13;\n    for (let n = 1; n <= SLOTS; n++) {\n      const pick = root.querySelector(`[name=\"slot${n}\"]`)?.value;\n      if (!pick) continue;\n      if (slotted[n]) { try { await slotted[n].delete(); } catch (_) {} }\n      if (pick === \"__clear__\") { changed = true; continue; }\n      const tpl = templates.find(t => t.id === pick);\n      if (!tpl) continue;\n      const cost = tpl.system.price?.value ?? 0;\n      if (gpLeft < cost) { ui.notifications.warn(`金币不足（需 ${cost} GP），晶槽 ${n} 未装填。`); continue; }\n      gpLeft -= cost;\n      const data = tpl.toObject();\n      delete data._id;\n      data.name = `〔晶槽${n}〕` + tpl.name;\n      foundry.utils.setProperty(data, \"flags.world.materiaSlot\", { weapon: WID, slot: n });\n      for (const ef of (data.effects || [])) {\n        for (const ch of (ef.changes || [])) {\n          if (ch.key === \"flags.midi-qol.OverTime\")\n            ch.value = String(ch.value).replace(/saveDC=\\d+/, `saveDC=${dc}`);\n        }\n      }\n      await actor.createEmbeddedDocuments(\"Item\", [data]);\n      changed = true;\n    }\n    if (changed) {\n      await actor.update({ \"system.currency.gp\": gpLeft });\n      await blade.update({ \"system.uses.spent\": maxTok });\n      ui.notifications.info(`${blade.name}：装填完成，剩余 ${gpLeft} GP。`);\n    }\n  }\n\n  const buttons = editAvail\n    ? [{ action: \"save\", icon: \"fa-solid fa-gem\", label: \"确认装填\", default: true, callback: applyLoad },\n       { action: \"cancel\", icon: \"fa-solid fa-xmark\", label: \"取消\" }]\n    : [{ action: \"ok\", icon: \"fa-solid fa-eye\", label: \"关闭\", default: true }];\n\n  new foundry.applications.api.DialogV2({ window: { title: `魔晶石装填器 · ${blade.name}` }, content, buttons }).render(true);\n} catch (err) { console.error(\"MateriaLoader |\", err); }"
+      }
+    },
+    "midi-qol": {
+      "onUseMacroName": "ItemMacro"
+    },
+    "autoanimations": {
+      "id": "39b7c040-e70b-40c6-b6a2-d1782eab6be7",
+      "label": "魔晶石巨剑 Materia Greatblade",
+      "levels3d": {
+        "type": "explosion",
+        "data": {
+          "color01": "#FFFFFF",
+          "color02": "#FFFFFF",
+          "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+        },
+        "sound": {
+          "enable": false
+        },
+        "secondary": {
+          "enable": false,
+          "data": {
+            "color01": "#FFFFFF",
+            "color02": "#FFFFFF",
+            "spritePath": "modules/levels-3d-preview/assets/particles/dust.png"
+          }
+        }
+      },
+      "macro": {
+        "enable": false,
+        "playWhen": "0"
+      },
+      "meleeSwitch": {
+        "video": {
+          "dbSection": "range",
+          "menuType": "weapon",
+          "animation": "arrow",
+          "variant": "regular",
+          "color": "regular"
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "detect": "automatic",
+          "range": 2,
+          "returning": false,
+          "switchType": "on"
+        }
+      },
+      "menu": "melee",
+      "primary": {
+        "video": {
+          "dbSection": "melee",
+          "menuType": "weapon",
+          "animation": "greatsword",
+          "variant": "01",
+          "color": "blue",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": true,
+          "delay": 0,
+          "file": "sounds/doors/magic/wall-open.ogg",
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "isWait": false,
+          "opacity": 1,
+          "playbackRate": 1,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "zIndex": 1
+        }
+      },
+      "secondary": {
+        "enable": false,
+        "video": {
+          "dbSection": "static",
+          "menuType": "spell",
+          "animation": "curewounds",
+          "variant": "01",
+          "color": "blue",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "addTokenWidth": false,
+          "anchor": "0.5",
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "fadeIn": 250,
+          "fadeOut": 500,
+          "isMasked": false,
+          "isRadius": true,
+          "isWait": false,
+          "opacity": 1,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1.5,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "zIndex": 1
+        }
+      },
+      "soundOnly": {
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        }
+      },
+      "source": {
+        "enable": false,
+        "video": {
+          "dbSection": "static",
+          "menuType": "spell",
+          "animation": "curewounds",
+          "variant": "01",
+          "color": "blue",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "addTokenWidth": false,
+          "anchor": "0.5",
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "fadeIn": 250,
+          "fadeOut": 500,
+          "isMasked": false,
+          "isRadius": false,
+          "isWait": true,
+          "opacity": 1,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "zIndex": 1
+        }
+      },
+      "target": {
+        "enable": false,
+        "video": {
+          "dbSection": "static",
+          "menuType": "spell",
+          "animation": "curewounds",
+          "variant": "01",
+          "color": "blue",
+          "enableCustom": false,
+          "customPath": ""
+        },
+        "sound": {
+          "enable": false,
+          "delay": 0,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "startTime": 0,
+          "volume": 0.75
+        },
+        "options": {
+          "addTokenWidth": false,
+          "anchor": "0.5",
+          "contrast": 0,
+          "delay": 0,
+          "elevation": 1000,
+          "fadeIn": 250,
+          "fadeOut": 500,
+          "isMasked": false,
+          "isRadius": false,
+          "opacity": 1,
+          "persistent": false,
+          "repeat": 1,
+          "repeatDelay": 250,
+          "saturate": 0,
+          "size": 1,
+          "tint": false,
+          "tintColor": "#FFFFFF",
+          "unbindAlpha": false,
+          "unbindVisibility": false,
+          "zIndex": 1
+        }
+      },
+      "isEnabled": true,
+      "isCustomized": true,
+      "fromAmmo": false,
+      "version": 5
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Item.g8ulBOVQ1hD918j8",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "chushi",
+      "uuid": "Item.g8ulBOVQ1hD918j8",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1781769538503,
+    "modifiedTime": 1781769538503,
+    "lastModifiedBy": "WSmz8rIxvwraatE3"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

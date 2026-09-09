@@ -1,0 +1,149 @@
+{
+  "name": "铁卫护符 Amulet of the Iron Guard",
+  "type": "equipment",
+  "img": "icons/equipment/neck/amulet-geometric-gold-red.webp",
+  "system": {
+    "description": {
+      "value": "<p>每个铁卫都与一枚护符以魔法相连。只要你与该护符同调并将其着装，你便可以控制与其相连的 <strong>铁卫 Iron Guard</strong>。只要铁卫和它的护符位于同一个位面，作为护符着装者的你便能通过心灵感应呼唤铁卫来到你身边，并且铁卫知晓护符的距离与方向。如果护符被摧毁，与之相连的铁卫将陷入 <strong>失能（Incapacitated）</strong>，直至一枚新的替代护符被制造出来。</p><h3>联结 Bound</h3><p>铁卫在魔法作用下与此护符绑定。只要铁卫没有陷入失能状态，且与护符着装者的距离不超过 5 尺，着装者的 <strong>护甲等级（AC）</strong> 便获得 +2 加值。此外，着装者获得所有伤害的抗性。每次着装者受到伤害时，失去的那一半生命值将转移由铁卫代为承受。</p>",
+      "chat": ""
+    },
+    "source": {
+      "custom": "Monster Manual",
+      "revision": 1,
+      "rules": "2014"
+    },
+    "quantity": 1,
+    "weight": {
+      "value": 1,
+      "units": "lb"
+    },
+    "price": {
+      "value": 24000,
+      "denomination": "gp"
+    },
+    "attunement": "required",
+    "equipped": false,
+    "rarity": "veryRare",
+    "identified": true,
+    "type": {
+      "value": "trinket",
+      "baseItem": ""
+    },
+    "properties": [
+      "mgc"
+    ],
+    "activities": {},
+    "uses": {
+      "spent": 0,
+      "recovery": []
+    },
+    "identifier": "-amulet-of-the-iron-guard",
+    "unidentified": {
+      "description": ""
+    },
+    "container": null,
+    "attuned": false,
+    "crew": {
+      "value": []
+    },
+    "armor": {
+      "value": null,
+      "dex": null
+    },
+    "proficient": null,
+    "strength": null
+  },
+  "effects": [
+    {
+      "name": "铁卫控制权",
+      "origin": "Item.zvQAfJivs5DeomNO",
+      "duration": {
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "img": "icons/equipment/neck/amulet-geometric-gold-red.webp",
+      "_id": "yoHAG9NUXOsfjVzQ",
+      "type": "base",
+      "system": {},
+      "changes": [
+        {
+          "key": "flags.world.ironAmulet",
+          "mode": 5,
+          "value": "tiewei001",
+          "priority": 20
+        }
+      ],
+      "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {
+        "dnd5e": {
+          "riders": {
+            "statuses": []
+          }
+        },
+        "dae": {
+          "disableCondition": "",
+          "stackable": "noneName",
+          "showIcon": false,
+          "disableIncapacitated": false,
+          "durationExpression": "",
+          "macroRepeat": "none",
+          "specialDuration": []
+        },
+        "core": {
+          "overlay": false
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      }
+    }
+  ],
+  "folder": null,
+  "flags": {
+    "dnd5e": {
+      "riders": {
+        "activity": []
+      }
+    },
+    "scene-packer": {
+      "sourceId": "Item.zvQAfJivs5DeomNO",
+      "hash": "5505f1bf074abfb01734ef3c148825050133d33f"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.longhua-dm-toolkit.longhua-items.Item.UIfMsp70T593NPo0",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Item.zvQAfJivs5DeomNO",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788842859432,
+    "modifiedTime": 1788842859714,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

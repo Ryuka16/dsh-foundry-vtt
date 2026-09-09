@@ -1,0 +1,134 @@
+{
+  "name": "警觉 Alert",
+  "type": "feat",
+  "flags": {
+    "dnd5e": {
+      "riders": {
+        "activity": [],
+        "effect": []
+      }
+    },
+    "midi-qol": {
+      "rollAttackPerTarget": "default",
+      "removeAttackDamageButtons": "default",
+      "itemCondition": "",
+      "reactionCondition": "",
+      "otherCondition": "",
+      "effectCondition": ""
+    },
+    "midiProperties": {
+      "autoFailFriendly": false,
+      "autoSaveFriendly": false,
+      "magicdam": false,
+      "magiceffect": false,
+      "noConcentrationCheck": false,
+      "toggleEffect": false,
+      "ignoreTotalCover": false
+    },
+    "scene-packer": {
+      "hash": "81f898cb75412f3fea768da1776dfab9e66ac635",
+      "sourceId": "Item.8Ki0B8PVeedRBpqr"
+    }
+  },
+  "img": "icons/magic/perception/hand-eye-pink.webp",
+  "system": {
+    "description": {
+      "value": "<p>经常对危机保持警惕，让你获得下列增益：</p><ul><li><p>你的先攻获得+5加值。</p></li><li><p>你在意识清醒时无法被突袭。</p></li><li><p>你看不到的生物对你发动攻击检定时，无法因此获得优势。</p></li></ul>",
+      "chat": ""
+    },
+    "source": {
+      "custom": "PHB",
+      "revision": 1,
+      "rules": "2014",
+      "book": "PHB"
+    },
+    "cover": null,
+    "uses": {
+      "max": "0",
+      "spent": 0,
+      "recovery": []
+    },
+    "type": {
+      "value": "feat",
+      "subtype": ""
+    },
+    "requirements": "",
+    "activities": {},
+    "identifier": "-alert",
+    "advancement": {},
+    "crewed": false,
+    "enchant": {},
+    "prerequisites": {
+      "level": null,
+      "repeatable": false,
+      "items": []
+    },
+    "properties": []
+  },
+  "effects": [
+    {
+      "name": "警觉",
+      "origin": "Item.8Ki0B8PVeedRBpqr",
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "flags": {
+        "dnd5e": {}
+      },
+      "_id": "k2DkCx7E9hKGAgOD",
+      "changes": [
+        {
+          "key": "flags.dnd5e.initiativeAlert",
+          "mode": 5,
+          "value": "true",
+          "priority": null
+        }
+      ],
+      "description": "",
+      "transfer": true,
+      "statuses": [],
+      "tint": "#ffffff",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "dnd5e",
+        "systemVersion": "5.3.3",
+        "lastModifiedBy": null
+      },
+      "img": "icons/magic/perception/hand-eye-pink.webp",
+      "type": "base",
+      "system": {},
+      "sort": 0
+    }
+  ],
+  "folder": null,
+  "_stats": {
+    "compendiumSource": "Compendium.dnd5e_classpack.feats-all.Item.ZSjxby9CMumX5Fex",
+    "duplicateSource": null,
+    "exportSource": {
+      "worldId": "gesila",
+      "uuid": "Item.8Ki0B8PVeedRBpqr",
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.3.3"
+    },
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 1788843472349,
+    "modifiedTime": 1788843472618,
+    "lastModifiedBy": "34cT0UflLomCQ0PU"
+  },
+  "ownership": {
+    "default": 0
+  }
+}
