@@ -32,7 +32,12 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 2. 世界包有现成怪：foundry_search 搜（SRD 在 package:dnd5e.monsters，汉化包中英文都搜）→ foundry_import_entity → foundry_place_token，禁止新建替代导入。
 3. 写操作落库后按工具说明回读验证；工具返回 isError 时先看 note/verified 字段判定是否模块回读误报，再决定重试。
 4. 拿不准的键名/参数/路径：先查，查不到就明说不知道并问用户，禁止臆造。
-5. 多世界路由：所有工具自动作用于「当前唯一在线」的世界（用户浏览器开着的那个）。动手前先 foundry_list_worlds 确认在线世界名；若报 "Multiple clients connected"，让用户关掉多余的世界页面再重试，不要瞎猜世界。`;
+5. 多世界路由：所有工具自动作用于「当前唯一在线」的世界（用户浏览器开着的那个）。动手前先 foundry_list_worlds 确认在线世界名；若报 "Multiple clients connected"，让用户关掉多余的世界页面再重试，不要瞎猜世界。
+6. 环境类问题先读内置教程，别自己造轮子：
+- 配对 / 装模块 / 连不上 relay / 请求超时 / 报 408 → **先 foundry_knowledge topic:"deploy"**（内置部署与排障手册：配对流程、Enter Code、408 自诊断、常见坑），按它做。
+- 用户要配对码 → 直接调 foundry_mint_pairing_code，不要读教程文件、不要写 PowerShell 脚本（Windows 执行策略会拦，实测三次全失败）。
+- 工具报「is not a function / 未注册」→ 插件没加载：让用户刷新 DSH（或 dev_reload_package dsh-foundry-vtt），不要绕路用 pwsh 直调 relay 代替工具。
+- 排障顺序固定：foundry_list_worlds 看世界在线 → 不行读 topic:"deploy" → 仍不行再向用户要信息。禁止在 relay 的 Go 源码里逐文件找根因（实测会耗掉一小时）。`;
 import { summarizeDoc } from './summarize.js';
 import { registerReferenceTools } from './reference.js';
 import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } from './knowledge.js';
@@ -251,14 +256,17 @@ async function callRelay(method, path, opts = {}) {
     }
     catch (e) {
         if (e instanceof Error && e.name === 'TimeoutError') {
-            throw new HttpError('relay 请求超时（30 秒）。relay 或世界可能无响应，请确认 relay 在跑且世界在线。', 0, e);
+            throw new HttpError('relay 请求超时（30 秒）。' + (await diagnoseRelayStall(cfg)), 0, e);
         }
-        throw new HttpError('无法连接 relay：' + (e instanceof Error ? e.message : String(e)) + '。请确认本地 relay 已启动且世界在线。', 0, e);
+        throw new HttpError('无法连接 relay：' + (e instanceof Error ? e.message : String(e)) +
+            '。请确认 relay 已启动（浏览器打开 ' + cfg.relayUrl.replace(/\/$/, '') + '/api/health 应返回 ok）且 FVTT 世界页面开着。', 0, e);
     }
     const ct = res.headers.get('content-type') ?? '';
     const responseBody = ct.includes('application/json') ? await res.json() : await res.text();
     if (!res.ok) {
-        throw new HttpError('relay 返回 HTTP ' + res.status + '：' + JSON.stringify(responseBody), res.status, responseBody);
+        // 408 = relay 收到了请求但模块没回；自诊断给结论，别让 AI 去读 relay 源码找根因。
+        const extra = res.status === 408 ? ' ' + (await diagnoseRelayStall(cfg)) : '';
+        throw new HttpError('relay 返回 HTTP ' + res.status + '：' + JSON.stringify(responseBody) + extra, res.status, responseBody);
     }
     if (responseBody != null &&
         typeof responseBody === 'object' &&
@@ -267,6 +275,119 @@ async function callRelay(method, path, opts = {}) {
         throw new HttpError('relay 返回 success:false：' + JSON.stringify(responseBody), 200, responseBody);
     }
     return rawEnvelope ? responseBody : unwrapEnvelope(responseBody);
+}
+/**
+ * 408 / 超时自诊断：relay 仍登记客户端（世界「显示在线」）但数据请求全部超时
+ * = relay ↔ FVTT 模块的 WebSocket 通道僵死，重启 relay 即可恢复（实测有效）。
+ * 目的：让 AI 一次拿到结论 + 处理办法，而不是去读 relay 的 Go 源码找根因
+ * （朋友那台实测为此绕了近一小时）。
+ */
+async function diagnoseRelayStall(cfg) {
+    const base = cfg.relayUrl.replace(/\/$/, '');
+    const out = [];
+    try {
+        const r = await fetch(base + '/clients', {
+            headers: { 'x-api-key': cfg.apiKey },
+            signal: AbortSignal.timeout(6000),
+        });
+        if (r.ok) {
+            const j = (await r.json());
+            const c = (j.clients ?? [])[0];
+            if (c) {
+                const seen = Number(c.lastSeen ?? 0);
+                const age = seen > 0 ? Math.round((Date.now() - seen) / 1000) : -1;
+                out.push('【自诊断】relay 侧仍登记着客户端 world=' + String(c.worldId ?? '?') +
+                    (age >= 0 ? '（最后心跳 ' + age + ' 秒前）' : '') +
+                    '，但数据请求全部超时 → 这是 relay↔模块的 WebSocket 通道僵死，不是「世界没开」。');
+            }
+            else {
+                out.push('【自诊断】relay 侧没有任何客户端登记 → 世界页面没连上（确认 FVTT 页面开着、模块已配对、模块里 Relay URL 是 ws:// 开头）。');
+            }
+        }
+        else {
+            out.push('【自诊断】/clients 返回 HTTP ' + r.status + ' → relay 自身异常。');
+        }
+    }
+    catch {
+        out.push('【自诊断】连 /clients 都失败 → relay 进程可能已死。');
+    }
+    out.push('【处理，实测有效】重启 relay：结束 relay.exe 进程后重开（DSH 启动时插件会自动拉起；也可双击 relay 目录的 start-relay.bat），然后在 FVTT 页面按 F5 刷新一次，再重试原操作。');
+    return out.join(' ');
+}
+/**
+ * 用 config 里的 relay 管理员账号走完整配对流程，产出 6 位配对码。
+ * 让新对话的 AI 不必去磁盘找教程、更不必自己造 PowerShell 脚本
+ * （朋友那台就这么撞上「running scripts is disabled on this system」，三次失败）。
+ * 流程字段全部取自 relay 源码 auth.go / pair_request.go（已查证）：
+ *   POST /auth/login {email,password} → {sessionToken}
+ *   POST /auth/pair-request {worldId(必填),worldTitle,systemId,...} → {code,pairUrl}
+ *   POST /auth/pair-request/{code}/approve（Bearer session）{remoteScopes,allowedTargetClients,remoteRequestsPerHour} → {success:true}
+ *   GET  /auth/pair-request/{code}/status → {status,pairingCode}
+ */
+async function mintPairingCode(worldId, worldTitle, systemId) {
+    const cfg = await getCfg();
+    const base = cfg.relayUrl.replace(/\/$/, '');
+    if (!cfg.relayAdminEmail || !cfg.relayAdminPassword) {
+        throw new HttpError('未配置 relay 管理员账号，无法自动出码。请在 ' + CONFIG_FILE +
+            ' 补 "relayAdminEmail" 与 "relayAdminPassword"（须与 relay 启动时的 ADMIN_EMAIL / ADMIN_PASSWORD 一致）。');
+    }
+    const call = async (path, init = {}) => {
+        let res;
+        try {
+            res = await fetch(base + path, {
+                ...init,
+                headers: { 'Content-Type': 'application/json', ...(init.headers ?? {}) },
+                signal: AbortSignal.timeout(15_000),
+            });
+        }
+        catch (e) {
+            throw new HttpError('配对流程连 relay 失败（' + path + '）：' + (e instanceof Error ? e.message : String(e)), 0, e);
+        }
+        const text = await res.text();
+        let body = text;
+        try {
+            body = JSON.parse(text);
+        }
+        catch { /* 非 JSON 响应保留原文 */ }
+        if (!res.ok) {
+            throw new HttpError('配对流程 ' + path + ' 返回 HTTP ' + res.status + '：' + text.slice(0, 300), res.status, body);
+        }
+        return (body ?? {});
+    };
+    const login = await call('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email: cfg.relayAdminEmail, password: cfg.relayAdminPassword }),
+    });
+    const token = String(login.sessionToken ?? '');
+    if (!token) {
+        throw new HttpError('relay 登录未返回 sessionToken（检查 relayAdminEmail / relayAdminPassword 是否与 relay 启动参数一致）：' + JSON.stringify(login).slice(0, 200));
+    }
+    const auth = { Authorization: 'Bearer ' + token };
+    const pr = await call('/auth/pair-request', {
+        method: 'POST',
+        body: JSON.stringify({ worldId, worldTitle, systemId, serverFingerprint: 'dsh-foundry-vtt' }),
+    });
+    const code = String(pr.code ?? '');
+    if (!code)
+        throw new HttpError('未拿到配对请求 code：' + JSON.stringify(pr).slice(0, 200));
+    await call('/auth/pair-request/' + encodeURIComponent(code) + '/approve', {
+        method: 'POST',
+        headers: auth,
+        body: JSON.stringify({ remoteScopes: ['*'], allowedTargetClients: [], remoteRequestsPerHour: 10000 }),
+    });
+    const st = await call('/auth/pair-request/' + encodeURIComponent(code) + '/status');
+    const pairingCode = String(st.pairingCode ?? '');
+    if (!pairingCode) {
+        throw new HttpError('已批准但未返回 6 位配对码（status=' + String(st.status ?? '?') + '）：' + JSON.stringify(st).slice(0, 200));
+    }
+    return {
+        pairingCode,
+        requestCode: code,
+        pairUrl: String(pr.pairUrl ?? base + '/pair/' + code),
+        status: String(st.status ?? 'approved'),
+        instruction: '把 ' + pairingCode + ' 给用户，让他在 FVTT 模块设置 → REST API Connection → Manage Connection 里点「Enter Code」输入（5 分钟内有效）。' +
+            '前提：模块里 Relay URL 已填 ws://localhost:3010 这类 ws:// 地址、模块已启用、FVTT 页面开着。',
+    };
 }
 /** 提取 args 里的 clientId/userId 覆盖进 query。 */
 function targetingQuery(args) {
@@ -511,6 +632,12 @@ export function apply(ctx) {
         }
     }
     catch { /* 旧环境无 systemPrompt service 时静默降级 */ }
+    // 0.5 foundry_mint_pairing_code —— 一键出 6 位配对码（新世界 / 重装后配对用）。
+    REG(makeTool('foundry_mint_pairing_code', '一键生成 6 位配对码：用 config.json 里的 relay 管理员账号自动走完 relay 配对流程，返回配对码 + 给用户看的操作指引。**用户说「给我配对码」「新世界要重新配对」「模块装好了要配对」时直接调这个工具**；不要去磁盘上翻教程文件，更不要自己写 PowerShell 脚本去实现（会被 Windows 执行策略拦，实测三次全失败）。前提：config.json 里已配 relayAdminEmail / relayAdminPassword。', {
+        worldId: { type: 'string', description: '世界 id（=世界文件夹名；可先随便填，模块交换时会带真实值）。缺省 unknown。' },
+        worldTitle: { type: 'string', description: '世界标题（仅记录用，可省略）。' },
+        systemId: { type: 'string', description: '游戏系统 id；dnd5e 世界填 "dnd5e"。缺省 dnd5e。' },
+    }, [], async (args) => mintPairingCode(String(args.worldId ?? 'unknown'), String(args.worldTitle ?? ''), String(args.systemId ?? 'dnd5e'))));
     // 1. foundry_list_worlds —— 列出连接 relay 的世界/客户端，含在线状态、系统、版本。
     REG(makeTool('foundry_list_worlds', '列出连接 relay 的所有 Foundry 世界/客户端（含在线状态、系统、版本）。第一步确认哪个世界在线、dnd5e 版本。**online=true 的世界会被所有工具自动路由（插件不传 clientId，relay 自动选唯一在线世界）**；若有多个世界同时在线，relay 会报 "Multiple clients connected"，此时请让用户关掉多余的世界页面（一次只开一个世界页），或用户说清要操作哪个世界后再重试。', {}, [], async () => {
         const data = (await callRelay('GET', '/clients', { rawEnvelope: true }));

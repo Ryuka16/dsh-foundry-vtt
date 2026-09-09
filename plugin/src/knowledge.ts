@@ -33,6 +33,7 @@ const BUILTIN_TOPICS: Record<string, { file: string; desc: string }> = {
   'kb-effects': { file: '02-效应配方.md', desc: '效应配方：mode 表/加伤（bonuses）/OverTime 持续伤害/常用 flags/物品宏三件套/光环/DAE 机制与 change-key 配方/激活条件/附魔/Optional/反应触发' },
   'kb-macros': { file: '03-宏体系.md', desc: '宏体系：挂宏 6 位置/Document 模型铁律/MidiQOL 常用函数/世界脚本与 CPR fork/DAE 宏/socket 远程委托/调试三板斧' },
   'kb-pitfalls': { file: '04-纪律与坑.md', desc: '纪律与坑：开工五病根七铁律/高频坑速查（effects 层级/伤害骰两说/DC 两说/图标 404/回读误报）/术语对照/卡面纪律/世界数据纪律' },
+  deploy: { file: '05-部署与排障.md', desc: '部署与排障手册（随插件发布）：架构/一次性安装四步/配对码流程与 relay 字段/故障速查表/408「世界在线但请求全超时」自诊断与处理/配置字段/日常运维。**遇到配对、装模块、连不上、超时 408 先读这个**' },
 }
 
 /** 资料库白名单：topic → 相对 knowledgeDir 的文件路径（真实文件名，已 glob 确认）。 */

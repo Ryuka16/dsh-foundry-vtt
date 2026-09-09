@@ -7,10 +7,9 @@
  * - query 行搜索：大文件（data-dict 389KB）先 grep 定位再用 offset 读原文。
  * - offset 分页：每页 ≤ PAGE_SIZE 字符，避免大文件整份灌进上下文。
  */
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { dirname } from 'node:path';
+import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const PAGE_SIZE = 4000;
 const MAX_GREP_LINES = 40;
@@ -21,12 +20,15 @@ const MAX_LINE_CHARS = 400;
  * 内容 = 本机资料库精华的通用化提炼（结构模板/效应配方/宏体系/纪律与坑）。
  */
 const BUILTIN_KB_DIR = join(dirname(fileURLToPath(import.meta.url)), 'knowledge-docs');
+/** 内置样本库目录（随插件包发布）：<插件包>/lib/samples，分类文件夹 + 用户拖入的真实配置实体 JSON。 */
+const BUILTIN_SAMPLES_DIR = join(dirname(fileURLToPath(import.meta.url)), 'samples');
 /** 内置主题：topic → 内置文档文件名 + 描述。 */
 const BUILTIN_TOPICS = {
     'kb-structure': { file: '01-结构模板.md', desc: 'dnd5e 5.3.x 结构模板：武器（damage.base 铁律）/豁免三件套+层级铁律/ActiveEffect/NPC 骨架/feat+spell/状态 id 全集' },
     'kb-effects': { file: '02-效应配方.md', desc: '效应配方：mode 表/加伤（bonuses）/OverTime 持续伤害/常用 flags/物品宏三件套/光环/DAE 机制与 change-key 配方/激活条件/附魔/Optional/反应触发' },
     'kb-macros': { file: '03-宏体系.md', desc: '宏体系：挂宏 6 位置/Document 模型铁律/MidiQOL 常用函数/世界脚本与 CPR fork/DAE 宏/socket 远程委托/调试三板斧' },
     'kb-pitfalls': { file: '04-纪律与坑.md', desc: '纪律与坑：开工五病根七铁律/高频坑速查（effects 层级/伤害骰两说/DC 两说/图标 404/回读误报）/术语对照/卡面纪律/世界数据纪律' },
+    deploy: { file: '05-部署与排障.md', desc: '部署与排障手册（随插件发布）：架构/一次性安装四步/配对码流程与 relay 字段/故障速查表/408「世界在线但请求全超时」自诊断与处理/配置字段/日常运维。**遇到配对、装模块、连不上、超时 408 先读这个**' },
 };
 /** 资料库白名单：topic → 相对 knowledgeDir 的文件路径（真实文件名，已 glob 确认）。 */
 const TOPICS = {
@@ -69,21 +71,33 @@ const TOPICS = {
 };
 /** 默认资料库根目录（可用 config.json 的 knowledgeDir 覆盖）。 */
 const DEFAULT_KNOWLEDGE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团工具\\FVTT技术资料';
+/** 默认样本库目录（可用 config.json 的 sampleDir 覆盖）：世界导出的真实配置实体 JSON。 */
+const DEFAULT_SAMPLE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团工具\\怪物与物品卡';
+/** 样本库已知金标准标签（按文件名关键词匹配，用于索引展示；其余样本用文件名+大小）。 */
+const SAMPLE_LABELS = [
+    { key: '磁轭手铳', label: '★物品宏金标准（onUseMacroName+dae.macro 三件套完整实例）' },
+    { key: '妄质百变腕甲', label: '★复杂活动结构/变身物品（140KB 完整字段实例）' },
+    { key: '金属龙吐息武器', label: '★武器自动化版（活动+豁免+效果全配置实例）' },
+    { key: '秘法魔剑士', label: '高等级 NPC 完整卡（法术+物品+特性 112KB）' },
+    { key: '唯死之舞', label: '带战斗自动化机制的 NPC（67KB）' },
+    { key: '巴哈姆特', label: '传奇生物完整卡（32KB）' },
+];
 /**
  * 注册 foundry_knowledge 工具。
  * @param REG 工具注册函数（与 registerReferenceTools 同签名）
  * @param getKnowledgeDir 解析 knowledgeDir 的函数（由 index.ts 注入，读 config）
  */
-export function registerKnowledgeTools(REG, getKnowledgeDir) {
+export function registerKnowledgeTools(REG, getKnowledgeDir, getSampleDir) {
     const topics = Object.keys(TOPICS);
     const builtinTopics = Object.keys(BUILTIN_TOPICS);
     const tool = {
         name: 'foundry_knowledge',
-        description: '按需读 FVTT 技术知识。两级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 用户本机资料库（血泪教训/数据字典/图标真源/世界宏金标准，若配置了 knowledgeDir 才有，主题：' + topics.join('/') + '）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① 大文件先传 query 关键词 grep 定位（返回匹配行+行号）；② 再传 offset 读原文页（每页 ' + PAGE_SIZE + ' 字符）。',
+        description: '按需读 FVTT 技术知识。三级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 本机资料库（血泪教训/数据字典/图标真源/世界宏金标准，若配置了 knowledgeDir 才有，主题：' + topics.join('/') + '）；③ 本地样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"samples" 不带 file 参数 = 列出样本目录索引（文件名+大小+标签）；② 带 file 参数（索引里的文件名）= 读该样本（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
         parameters: {
             type: 'object',
             properties: {
-                topic: { type: 'string', description: '知识主题（内置：' + builtinTopics.join(' / ') + '；本机资料库：' + topics.join(' / ') + '）' },
+                topic: { type: 'string', description: '知识主题。内置：' + builtinTopics.join(' / ') + '；本机资料库：' + topics.join(' / ') + '；本地样本库："samples"（世界导出的真实配置实体，抄改首选）' },
+                file: { type: 'string', description: '可选：样本文件名（仅 topic:"samples" 时用，文件名从 samples 索引拿）' },
                 query: { type: 'string', description: '可选：按行搜索关键词（如 "OverTime"/"光环"/"图标"），返回最多 40 行匹配（含行号）。大文件先 query 定位再 offset 读原文。' },
                 offset: { type: 'number', description: '可选：从第几个字符开始读原文（无 query 时生效，默认 0）。返回值里有 nextOffset 与 hasMore 用于翻页。' },
             },
@@ -119,6 +133,82 @@ export function registerKnowledgeTools(REG, getKnowledgeDir) {
                 }
                 return servePage(args, topic, entry.file, entry.desc, text);
             }
+            // 样本库：内置（随 git 发布的分类样本库）+ 本机扩展目录。topic="samples"。
+            if (topic === 'samples') {
+                const roots = [{ root: BUILTIN_SAMPLES_DIR, label: '内置样本库（随 git 发布）' }];
+                const localRoot = getSampleDir();
+                if (localRoot && existsSync(localRoot) && resolve(localRoot) !== resolve(BUILTIN_SAMPLES_DIR)) {
+                    roots.push({ root: localRoot, label: '本机扩展' });
+                }
+                const fileName = args.file === undefined ? '' : String(args.file);
+                if (!fileName) {
+                    // 无 file：列分类树索引。
+                    const parts = [];
+                    let totalFiles = 0;
+                    for (const r of roots) {
+                        if (!existsSync(r.root))
+                            continue;
+                        try {
+                            const files = (await walkTree(r.root)).sort((a, b) => a.rel.localeCompare(b.rel));
+                            totalFiles += files.filter((f) => f.rel.toLowerCase().endsWith('.json')).length;
+                            // 按顶层文件夹分组成树
+                            const tree = new Map();
+                            for (const f of files) {
+                                const slash = f.rel.indexOf('/');
+                                const top = slash > 0 ? f.rel.slice(0, slash) : f.rel;
+                                const rest = slash > 0 ? f.rel.slice(slash + 1) : '';
+                                if (!tree.has(top))
+                                    tree.set(top, []);
+                                tree.get(top).push({ rel: rest, KB: Math.round(f.size / 1024) });
+                            }
+                            const lines = ['■ ' + r.label + '：' + r.root];
+                            for (const [top, items] of tree) {
+                                if (items.length === 1 && items[0].rel === '') {
+                                    lines.push('  ' + top + '（' + items[0].KB + 'KB）');
+                                }
+                                else {
+                                    lines.push('  ' + top + '/');
+                                    for (const it of items)
+                                        lines.push('    ' + it.rel + '（' + it.KB + 'KB）');
+                                }
+                            }
+                            parts.push(lines.join('\n'));
+                        }
+                        catch (e) {
+                            parts.push('■ ' + r.label + '：' + r.root + '（读取失败：' + (e instanceof Error ? e.message : String(e)) + '）');
+                        }
+                    }
+                    if (parts.length === 0) {
+                        return { topic, error: '样本库不可用：内置样本目录与 sampleDir 均不存在。' };
+                    }
+                    return {
+                        topic,
+                        total: totalFiles,
+                        content: '【样本库索引】共 ' + totalFiles + ' 个样本 JSON（世界导出的真实配置实体——建东西前先来这找同类样本：读它的结构→照抄→改数值，一次过）：\n' +
+                            parts.join('\n') +
+                            '\n\n用法：foundry_knowledge{topic:"samples", file:"<分类文件夹>/<文件名>"} 读样本（内置样本需带分类子路径，如 "01-武器与攻击/xxx.json"）；每个分类文件夹里有 README 说明放什么。大文件先加 query 关键词 grep 定位（如 "OverTime"/"onUseMacroName"/"activities"），再 offset 翻页。',
+                    };
+                }
+                // 有 file：先查内置样本树，再查本机扩展。防目录逃逸。
+                for (const r of roots) {
+                    if (!existsSync(r.root))
+                        continue;
+                    const rootResolved = resolve(r.root);
+                    const target = resolve(join(r.root, fileName));
+                    if ((target.startsWith(rootResolved + '\\') || target.startsWith(rootResolved + '/')) && existsSync(target)) {
+                        let text;
+                        try {
+                            text = (await readFile(target, 'utf8')).replace(/^\uFEFF/, '');
+                        }
+                        catch (e) {
+                            return { topic, file: fileName, error: '样本读取失败：' + (e instanceof Error ? e.message : String(e)) };
+                        }
+                        const label = SAMPLE_LABELS.find((s) => fileName.includes(s.key));
+                        return servePage(args, topic, fileName, (label ? label.label + '；' : '') + '世界导出的真实配置实体 JSON，结构可照抄（改 name/数值/描述）。', text);
+                    }
+                }
+                return { topic, file: fileName, error: '样本文件未找到：「' + fileName + '」。file 请用 samples 索引里列出的路径（内置样本带分类文件夹前缀）。' };
+            }
             // 本机资料库主题：依赖用户环境的 knowledgeDir
             const entry = TOPICS[topic];
             if (!entry) {
@@ -148,6 +238,28 @@ export function registerKnowledgeTools(REG, getKnowledgeDir) {
         },
     };
     REG(tool);
+}
+/** 递归列目录下所有文件（相对路径 + 字节数）。 */
+async function walkTree(dir, prefix = '') {
+    const out = [];
+    let entries;
+    try {
+        entries = await readdir(dir, { withFileTypes: true });
+    }
+    catch {
+        return out;
+    }
+    for (const e of entries) {
+        const rel = prefix ? prefix + '/' + e.name : e.name;
+        const full = join(dir, e.name);
+        if (e.isDirectory()) {
+            out.push(...(await walkTree(full, rel)));
+        }
+        else {
+            out.push({ rel, size: (await readFile(full)).length });
+        }
+    }
+    return out;
 }
 /** 分页/检索服务：query 走行 grep，否则 offset 分页。 */
 async function servePage(args, topic, fileName, desc, text) {
@@ -185,5 +297,5 @@ async function servePage(args, topic, fileName, desc, text) {
         content: '【' + desc + '】\n文件：' + fileName + '（共 ' + text.length + ' 字符）\n第 ' + offset + '–' + nextOffset + ' 字符' + (hasMore ? '（还有更多，传 offset=' + nextOffset + ' 继续读）' : '（已到末尾）') + '：\n' + chunk,
     };
 }
-export { DEFAULT_KNOWLEDGE_DIR, TOPICS };
+export { DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR, TOPICS };
 //# sourceMappingURL=knowledge.js.map

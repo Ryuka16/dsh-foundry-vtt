@@ -65,14 +65,14 @@ export function registerExtraTools(h, reg) {
     const useBodyKeys = ['actorUuid', 'abilityUuid', 'abilityName', 'itemUuid', 'itemName', 'targetUuid', 'targetName'];
     const useProps = {
         actorUuid: { type: 'string', description: 'actor 的 uuid' },
-        abilityUuid: { type: 'string', description: '能力/物品/法术/特性的 uuid（openapi 键名，与名称二选一）' },
+        abilityUuid: { type: 'string', description: '能力/物品/法术/特性的 uuid。**模块端必填：与 abilityName 二选一——只传 itemName 会报 "abilityUuid or abilityName is required"**' },
         abilityName: { type: 'string', description: '能力/物品/法术/特性的名字（与 uuid 二选一）' },
         itemUuid: { type: 'string', description: '物品的 uuid（同时支持，模块端自动取认识的键）' },
         itemName: { type: 'string', description: '物品的名字（同时支持）' },
         targetUuid: { type: 'string', description: '目标的 uuid（可选）' },
         targetName: { type: 'string', description: '目标的名字（可选）' },
     };
-    reg(simple(h, 'foundry_dnd5e_use_item', '让 actor 使用一个物品（POST /dnd5e/use-item）：消耗/使用效果、自动扣充能、掷物品相关伤害。uuid 与 name 二选一；itemUuid/abilityUuid 两套键名同时透传，模块端取认识的。', 'POST', '/dnd5e/use-item', { ...useProps }, ['actorUuid'], useBodyKeys));
+    reg(simple(h, 'foundry_dnd5e_use_item', '让 actor 使用一个物品（POST /dnd5e/use-item）：消耗/使用效果、自动扣充能、掷物品相关伤害。**必须传 abilityUuid 或 abilityName（只传 itemName 会被模块拒："abilityUuid or abilityName is required"）**；itemUuid/itemName 会一并透传，但模块端只认 abilityUuid/abilityName 这两个键。', 'POST', '/dnd5e/use-item', { ...useProps }, ['actorUuid'], useBodyKeys));
     reg(simple(h, 'foundry_dnd5e_use_spell', '让 actor 施放一个法术（POST /dnd5e/use-spell）：自动消耗法术位、放置模板、掷伤害。', 'POST', '/dnd5e/use-spell', { ...useProps }, ['actorUuid'], useBodyKeys));
     reg(simple(h, 'foundry_dnd5e_use_feature', '让 actor 使用一个职业/种族特性（POST /dnd5e/use-feature）：自动扣使用次数、应用效果。', 'POST', '/dnd5e/use-feature', { ...useProps }, ['actorUuid'], useBodyKeys));
     reg(simple(h, 'foundry_dnd5e_use_ability', '让 actor 使用一个通用能力条目（POST /dnd5e/use-ability）。', 'POST', '/dnd5e/use-ability', { ...useProps }, ['actorUuid'], useBodyKeys));

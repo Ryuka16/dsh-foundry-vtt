@@ -1,7 +1,7 @@
 {
   "name": "@dsh-external/dsh-foundry-vtt",
-  "version": "1.1.5",
-  "description": "DSH 原生 FVTT 控制工具包（89 工具：掷骰/怪物/自动化/遭遇/场景/聊天/声音 + 省 token 建武器 create+update 双步 + 内置结构参考库 20 主题 + 本地资料库检索 36 文件 + 多世界自动路由），经 relay HTTP 驱动 ThreeHats 模块",
+  "version": "1.1.6",
+  "description": "DSH 原生 FVTT 控制工具包（90 工具：掷骰/怪物/自动化/遭遇/场景/聊天/声音 + 省 token 建武器 create+update 双步 + 内置结构参考库 20 主题 + 内置部署排障手册 deploy + 一键出配对码 + 408 自诊断 + 多世界自动路由），经 relay HTTP 驱动 ThreeHats 模块",
   "type": "module",
   "main": "./lib/index.js",
   "types": "./lib/types/index.d.ts",
