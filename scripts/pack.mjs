@@ -31,7 +31,11 @@ const EXCLUDE_DIRS = new Set(['node_modules', '.git', 'data', 'dist'])
 const EXCLUDE_FILES = new Set(['.env', '.DS_Store', 'Thumbs.db'])
 const isExcluded = (p) => {
   const base = p.split(/[\\/]/).pop()
+  // plugin/scripts 是「开发用编译脚本」，分发包里不需要；且它曾造成「旧版是文件、新版是目录」
+  // 的覆盖解压冲突（Cannot open output file: ...\plugin\scripts\build.sh）。一律不进包。
+  const inPluginScripts = /[\\/]plugin[\\/]scripts([\\/]|$)/.test(p)
   return (
+    inPluginScripts ||
     EXCLUDE_DIRS.has(base) ||
     EXCLUDE_FILES.has(base) ||
     /\.(db|db-shm|db-wal|env)$/i.test(base) ||
