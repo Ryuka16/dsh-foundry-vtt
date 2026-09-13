@@ -14,6 +14,25 @@ import { fileURLToPath } from 'node:url';
 const PAGE_SIZE = 4000;
 const MAX_GREP_LINES = 40;
 const MAX_LINE_CHARS = 400;
+/** 图标真源清单缓存（6560 条，首次检索时读入，之后按目录/关键词过滤）。 */
+let ICON_CACHE = null;
+/**
+ * 图标检索用的大类权重名单（只是「哪一类更像实物图」的粗分，不是路径映射）。
+ * 物品类提权：AI 建物品/给效果配图时最常要的是这类写真图。
+ * 特效与技能类降权：多为法术光效与技能符号，当物品图标不合适（但 AI 显式加 dir 指定时照样能查到）。
+ * 只影响同级别候选的排序（±15 分），不改变命中范围，不会漏掉任何图。
+ */
+const ITEM_DIRS = [
+    'icons/weapons/',
+    'icons/equipment/',
+    'icons/containers/',
+    'icons/consumables/',
+    'icons/commodities/',
+    'icons/tools/',
+    'icons/sundries/',
+    'icons/plants/',
+];
+const EFFECT_DIRS = ['icons/magic/', 'icons/skills/'];
 /**
  * 内置知识文档（随插件包发布，clone 仓库的人没有本机资料库也能用）。
  * 文件位于 <插件包>/lib/knowledge-docs/*.md（build 时从 src/knowledge-docs/ 拷贝）。
@@ -383,7 +402,181 @@ export function registerKnowledgeTools(REG, getKnowledgeDir, getSampleDir) {
             };
         },
     };
+    /**
+     * 图标检索库：在真源清单（6560 条）里按目录 + 关键词搜路径，一次给一批候选。
+     * 为什么单独做工具：foundry_knowledge{topic:"icons"} 是「行 grep + 40 行上限 + 带行号」的通用读法，
+     * 找图标时想一次看全某个目录（如 icons/weapons/swords 有 88 条）会被截断，行号格式还要再解析一遍。
+     * 这个工具专做检索：可限定目录、可多关键词、最多 200 条、只返回裸路径（token 最省）。
+     * 插件不内置任何「物品名 → 图标」映射：映射不可能覆盖全（真源里连 longsword/warhammer/handaxe
+     * 这些整词都没有），且会随真源更新而腐坏——让 AI 现查，插件只负责搜得快。
+     */
+    const iconTool = {
+        name: 'foundry_search_icon',
+        description: '图标检索库：在 6560 条图标真源清单里搜路径，**返回一串候选给你自己挑**。' +
+            '做物品 / 效果 / token 需要图标时走这里：想个英文词（sword / dagger / potion / fire / skull / zombie）搜一下，' +
+            '**把返回的列表看一遍，挑一张最贴的照抄进 img / effectImg** —— 不要凭记忆拼路径，也不要闭眼抓第一条。' +
+            '可加 dir 限定目录收窄（weapons / weapons/polearms / magic/fire / consumables / creatures）；' +
+            '搜不到就换更粗的词根（longsword → sword、warhammer → hammer、quarterstaff → staff、handaxe → axe），' +
+            '或干脆用 foundry_file_system{source:"public", path:"icons/weapons"} 翻真实目录看实物。',
+        parameters: {
+            type: 'object',
+            properties: {
+                keyword: { type: 'string', description: '必填：路径里的英文词（如 sword / dagger / potion / fire / skull）。多个词用空格分隔，任一命中即返回。' },
+                dir: { type: 'string', description: '可选：限定目录前缀，如 weapons / weapons/polearms / magic/fire / consumables / creatures / skills' },
+                limit: { type: 'number', description: '可选：最多返回多少条（默认 30，上限 200）' },
+            },
+            required: ['keyword'],
+            additionalProperties: true,
+        },
+        output: {
+            schema: { type: 'object', additionalProperties: true },
+            render: (_a, v) => {
+                const o = v;
+                if (o && typeof o.error === 'string')
+                    return [{ type: 'text', text: o.error }];
+                const list = Array.isArray(o?.icons) ? o.icons : [];
+                const hint = typeof o?.hint === 'string' ? '\n(' + o.hint + ')' : '';
+                return [{ type: 'text', text: list.length ? list.join('\n') + hint : '无匹配' + hint }];
+            },
+        },
+        async execute(args) {
+            const words = String(args.keyword ?? '')
+                .toLowerCase()
+                .split(/[\s,]+/)
+                .filter((w) => w.length >= 2);
+            if (!words.length)
+                return { error: 'keyword 必填：传路径里的英文词，如 sword / dagger / potion' };
+            const dir = String(args.dir ?? '')
+                .toLowerCase()
+                .replace(/^icons\//, '')
+                .replace(/^\/+|\/+$/g, '');
+            const limit = Math.min(200, Math.max(1, Math.floor(Number(args.limit) || 30)));
+            const file = join(BUILTIN_KB_DIR, 'fvtt-icon-paths.txt');
+            if (!existsSync(file))
+                return { error: '图标真源清单缺失：' + file + '（插件包不完整，请重装插件）' };
+            let cache = ICON_CACHE;
+            if (!cache) {
+                const text = (await readFile(file, 'utf8')).replace(/^\uFEFF/, '');
+                cache = text
+                    .split(/\r?\n/)
+                    .map((s) => s.trim())
+                    .filter((s) => s.startsWith('icons/') || s.startsWith('systems/'));
+                ICON_CACHE = cache;
+            }
+            const pool = dir
+                ? cache.filter((p) => p.toLowerCase().includes('/' + dir + '/') || p.toLowerCase().endsWith('/' + dir))
+                : cache;
+            // dir 猜错时别只回一句「无匹配」—— 直接把该前缀下**真实存在的子目录**列出来。
+            // 为什么：AI 猜 dir 经常猜错（实测把 equipment/armor 当目录，而真源里是
+            // equipment/chest、equipment/neck、equipment/head…），只说「去读 topic:icon-map」
+            // 等于让 AI 再赌一次，白烧一轮 token。
+            let dirHint = '';
+            if (dir && pool.length === 0) {
+                // 用 dir 的**首段**去找同级真实子目录：dir="equipment/armor"（不存在）→ head="equipment"
+                // → 列出 equipment/chest、equipment/neck、equipment/head… 这样 AI 一眼就知道该改成什么，
+                // 而不是再去赌一次。实测真源里 equipment/armor 并不存在，正确的段是 chest/neck/head 等。
+                const head = dir.split('/')[0];
+                const segs = new Set();
+                for (const p of cache) {
+                    const low = p.toLowerCase();
+                    const i = low.indexOf(head + '/');
+                    if (i < 0)
+                        continue;
+                    const rest = low.slice(i + head.length + 1);
+                    const seg = rest.split('/')[0];
+                    if (seg && !seg.includes('.'))
+                        segs.add(head + '/' + seg);
+                }
+                const list = [...segs].sort().slice(0, 40);
+                dirHint = list.length
+                    ? '⚠️ dir:"' + dir + '" 下没有任何匹配（该路径段在真源 6560 条里不存在）。' +
+                        '「' + head + '/」下**真实存在的子目录**共 ' + segs.size + ' 个：' + list.join(' / ') +
+                        '。挑一个重试，或**去掉 dir** 只用关键词检索。'
+                    : '⚠️ dir:"' + dir + '" 在真源 6560 条里不存在。去掉 dir 重试，或先读 topic:"icon-map" 看大类前缀（共 258 个二级目录）。';
+            }
+            // 相关性排序（纯算法，不硬编码任何目录表）：
+            //   ① 关键词命中「文件名开头」> 「文件名中间」> 「只在目录段命中」；
+            //   ② 扩展名偏好 webp(+30，真源 6248 条实物图) > png(+10) > svg(-50，118 条抽象方块图，用户明确不要)；
+            //   ③ 物品类目录微调 +15 / 特效技能类 -15；
+            //   ④ 同分时路径短者优先。
+            // 为什么必须排：清单按目录顺序排，halberd 原样返回会先给
+            // icons/consumables/plants/tearthumb-halberd-leaf-green.webp（戟叶植物）；
+            // 而只按文件名权重排又会把 icons/svg/sword.svg 顶到 icons/weapons/swords/sword-guard.webp 前面。
+            const score = (p, terms) => {
+                const file = p.slice(p.lastIndexOf('/') + 1).toLowerCase();
+                const l = p.toLowerCase();
+                const dirSeg = p.slice(0, p.lastIndexOf('/')).toLowerCase();
+                let s = 0;
+                for (const w of terms) {
+                    if (file.startsWith(w))
+                        s += 100;
+                    else if (file.includes(w))
+                        s += 50;
+                    // 目录段命中要单独算分：搜 warhammer 降级成 hammer 后，
+                    // icons/weapons/hammers/hammer-flared-steel.webp（武器锤，目录名就叫 hammers）
+                    // 与 icons/tools/hand/hammer-and-nail.webp（钉锤，只有文件名含 hammer）本来同分，
+                    // 「路径短者优先」会让工具锤赢——加上目录分才能让武器锤排前。
+                    if (dirSeg.includes(w))
+                        s += 25;
+                    else if (l.includes(w))
+                        s += 10;
+                }
+                s += p.endsWith('.webp') ? 30 : p.endsWith('.png') ? 10 : -50;
+                // 大类微调（物品类 +15 / 特效与技能类 -15）：只动 15 分，远小于「文件名开头命中 +100」，
+                // 只在同级别候选之间调序，不会把正确的图挤下去。依据是真源 13 个大类的条数分布——
+                // weapons 685 / equipment 1064 / containers 281 / consumables 565 / commodities 1117 /
+                // tools 228 / sundries 369 是物品写真；magic 1097 / skills 309 多为法术特效与技能符号。
+                if (ITEM_DIRS.some((d) => l.startsWith(d)))
+                    s += 15;
+                else if (EFFECT_DIRS.some((d) => l.startsWith(d)))
+                    s -= 15;
+                return s - p.length / 1000;
+            };
+            // 词根降级（实测刚需）：真源里 warhammer / handaxe / quarterstaff / rapier / lance 这些整词不存在，
+            // 只做整词子串匹配会 0 命中——实测建「战锤 / 手斧 / 长棍」三个物品时全部跳过（命中 0）。
+            // 所以在原词 0 命中时，按「从右往左截断」找词根（warhammer→hammer / handaxe→axe / quarterstaff→staff），
+            // 只取第一个真能命中的后缀，不做过度扩展。
+            const terms = [...words];
+            let matched = pool.filter((p) => {
+                const l = p.toLowerCase();
+                return terms.some((w) => l.includes(w));
+            });
+            let degradedFrom = '';
+            if (matched.length === 0) {
+                outer: for (const w of words) {
+                    for (let len = w.length - 1; len >= 3; len--) {
+                        const sub = w.slice(w.length - len);
+                        const cand = pool.filter((p) => p.toLowerCase().includes(sub));
+                        if (cand.length) {
+                            matched = cand;
+                            terms.length = 0;
+                            terms.push(sub);
+                            degradedFrom = w;
+                            break outer;
+                        }
+                    }
+                }
+            }
+            const hits = matched.sort((a, b) => score(b, terms) - score(a, terms));
+            return {
+                keyword: String(args.keyword ?? ''),
+                dir: dir || '(全部)',
+                total: hits.length,
+                returned: Math.min(hits.length, limit),
+                icons: hits.slice(0, limit),
+                hint: hits.length === 0
+                    ? (dirHint || '无匹配。换个更通用的说法，或先读 topic:"icon-map" 看该类图标在哪个目录下')
+                    : (degradedFrom
+                        ? '「' + degradedFrom + '」在真源里没有整词，已自动降级用词根「' + terms[0] + '」检索；结果不对就换更准的词，或加 dir 指定目录。'
+                        : '') +
+                        (hits.length > limit
+                            ? '共 ' + hits.length + ' 条，只返回前 ' + limit + ' 条——加 dir 收窄或换更具体的词'
+                            : '把路径原样照抄进 img / effectImg（不要自己拼）'),
+            };
+        },
+    };
     REG(tool);
+    REG(iconTool);
 }
 /** 递归列目录下所有文件（相对路径 + 字节数）。 */
 async function walkTree(dir, prefix = '') {

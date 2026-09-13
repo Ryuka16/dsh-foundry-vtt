@@ -23,12 +23,13 @@ import { registerExtraTools } from './tools-extra.js';
 /** 注入系统提示的工作铁律：强制 AI 先查模板/样本/真源，再写 JSON。每个新对话 AI 自动看到。 */
 const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须遵守）
 1. 先查后写，严禁凭记忆手搓 dnd5e JSON：
-- 结构模板 → foundry_reference（主题：weapon/save-activity/effect/creature/feat/spell/status-list/bonuses/midi-over-time/midi-flags/item-macro/aura/dae/conditions/enchant/optional/trigger/overtime-activity/iron-rules/pitfalls），模板秒回，照抄改数值。
+- 结构模板 → foundry_reference（主题：weapon/roll-data/save-activity/effect/creature/feat/spell/status-list/bonuses/midi-over-time/midi-flags/item-macro/aura/dae/conditions/enchant/optional/trigger/overtime-activity/iron-rules/pitfalls），模板秒回，照抄改数值。**写任何公式/DC/加值字段前先看 roll-data**。
 - 真实样本 → foundry_knowledge topic:"samples" 列索引找同类实体（怪物卡/武器/状态与中毒/持续伤害OverTime/光环/物品宏/DAE特殊时长/法术特性/装备/奇物），file 读样本（大文件先 query 关键词再 offset 翻页）。0 实例的键名禁止写进文档。
-- 图标路径 → 先 foundry_knowledge topic:"icon-map" 看分类地图定位该去哪个前缀（13 大类 + icons/svg 全清单 + 高频映射），再 topic:"icons" 用 query 搜关键词（如 halberd/potion-red/poison）拿真路径照抄。6560 条真源随插件发布，任何环境可用。禁止猜路径，猜错 = 卡面裂图。
+- 图标路径 → **做物品/效果/token 前，先 foundry_search_icon{keyword:"sword"} 检索，把返回的候选列表看一遍，自己挑一张最贴的填进 img / effectImg**（这是你的活，别指望插件替你选）。可加 dir:"weapons/polearms" 收窄、一次最多 200 条。搜不到就换词根（longsword → sword、warhammer → hammer、handaxe → axe、quarterstaff → staff —— 这些整词在真源里不存在），或 foundry_file_system{source:"public", path:"icons/weapons"} 翻真实目录看实物；要分类全貌时读 topic:"icon-map"（13 大类 + 效果图标对照表）。6560 条真源随插件发布，任何环境可用。**一律用 webp（真源 6248 条实物图），禁止用 icons/svg/ 那 118 条抽象方块图（aura.svg/circle.svg 之类），也不要用 systems/dnd5e/icons/svg/ 那 237 条系统 UI 图标**。禁止猜路径，猜错 = 卡面裂图。
 - **模块 API / 标志名 / 函数签名** → 先 foundry_knowledge topic:"manuals" 不带 file 列索引（28 个模块官方文档 + 57 篇飞书原文，随插件发布），再 file 读原文、query grep 定位。**要写具体模块的东西时必查**：Sequencer 特效、midi-qol flags、DAE 键名、AC5E、TokenMagic、Rest Recovery、Automated Animations、CPR 宏。**纯 dnd5e 结构不用查**（走上面第 1、2 行就够）。
 - CPR 宏 identifier → foundry_knowledge topic:"cpr-mapping" 查映射表，禁止瞎编（本机资料库主题，未配置时查不到，那就直接照 manuals 里的 CPR 文档走）。
-- **做自动化 / 写宏 / 查模块机制** → 资料库已随包发布（内置副本，任何环境可用，先来这里别凭记忆）：topic:"auto-guide"（自动化指北 393KB，哪些效果要哪些模块的总表）、topic:"macro-compendium"（宏汇编 103KB）、topic:"dnd5e-quickref"（5.3.3 官方写法）、topic:"midi-guide"（midi 入门）、topic:"cpr-universe"（CPR 宇宙指南）、topic:"data-dict"（数据字典）、topic:"monster-spec"（怪物规格）。**不确定有哪些文件就先 topic:"local" 列全索引**（70 个文件带路径）。
+- **dnd5e 系统自身写法**（活动字段/公式引用/AC/移动/感官/角色卡结构）→ topic:"dnd5e-quickref"，**已按 5.3.3 校准**。⚠️ 别照抄 dnd5e 官方 wiki——那是 6.0.0（只支持 Foundry v14+），移速 @attributes.movement.speeds.*、感官 @attributes.senses.ranges.*、12 种活动类型等本项目全没有，照抄必错。写 dnd5e 原生字段前先查它。
+- **做自动化 / 写宏 / 查模块机制** → 资料库已随包发布（内置副本，任何环境可用，先来这里别凭记忆）：topic:"auto-guide"（自动化指北 393KB，哪些效果要哪些模块的总表）、topic:"macro-compendium"（宏汇编 103KB）、topic:"midi-guide"（midi 入门）、topic:"cpr-universe"（CPR 宇宙指南）、topic:"data-dict"（数据字典）、topic:"monster-spec"（怪物规格）。**不确定有哪些文件就先 topic:"local" 列全索引**（70 个文件带路径）。
 - 坑书与专项 → topic:"pitfalls"（坑书总集）/ topic:"methodology"（方法论）/ topic:"creature-guide"（搓怪物模板）/ topic:"item-macro"（物品宏指南）/ topic:"aura"（光环）/ topic:"iron-rules"（开工铁律）/ topic:"traps" / topic:"forced-move" / topic:"world-sync" / topic:"code-review" / topic:"release-check" / topic:"overtime" 等。这些属资料库主题：本机有更新版会优先用本机，没有则用内置副本，**动手前先看这个坑有没有踩过**。
 - **dnd5e 5.3.3 文档内所有 _id 必须恰好 16 位字母数字**（如 "dnd5eactivity000"、"bleedOT000000001"）；超 16 位（如 "poisonOT000000001" 17 位）会被系统拒绝创建，报 "Failed to create entity"。activity 引用（otherActivityId/otherActivityUuid）与 effects[]._id 指向的 id 也要遵守并保持一致。生成 id 时数清楚位数；插件会自动把超长 _id 规范成合法 16 位（同值引用同步替换）。
 2. 世界包有现成怪：foundry_search 搜（SRD 在 package:dnd5e.monsters，汉化包中英文都搜）→ foundry_import_entity → foundry_place_token，禁止新建替代导入。
@@ -39,7 +40,13 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 - 配对 / 装模块 / 连不上 relay / 请求超时 / 报 408 → **先 foundry_knowledge topic:"deploy"**（内置部署与排障手册：配对流程、Enter Code、408 自诊断、常见坑），按它做。
 - 用户要配对码 → 直接调 foundry_mint_pairing_code，不要读教程文件、不要写 PowerShell 脚本（Windows 执行策略会拦，实测三次全失败）。
 - 工具报「is not a function / 未注册」→ 插件没加载：让用户刷新 DSH（或 dev_reload_package dsh-foundry-vtt），不要绕路用 pwsh 直调 relay 代替工具。
-- 排障顺序固定：foundry_list_worlds 看世界在线 → 不行读 topic:"deploy" → 仍不行再向用户要信息。禁止在 relay 的 Go 源码里逐文件找根因（实测会耗掉一小时）。`;
+- 排障顺序固定：foundry_list_worlds 看世界在线 → 不行读 topic:"deploy" → 仍不行再向用户要信息。禁止在 relay 的 Go 源码里逐文件找根因（实测会耗掉一小时）。
+7. **公式与 DC 一律用 @ 动态引用，不要写死数字**：
+- 写伤害/DC/加值/条件字段前 → 先 foundry_reference{topic:"roll-data"} 查合法落点（落点写错会被静默忽略，不报错、只是不生效）。
+- 常用：@mod（行动属性调整值）｜@prof 或 @attributes.prof（熟练；@prof 在专精时自动加倍）｜@abilities.con.mod｜@attributes.spelldc（施法DC）｜@details.cr｜@classes.X.levels｜@scale.X.Y（比例值）。
+- 落点：伤害公式 → foundry_create_item_minimal 的 damage.formula；DC → save.dc 直接传字符串（如 "8 + @prof + @abilities.dex.mod"）；OverTime 串内可写 saveDC=@attributes.spelldc。
+- ⚠️ save.dc.calculation 只用 "" 或 "spellcasting"；"flat" 会让 DC 丢回默认值（资料库两条独立记录 + 样本库 98 个 DC 实例中有效使用者 0）。
+- 理由：写死 DC 的武器，角色一升级就是错的。`;
 import { summarizeDoc } from './summarize.js';
 import { registerReferenceTools } from './reference.js';
 import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } from './knowledge.js';
@@ -174,6 +181,31 @@ async function getCfg() {
 function jsonRender(_args, value) {
     return [{ type: 'text', text: typeof value === 'string' ? value : JSON.stringify(value, null, 2) }];
 }
+/**
+ * 递归剔除 undefined / function / symbol。
+ *
+ * 为什么必须有：DSH 校验工具输出必须是 **lossless JSON**，`{a: undefined}` 经 JSON 序列化会丢键，
+ * 于是整条工具结果被判 `returned invalid output: value is not lossless JSON` ——
+ * **AI 拿不到任何返回值**（连 uuid 都看不见），等于这个工具在 harness 里完全瞎做。
+ * 实测：create_item_minimal 的 verify 对象里有 12 个可选字段为 undefined（armor/uses/capacity/
+ * damageBase/attack/attackOtherActivityId/saveDc/saveActivityEffectId/itemEffectId/effectDuration/
+ * activityType…），导致该工具 30/30 次返回失败。
+ * 放在 makeTool 出口统一处理 → 91 个工具全部受益，不必逐个手改。
+ */
+function pruneUndefined(v) {
+    if (Array.isArray(v))
+        return v.map((x) => pruneUndefined(x));
+    if (v && typeof v === 'object') {
+        const out = {};
+        for (const [k, x] of Object.entries(v)) {
+            if (x === undefined)
+                continue;
+            out[k] = pruneUndefined(x);
+        }
+        return out;
+    }
+    return v;
+}
 function makeTool(toolName, description, properties, required, execute) {
     return {
         name: toolName,
@@ -181,7 +213,7 @@ function makeTool(toolName, description, properties, required, execute) {
         parameters: { type: 'object', properties, required, additionalProperties: true },
         output: { schema: { type: 'object', additionalProperties: true }, render: jsonRender },
         async execute(args) {
-            return execute(args);
+            return pruneUndefined(await execute(args));
         },
     };
 }
@@ -1029,6 +1061,9 @@ export function apply(ctx) {
         delete doc._id;
         delete doc._stats;
         delete doc.compendiumSource;
+        // ⚠️ compendium 源文档带的 folder 是**源包里的**文件夹 id，复制到世界后那个 id 不存在
+        // → 世界会静默把 folder 置 null（不报错）。所以先无条件清掉，再按传参设置。
+        delete doc.folder;
         if (args.name)
             doc.name = args.name;
         if (args.folder)

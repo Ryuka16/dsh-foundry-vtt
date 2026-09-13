@@ -150,8 +150,36 @@ export function registerExtraTools(h, reg) {
     // ═══ 宏与 JS / 结构（4 工具）═══════════════════════════════════
     reg(simple(h, 'foundry_macro_list', '列出世界全部宏（GET /macros），返回 uuid/名字。', 'GET', '/macros', {}, [], [], []));
     reg(simple(h, 'foundry_macro_execute', '执行一个宏（POST /macro/{uuid}/execute）。uuid 从 foundry_macro_list 拿；args 为传给宏的参数对象。', 'POST', '/macro/{uuid}/execute', { uuid: { type: 'string', description: '宏的 uuid' }, args: { type: 'object', description: '传给宏的参数对象（可选）' } }, ['uuid'], ['args'], [], ['uuid']));
-    reg(simple(h, 'foundry_execute_js', '⚠️ 在世界内直接执行 JavaScript（POST /execute-js）。这是最高权限的底层操作：可读写世界任意数据、可调用任何 Foundry API。**只用于其他工具覆盖不到的特殊操作；写脚本前先想清楚后果，不确定就先用 foundry_get_entity 读数据结构再写。注意：此端点默认被 REST API 模块设置禁用，未开启会返回 400 "execute-js is disabled in REST API module settings. A GM must enable it to allow JavaScript execution."——优先改用专用工具（foundry_update_entity 支持内嵌物品 uuid Actor.<actorId>.Item.<itemId>，可直接改 actor 身上物品的 system/effects，改物品自动化特性通常不需要 execute_js）。**', 'POST', '/execute-js', { script: { type: 'string', description: '要执行的 JavaScript 代码' } }, [], ['script']));
-    reg(simple(h, 'foundry_structure', '读世界目录结构（GET /structure）：文件夹树与实体清单。types 可逗号分隔过滤（Scene/Actor/Item/JournalEntry/RollTable/Cards/Macro/Playlist）；recursive 递归子目录。', 'GET', '/structure', { path: { type: 'string', description: '起始路径（null=根）' }, types: { type: 'string', description: '类型过滤，逗号分隔' }, recursive: { type: 'boolean', description: '递归读取' }, recursiveDepth: { type: 'number', description: '递归深度（默认 5）' }, includeEntityData: { type: 'boolean', description: '含完整实体数据' } }, [], [], ['path', 'types', 'recursive', 'recursiveDepth', 'includeEntityData']));
+    reg(simple(h, 'foundry_execute_js', '⚠️ 在世界内直接执行 JavaScript（POST /execute-js）。这是最高权限的底层操作：可读写世界任意数据、可调用任何 Foundry API，返回任意 JSON。\n' +
+        '**可用性取决于世界设置**：REST API 模块设置里若没开，会返回 400 "execute-js is disabled in REST API module settings. A GM must enable it to allow JavaScript execution."；开着则正常返回结果（实测有的世界是开着的）。所以：**可以直接试一次**，别因为描述里写着「默认禁用」就放弃——但报上面那条 400 就说明该世界没开，改用专用工具。\n' +
+        '优先用专用工具（foundry_update_entity 支持内嵌物品 uuid Actor.<actorId>.Item.<itemId>，可直接改 actor 身上物品的 system/effects；改物品自动化特性通常不需要 execute_js）。真正的用途是**查专用工具拿不到的运行时值**：如 save.dc 算出来的 dc.value（普通 GET /get 看不到）、token texture 是否有效、某个 flag 的真实解析结果。写脚本前先想清楚后果。', 'POST', '/execute-js', { script: { type: 'string', description: '要执行的 JavaScript 代码' } }, [], ['script']));
+    reg(h.makeTool('foundry_structure', '读世界目录结构（GET /structure）：文件夹树与实体清单。types 可逗号分隔过滤（Scene/Actor/Item/JournalEntry/RollTable/Cards/Macro/Playlist）；recursive 递归子目录。\n' +
+        '⚠️ **这个工具很容易一次吐出几 MB**（compendium 包会被全量带出，实测单次 3.88 MB，直接撑爆结果被截断落盘）。所以：\n' +
+        '① **要查某类实体就一定给 types**（如 types:"Actor" 或 "Item,Scene"）；\n' +
+        '② 要进某个文件夹就给 path（Folder id，从 foundry_get_folder 拿）；\n' +
+        '③ **不传 recursive 就不递归**，别习惯性开递归；\n' +
+        '④ **只想拿几个 uuid 时不要用它** —— 用 foundry_search（按名字）或 foundry_get_folder。\n' +
+        '⚠️ 实测提醒：**path / types 的过滤未必生效**（relay 端可能忽略它们，传了仍返回整棵树）。所以别指望靠参数收窄体积——拿到结果后自己挑需要的那部分。', {
+        types: { type: 'string', description: '类型过滤，逗号分隔（强烈建议给，如 "Actor" / "Item,Scene"）——不给会把 compendium 全量带出，单次可能几 MB' },
+        path: { type: 'string', description: '起始路径（文件夹 id；不给=整棵树）' },
+        recursive: { type: 'boolean', description: '递归读取（默认不开；开了体积会显著变大）' },
+        recursiveDepth: { type: 'number', description: '递归深度（默认 5）' },
+        includeEntityData: { type: 'boolean', description: '含完整实体数据（**慎用**，会极大膨胀结果）' },
+    }, [], async (args) => {
+        const query = { ...h.targetingQuery(args) };
+        for (const k of ['types', 'path', 'recursive', 'recursiveDepth', 'includeEntityData']) {
+            if (args[k] !== undefined)
+                query[k] = args[k];
+        }
+        const out = h.asObject(await h.callRelay('GET', '/structure', { query }));
+        if (args.types === undefined && args.path === undefined) {
+            return {
+                ...out,
+                warning: '⚠️ 这次既没给 types 也没给 path —— 返回的是整个世界目录树（含 compendium），体积可能达数 MB。下次请用 types 或 path 限定范围。',
+            };
+        }
+        return out;
+    }));
     // ═══ 文件（2 工具）══════════════════════════════════════════════
     reg(simple(h, 'foundry_file_system', '浏览 Foundry 文件系统（GET /file-system）。source 目录源（data/systems/modules 等）；path 相对路径；recursive 递归列子目录。', 'GET', '/file-system', { path: { type: 'string', description: '相对路径' }, source: { type: 'string', description: '目录源（data/systems/modules 等）' }, recursive: { type: 'boolean', description: '递归列子目录' } }, [], [], ['path', 'source', 'recursive']));
     reg(simple(h, 'foundry_file_upload', '上传文件到 Foundry（POST /upload）。fileData 为 base64 编码的文件内容；source/path 定位目录；filename 目标文件名；overwrite 覆盖同名。', 'POST', '/upload', { fileData: { type: 'string', description: 'base64 编码的文件数据' }, filename: { type: 'string', description: '目标文件名' }, path: { type: 'string', description: '目标目录' }, source: { type: 'string', description: '目录源（data 等）' }, mimeType: { type: 'string', description: 'MIME 类型' }, overwrite: { type: 'boolean', description: '覆盖同名文件' } }, [], ['fileData', 'filename', 'path', 'source', 'mimeType', 'overwrite']));

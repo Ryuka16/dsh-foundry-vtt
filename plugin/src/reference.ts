@@ -8,6 +8,42 @@
  */
 
 const REFERENCE: Record<string, string> = {
+  'roll-data': `【动态引用 @公式 总表 · 出自用户资料库「飞书知识库/30-掷骰数据」+ 样本库实测落点】
+何时用：任何公式字段都能塞 @ 引用，别写死数字——同一把武器给谁用、几级用，自动算对。
+⚠️ 落点写错会被静默忽略（不报错、只是不生效）；写死 DC 会让高等级角色用起来全是错的。
+
+【最常用】
+@mod                            使用该行动时的当前属性调整值（武器伤害最常用："1d8 + @mod"）
+@prof / @attributes.prof        熟练加值（@prof 在专精时自动加倍，用 @attributes.prof 规避）
+@abilities.str|dex|con|int|wis|cha 的 .mod 调整值 / .value 属性值 / .dc = 8+熟练+调整 / .save.value 豁免
+@attributes.spelldc 或 @attributes.spell.dc    施法 DC（做效果最常用）
+@details.level / @details.cr    角色等级 / 挑战等级
+@classes.<identifier>.levels    某职业等级（如 @classes.paladin.levels）
+@scale.<父物品id>.<快捷栏id>    比例值（如 @scale.monk.die、@scale.rogue.sneak-attack）
+@item.uses.value / .max、@item.level、@item.levels
+@scaling / @scaling.increase    升环比例等级及其增量
+其余全表（hp/ac/hd/movement/senses/init/skills/spells/statuses/currency/exhaustion）：
+foundry_knowledge{topic:"manuals", file:"飞书知识库/30-掷骰数据.md"}
+
+【@ 与 ## 的区别（DAE 效果专用）】
+@字段  → 在【使用者】身上求值（力量18者用物品时 @abilities.str.mod = 8）
+##字段 → 不求值，写进目标身上的 change，最终按【目标】的数据算（= 2）
+
+【实测合法落点（样本库全量 grep，全部来自真实世界导出）】
+damage.base.custom.formula             "2d6 + @mod +1"、"1@scale.monk.die + @mod"  ← 动态伤害骰走这里（须 custom.enabled:true）
+activities.<act>.damage.parts[].bonus  "@mod"
+activities.<act>.save.dc.formula       "8 + @prof"、"8 + @prof + @abilities.dex.mod"
+activities.<act>.roll.formula          "1d20 + @mod"
+healing.bonus / healing.custom.formula "@mod"、"@abilities.cha.mod + @classes.bard.levels"
+effects[].changes[].value              OverTime 串内 "saveDC=@attributes.spelldc"；属性增减益 "@abilities.str.mod"
+description.value                      富文本：@UUID[Compendium.包.Item.id]{名字}（可点实体链接）、[[lookup @name lowercase]]、[[/r 3d6]] 内联掷骰、[[/check dex dc=@abilities.con.dc]]
+attributes.ac.formula                  "12 + @abilities.int.mod"（配合 attributes.ac.calc）
+
+【DC 的坑】save.dc.calculation 实际可用取值只有两种：""（自定义，formula 可写数字也可写公式）、"spellcasting"（跟随使用者的施法 DC）。
+⚠️ "flat" 被本资料库两条独立记录判定为不合法（formula 会被忽略、DC 丢回默认值），样本库 98 个 DC 实例中有效使用者为 0。
+最省事的写法：不算数，直接引用 @attributes.spelldc 或 @abilities.con.dc。
+
+【公式不生效时的排查顺序】① 是否写进了会被 5.3.3 清洗的字段（典型：activity.damage.parts[].formula 会被清空）② custom.enabled 是否为 true ③ 引用路径是否拼错——F12 打 canvas.tokens.controlled[0].actor.getRollData() 看真实可用键`,
   weapon: `【dnd5e 5.3.3 武器物品模板 · 已验证】
 流程：foundry_create_entity{entityType:"Item", data:<本模板>} 创建物品 → foundry_modify_actor{action:"give", itemUuid} 给怪物。
 铁律：伤害骰只写 system.damage.base{number,denomination,bonus,types}；activities 的 damage.parts 必须留空数组 + includeBase:true；写 parts[].formula 会被 5.3.3 清洗成空（怪物没伤害）。
@@ -482,7 +518,7 @@ export function registerReferenceTools(REG: (t: { name: string }) => void) {
   const tool: { name: string } & Record<string, unknown> = {
     name: 'foundry_reference',
     description:
-      '内置 dnd5e 5.3.3 结构参考库（本地模板，零 HTTP 延迟，秒回省 token）。**建物品/加自动化/写怪物前先查这里，别再 search+get_entity 拉完整样本怪照抄（一次几十 KB 白花钱）。** 结构模板：weapon=武器物品（伤害骰放 damage.base 铁律）；save-activity=豁免活动（咬中过豁免中状态）；effect=ActiveEffect 自动化（statuses+changes）；creature=NPC 数值骨架（僵尸样例）；feat=被动特性物品；spell=法术物品；status-list=常用状态 id。效应配方：bonuses=加伤/减益/改动键速查；midi-over-time=持续伤害 OverTime；midi-flags=midi-qol 常用 flags+macroPass 表；item-macro=物品宏三件套+宏体骨架；aura=光环效果；dae=DAE 主动效果机制（特殊时长/macro.execute/change-key 配方）；conditions=激活条件全集（运算符/变量/示例）；enchant=附魔键值（改物品/行动）；optional=Optional 可选加值全集；trigger=自动化路由+反应触发/触发行动；overtime-activity=行动版 OverTime（⚠键名未坐实）。工作纪律：iron-rules=开工七铁律（先查证再动手）；pitfalls=高频坑速查（effects 层级/DC 两说/图标 404 等）。',
+      '内置 dnd5e 5.3.3 结构参考库（本地模板，零 HTTP 延迟，秒回省 token）。**建物品/加自动化/写怪物前先查这里，别再 search+get_entity 拉完整样本怪照抄（一次几十 KB 白花钱）。** 结构模板：weapon=武器物品（伤害骰放 damage.base 铁律）；roll-data=**动态引用 @公式总表**（写任何公式/DC/加值前先查，别写死数字）；save-activity=豁免活动（咬中过豁免中状态）；effect=ActiveEffect 自动化（statuses+changes）；creature=NPC 数值骨架（僵尸样例）；feat=被动特性物品；spell=法术物品；status-list=常用状态 id。效应配方：bonuses=加伤/减益/改动键速查；midi-over-time=持续伤害 OverTime；midi-flags=midi-qol 常用 flags+macroPass 表；item-macro=物品宏三件套+宏体骨架；aura=光环效果；dae=DAE 主动效果机制（特殊时长/macro.execute/change-key 配方）；conditions=激活条件全集（运算符/变量/示例）；enchant=附魔键值（改物品/行动）；optional=Optional 可选加值全集；trigger=自动化路由+反应触发/触发行动；overtime-activity=行动版 OverTime（⚠键名未坐实）。工作纪律：iron-rules=开工七铁律（先查证再动手）；pitfalls=高频坑速查（effects 层级/DC 两说/图标 404 等）。',
     parameters: {
       type: 'object',
       properties: {
