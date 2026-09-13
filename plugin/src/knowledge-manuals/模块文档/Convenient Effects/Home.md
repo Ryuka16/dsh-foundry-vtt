@@ -1,0 +1,1 @@
+All documentation has moved [here](https://www.dfreds-modules.com/free-modules/convenient-effects/).

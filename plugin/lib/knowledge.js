@@ -22,6 +22,12 @@ const MAX_LINE_CHARS = 400;
 const BUILTIN_KB_DIR = join(dirname(fileURLToPath(import.meta.url)), 'knowledge-docs');
 /** 内置样本库目录（随插件包发布）：<插件包>/lib/samples，分类文件夹 + 用户拖入的真实配置实体 JSON。 */
 const BUILTIN_SAMPLES_DIR = join(dirname(fileURLToPath(import.meta.url)), 'samples');
+/**
+ * 内置原样文档库（随插件包发布）：<插件包>/lib/knowledge-manuals。
+ * 内容 = 模块官方文档（28 个模块）+ 飞书知识库（57 篇）的 .md 原文（不含配图）。
+ * 与 knowledge-docs（提炼件）的区别：这边是原文，可 grep 到具体 API/字段的原始出处。
+ */
+const BUILTIN_MANUALS_DIR = join(dirname(fileURLToPath(import.meta.url)), 'knowledge-manuals');
 /** 内置主题：topic → 内置文档文件名 + 描述。 */
 const BUILTIN_TOPICS = {
     'kb-structure': { file: '01-结构模板.md', desc: 'dnd5e 5.3.x 结构模板：武器（damage.base 铁律）/豁免三件套+层级铁律/ActiveEffect/NPC 骨架/feat+spell/状态 id 全集' },
@@ -92,12 +98,12 @@ export function registerKnowledgeTools(REG, getKnowledgeDir, getSampleDir) {
     const builtinTopics = Object.keys(BUILTIN_TOPICS);
     const tool = {
         name: 'foundry_knowledge',
-        description: '按需读 FVTT 技术知识。三级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 本机资料库（血泪教训/数据字典/图标真源/世界宏金标准，若配置了 knowledgeDir 才有，主题：' + topics.join('/') + '）；③ 本地样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"samples" 不带 file 参数 = 列出样本目录索引（文件名+大小+标签）；② 带 file 参数（索引里的文件名）= 读该样本（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
+        description: '按需读 FVTT 技术知识。四级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 原样文档库（topic:"manuals"，随插件发布，任何环境可用）：28 个模块的官方文档 + 57 篇飞书知识库原文——查模块 API/字段/函数签名的原始出处来这里，别猜；③ 本机资料库（血泪教训/数据字典/图标真源/世界宏金标准，若配置了 knowledgeDir 才有，主题：' + topics.join('/') + '）；④ 本地样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"manuals"/"samples" 不带 file 参数 = 列出索引（manuals 列文档清单，samples 列样本文件名+大小+标签）；② 带 file 参数（索引里的路径）= 读原文（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
         parameters: {
             type: 'object',
             properties: {
-                topic: { type: 'string', description: '知识主题。内置：' + builtinTopics.join(' / ') + '；本机资料库：' + topics.join(' / ') + '；本地样本库："samples"（世界导出的真实配置实体，抄改首选）' },
-                file: { type: 'string', description: '可选：样本文件名（仅 topic:"samples" 时用，文件名从 samples 索引拿）' },
+                topic: { type: 'string', description: '知识主题。内置：' + builtinTopics.join(' / ') + '；原样文档库："manuals"（模块官方文档 + 飞书知识库原文）；本机资料库：' + topics.join(' / ') + '；本地样本库："samples"（世界导出的真实配置实体，抄改首选）' },
+                file: { type: 'string', description: '可选：文档/样本路径（topic 为 "manuals" 或 "samples" 时用，传对应索引里列出的完整路径）' },
                 query: { type: 'string', description: '可选：按行搜索关键词（如 "OverTime"/"光环"/"图标"），返回最多 40 行匹配（含行号）。大文件先 query 定位再 offset 读原文。' },
                 offset: { type: 'number', description: '可选：从第几个字符开始读原文（无 query 时生效，默认 0）。返回值里有 nextOffset 与 hasMore 用于翻页。' },
             },
@@ -132,6 +138,62 @@ export function registerKnowledgeTools(REG, getKnowledgeDir, getSampleDir) {
                     return { topic, file: entry.file, error: '内置文档读取失败：' + (e instanceof Error ? e.message : String(e)) };
                 }
                 return servePage(args, topic, entry.file, entry.desc, text);
+            }
+            // 原样文档库：模块官方文档 + 飞书知识库（随 git 发布）。topic="manuals"。
+            if (topic === 'manuals') {
+                if (!existsSync(BUILTIN_MANUALS_DIR)) {
+                    return { topic, error: '原样文档库不可用：内置目录不存在（' + BUILTIN_MANUALS_DIR + '）。' };
+                }
+                const fileName = args.file === undefined ? '' : String(args.file);
+                if (!fileName) {
+                    let files;
+                    try {
+                        files = (await walkTree(BUILTIN_MANUALS_DIR))
+                            .filter((f) => f.rel.toLowerCase().endsWith('.md'))
+                            .sort((a, b) => a.rel.localeCompare(b.rel));
+                    }
+                    catch (e) {
+                        return { topic, error: '原样文档库读取失败：' + (e instanceof Error ? e.message : String(e)) };
+                    }
+                    // 分组：模块文档/<模块>/<文件>.md → "模块文档/<模块>"；飞书知识库/<文件>.md → "飞书知识库"
+                    // 每行列**完整相对路径**（多个模块有同名 README.md，只列裸名 AI 拼不出 file 参数）
+                    const tree = new Map();
+                    for (const f of files) {
+                        const seg = f.rel.split('/');
+                        const group = seg.length >= 3 ? seg[0] + '/' + seg[1] : seg[0];
+                        if (!tree.has(group))
+                            tree.set(group, []);
+                        tree.get(group).push(f.rel + '（' + Math.max(1, Math.round(f.size / 1024)) + 'KB）');
+                    }
+                    const lines = [];
+                    for (const [group, items] of tree) {
+                        lines.push('  ' + group + '（' + items.length + ' 篇）');
+                        for (const it of items.slice().sort())
+                            lines.push('    ' + it);
+                    }
+                    return {
+                        topic,
+                        total: files.length,
+                        content: '【原样文档库索引】共 ' + files.length + ' 篇（模块官方文档 + 飞书知识库原文，随 git 发布，任何环境可用）：\n' +
+                            lines.join('\n') +
+                            '\n\n用法：foundry_knowledge{topic:"manuals", file:"<下面缩进行里的完整路径，直接照抄>"}。大文件（>20KB）先加 query 关键词 grep 定位（如 "onUseMacroName"/"flags"/"workflow"），再传 offset 翻页（每页 ' + PAGE_SIZE + ' 字符）。查模块 API 原始出处、字段名、函数签名时来这里，别猜。',
+                    };
+                }
+                // 有 file：读文档，防目录逃逸
+                const rootResolved = resolve(BUILTIN_MANUALS_DIR);
+                const target = resolve(join(BUILTIN_MANUALS_DIR, fileName));
+                const inside = target.startsWith(rootResolved + '\\') || target.startsWith(rootResolved + '/');
+                if (!inside || !existsSync(target)) {
+                    return { topic, file: fileName, error: '文档未找到：「' + fileName + '」。file 请用 manuals 索引里列出的完整路径（如 "模块文档/Sequencer/index.md"）。' };
+                }
+                let text;
+                try {
+                    text = (await readFile(target, 'utf8')).replace(/^\uFEFF/, '');
+                }
+                catch (e) {
+                    return { topic, file: fileName, error: '文档读取失败：' + (e instanceof Error ? e.message : String(e)) };
+                }
+                return servePage(args, topic, fileName, '原样文档原文（模块官方文档 / 飞书知识库）', text);
             }
             // 样本库：内置（随 git 发布的分类样本库）+ 本机扩展目录。topic="samples"。
             if (topic === 'samples') {
