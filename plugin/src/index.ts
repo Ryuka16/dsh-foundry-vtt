@@ -26,9 +26,11 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 1. 先查后写，严禁凭记忆手搓 dnd5e JSON：
 - 结构模板 → foundry_reference（主题：weapon/save-activity/effect/creature/feat/spell/status-list/bonuses/midi-over-time/midi-flags/item-macro/aura/dae/conditions/enchant/optional/trigger/overtime-activity/iron-rules/pitfalls），模板秒回，照抄改数值。
 - 真实样本 → foundry_knowledge topic:"samples" 列索引找同类实体（怪物卡/武器/状态与中毒/持续伤害OverTime/光环/物品宏/DAE特殊时长/法术特性/装备/奇物），file 读样本（大文件先 query 关键词再 offset 翻页）。0 实例的键名禁止写进文档。
-- 图标路径 → foundry_knowledge topic:"icons" grep 确认真源，禁止猜路径。
-- CPR 宏 identifier → foundry_knowledge topic:"cpr-mapping" 查映射表，禁止瞎编。
-- 深层问题（光环/陷阱/物品宏/复杂 flags）→ foundry_knowledge 对应主题（item-macro/aura/traps/iron-rules/pitfalls 等）。
+- 图标路径 → 先 foundry_knowledge topic:"icon-map" 看分类地图定位该去哪个前缀（13 大类 + icons/svg 全清单 + 高频映射），再 topic:"icons" 用 query 搜关键词（如 halberd/potion-red/poison）拿真路径照抄。6560 条真源随插件发布，任何环境可用。禁止猜路径，猜错 = 卡面裂图。
+- **模块 API / 标志名 / 函数签名** → 先 foundry_knowledge topic:"manuals" 不带 file 列索引（28 个模块官方文档 + 57 篇飞书原文，随插件发布），再 file 读原文、query grep 定位。**要写具体模块的东西时必查**：Sequencer 特效、midi-qol flags、DAE 键名、AC5E、TokenMagic、Rest Recovery、Automated Animations、CPR 宏。**纯 dnd5e 结构不用查**（走上面第 1、2 行就够）。
+- CPR 宏 identifier → foundry_knowledge topic:"cpr-mapping" 查映射表，禁止瞎编（本机资料库主题，未配置时查不到，那就直接照 manuals 里的 CPR 文档走）。
+- **做自动化 / 写宏 / 查模块机制** → 资料库已随包发布（内置副本，任何环境可用，先来这里别凭记忆）：topic:"auto-guide"（自动化指北 393KB，哪些效果要哪些模块的总表）、topic:"macro-compendium"（宏汇编 103KB）、topic:"dnd5e-quickref"（5.3.3 官方写法）、topic:"midi-guide"（midi 入门）、topic:"cpr-universe"（CPR 宇宙指南）、topic:"data-dict"（数据字典）、topic:"monster-spec"（怪物规格）。**不确定有哪些文件就先 topic:"local" 列全索引**（70 个文件带路径）。
+- 坑书与专项 → topic:"pitfalls"（坑书总集）/ topic:"methodology"（方法论）/ topic:"creature-guide"（搓怪物模板）/ topic:"item-macro"（物品宏指南）/ topic:"aura"（光环）/ topic:"iron-rules"（开工铁律）/ topic:"traps" / topic:"forced-move" / topic:"world-sync" / topic:"code-review" / topic:"release-check" / topic:"overtime" 等。这些属资料库主题：本机有更新版会优先用本机，没有则用内置副本，**动手前先看这个坑有没有踩过**。
 - **dnd5e 5.3.3 文档内所有 _id 必须恰好 16 位字母数字**（如 "dnd5eactivity000"、"bleedOT000000001"）；超 16 位（如 "poisonOT000000001" 17 位）会被系统拒绝创建，报 "Failed to create entity"。activity 引用（otherActivityId/otherActivityUuid）与 effects[]._id 指向的 id 也要遵守并保持一致。生成 id 时数清楚位数；插件会自动把超长 _id 规范成合法 16 位（同值引用同步替换）。
 2. 世界包有现成怪：foundry_search 搜（SRD 在 package:dnd5e.monsters，汉化包中英文都搜）→ foundry_import_entity → foundry_place_token，禁止新建替代导入。
 3. 写操作落库后按工具说明回读验证；工具返回 isError 时先看 note/verified 字段判定是否模块回读误报，再决定重试。

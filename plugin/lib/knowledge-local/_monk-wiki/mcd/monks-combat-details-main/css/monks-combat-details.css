@@ -1,0 +1,231 @@
+.form-group.group-header {
+    font-weight: bold;
+    padding: 8px 20px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+}
+
+.combat-playlist-row {
+    padding: 2px;
+}
+
+.combat-playlist-row select {
+    font-size: var(--font-size-14);
+    border: transparent;
+    background-color: var(--input-background-color);
+}
+
+.encounter-cr-row {
+    line-height: 25px;
+}
+
+.encounter-cr-row h4 {
+    margin-bottom: 0px;
+}
+
+.encounter-cr {
+    display: inline-block;
+    padding: 2px 4px;
+    line-height: 16px;
+    color: #fff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+    white-space: nowrap;
+    vertical-align: top;
+    background-color: #999;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    height: 25px;
+    flex: 0 0 120px;
+    text-align: center;
+    position: relative;
+    font-size: 16px;
+    font-weight: normal;
+    padding: 4px;
+    margin-left: 4px;
+}
+
+.encounter-cr[rating="easy"] {
+    background-color: #468847;
+}
+
+.encounter-cr[rating="average"] {
+    background-color: #3a87ad;
+}
+
+.encounter-cr[rating="challenging"] {
+    background-color: #f89406;
+}
+
+.encounter-cr[rating="hard"] {
+    background-color: #b94a48;
+}
+
+.encounter-cr[rating="epic"] {
+    background-color: #333333;
+}
+
+.encounter-cr-rating {
+    /*width: calc(100% - 8px);
+    position: absolute;
+    bottom: 1px;*/
+    line-height: 10px;
+    font-size: 10px;
+    text-align: center;
+}
+
+.combat-sidebar .combat-controls {
+    min-height: 38px;
+}
+
+.combat-sidebar .combat-controls .combat-control {
+    white-space: nowrap;
+}
+
+.chat-log .message.round-marker {
+    background: none !important;
+    border: none !important;
+    border-radius: 0px;
+    border-bottom: 1px solid #ff6400 !important;
+    padding: 0pc 5px;
+    margin: 0px;
+    box-shadow: none;
+    background-image: none !important;
+}
+
+.chat-log .message.round-marker::before {
+    background: none !important;
+}
+
+#chat-notifications .chat-log .message.round-marker {
+    background: rgba(255, 255, 255, 0.7) !important;
+    border-radius: 4px;
+}
+
+body.system-sw5e .chat-log .message.round-marker {
+    border-bottom: transparent !important;
+}
+
+.chat-log .message.round-marker .message-header {
+    flex-direction: row-reverse;
+}
+
+.chat-log .message.round-marker .message-header .message-sender,
+.chat-log .message.round-marker .message-header .message-timestamp,
+.chat-log .message.round-marker .message-content {
+    display: none !important;
+    border-bottom: none !important;
+    padding: 0px
+}
+
+.chat-log .message.round-marker .message-header .flavor-text {
+    flex: 1;
+    color: #f0f0e0 !important;
+    grid-area: unset;
+}
+
+.chat-log.theme-light .message.round-marker .message-header .flavor-text {
+    color: var(--color-dark-4) !important;
+}
+
+#chat-notifications .chat-log .message.round-marker .message-header .flavor-text {
+    color: #333 !important;
+}
+
+.chat-log .message.round-marker .message-header .chat-control {
+    color: #f0f0e0 !important;
+}
+
+body.light-theme.system-sw5e .chat-log .message.round-marker .message-header .flavor-text,
+body.light-theme.system-sw5e .chat-log .message.round-marker .message-header .chat-control {
+    color: #c40f0f !important;
+}
+
+body.dark-theme.system-sw5e .chat-log .message.round-marker .message-header .flavor-text {
+    color: #E81111 !important;
+    font-weight: bold;
+    text-shadow: 2px 2px #363636;
+}
+
+body.dark-theme.system-sw5e .chat-log .message.round-marker .message-header .chat-control {
+    color: #E81111 !important;
+}
+
+.chat-log .message.round-marker .message-header .message-metadata {
+    background-color: transparent;
+    background-image: none;
+    flex: 1;
+}
+
+body.system-dnd5e .chat-log .message.round-marker .message-header .message-metadata {
+    margin-top: 10px;
+    line-height: 2px;
+    color: var(--color-text-dark-secondary);
+}
+
+body.system-dnd5e .chat-log.theme-light .message.round-marker .message-header .message-metadata {
+    color: var(--color-dark-4) !important;
+}
+
+.chat-log .message.round-marker .message-header .message-delete,
+body.system-dnd5e .chat-log .message.round-marker .message-header .chat-control i {
+    color: var(--color-text-dark-secondary);
+    margin-right: 5px;
+}
+
+.chat-log .message.round-marker .message-header .message-delete:hover,
+body.system-dnd5e .chat-log .message.round-marker .message-header .chat-control i:hover {
+    color: var(--stat-font);
+}
+
+#combat #combat-tracker {
+    position: relative;
+}
+
+#combat-turn-message {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0px;
+    width: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    color: #222;
+}
+
+#combat-turn-message > * {
+    opacity: 1;
+    transition: opacity 0.5s;
+
+    @starting-style {
+        opacity: 0;
+    }
+}
+
+#combat-turn-message > *.hide {
+    opacity: 0;
+}
+
+.combat-sidebar.hide-defeated li.combatant.defeated {
+    display: none;
+}
+
+#combat .add-placeholder,
+#combat-popout .add-placeholder {
+    margin: 0;
+    border-top: 2px groove var(--color-border-dark-4);
+    padding-top: 4px;
+    text-align: center;
+}
+
+li.combatant.placeholder .combatant-controls > *:not([data-control="toggleHidden"]) {
+    display: none;
+}
+
+.notransition {
+    -o-transition: none !important;
+    -ms-transition: none !important;
+    -moz-transition: none !important;
+    -webkit-transition: none !important;
+    transition: none !important;
+}

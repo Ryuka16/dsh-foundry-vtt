@@ -28,6 +28,13 @@ const BUILTIN_SAMPLES_DIR = join(dirname(fileURLToPath(import.meta.url)), 'sampl
  * 与 knowledge-docs（提炼件）的区别：这边是原文，可 grep 到具体 API/字段的原始出处。
  */
 const BUILTIN_MANUALS_DIR = join(dirname(fileURLToPath(import.meta.url)), 'knowledge-manuals');
+/**
+ * 内置「本机资料库」副本（随插件包发布）：<插件包>/lib/knowledge-local。
+ * 内容 = 原知识库沉淀的通用化副本（已脱敏：去掉本地路径与自建模块 id），
+ * 含数据字典/怪物规格/自动化指北/宏体系/CPR 指南/坑书 14 篇/monk wiki 等。
+ * 查找顺序：本机 knowledgeDir（用户可能已更新）→ 内置副本（任何环境可用）。
+ */
+const BUILTIN_LOCAL_DIR = join(dirname(fileURLToPath(import.meta.url)), 'knowledge-local');
 /** 内置主题：topic → 内置文档文件名 + 描述。 */
 const BUILTIN_TOPICS = {
     'kb-structure': { file: '01-结构模板.md', desc: 'dnd5e 5.3.x 结构模板：武器（damage.base 铁律）/豁免三件套+层级铁律/ActiveEffect/NPC 骨架/feat+spell/状态 id 全集' },
@@ -35,13 +42,15 @@ const BUILTIN_TOPICS = {
     'kb-macros': { file: '03-宏体系.md', desc: '宏体系：挂宏 6 位置/Document 模型铁律/MidiQOL 常用函数/世界脚本与 CPR fork/DAE 宏/socket 远程委托/调试三板斧' },
     'kb-pitfalls': { file: '04-纪律与坑.md', desc: '纪律与坑：开工五病根七铁律/高频坑速查（effects 层级/伤害骰两说/DC 两说/图标 404/回读误报）/术语对照/卡面纪律/世界数据纪律' },
     deploy: { file: '05-部署与排障.md', desc: '部署与排障手册（随插件发布）：架构/一次性安装四步/配对码流程与 relay 字段/故障速查表/408「世界在线但请求全超时」自诊断与处理/配置字段/日常运维。**遇到配对、装模块、连不上、超时 408 先读这个**' },
+    'icon-map': { file: '06-图标地图.md', desc: '图标分类地图（随插件发布）：13 大类路径前缀 + icons/svg 全清单 + 高频实战映射（武器/护甲/药水/法术/状态/token 去哪找）。**找图标先读这个定位前缀，再去 icons 主题 grep**' },
+    icons: { file: 'fvtt-icon-paths.txt', desc: '图标路径真源 6560 条（随插件发布，任何环境可用）：query 搜关键词（如 halberd/potion-red/poison）拿真路径照抄，绝不猜。查不到就换词根，别自己拼路径' },
 };
 /** 资料库白名单：topic → 相对 knowledgeDir 的文件路径（真实文件名，已 glob 确认）。 */
 const TOPICS = {
     'iron-rules': { file: 'FVTT-已验证机制速查与开工铁律.md', desc: '已验证机制键名速查 + 开工铁律 + 废弃路线清单（做效果前先读）' },
     'data-dict': { file: 'FVTT-data-dict-v9_1.md', desc: 'FVTT 机制数据字典 389KB（§14 CPR/§17 OverTime/§26 宏挂载/§30C Optional 加值），大文件先 query 定位' },
     'monster-spec': { file: 'FVTT-monster-spec-v2_1.md', desc: '怪物/物品 JSON 结构规范 92KB（含 M7 宏三件套）' },
-    icons: { file: 'fvtt-icon-paths.txt', desc: '图标路径真源 323KB，grep 拿真路径，绝不猜（先 query 搜关键词）' },
+    'icons-local': { file: 'fvtt-icon-paths.txt', desc: '本机图标真源文件（与内置 topic:"icons" 同一份内容；保留此条目仅为兼容旧引用，正常请用内置 icons）' },
     'item-macro': { file: 'midi的物品宏使用指南.md', desc: '物品宏完整指南（三件套/macroPass 全表/宏体骨架/铁律）' },
     'creature-guide': { file: '01_搓怪物.md', desc: '搓怪物提示词模板（5 步流程 + 必读资料清单）' },
     'world-macros': { file: '世界脚本的宏.json', desc: '用户世界脚本宏合集 JSON（找现成宏金标准）' },
@@ -74,6 +83,20 @@ const TOPICS = {
     'feishu-reaction': { file: '飞书知识库\\52-MIDI反应自动化.md', desc: 'MIDI 反应自动化' },
     'feishu-multi-save': { file: '飞书知识库\\53-midi多属性豁免.md', desc: 'midi 多属性豁免' },
     'feishu-self-target': { file: '飞书知识库\\54-特殊目标-self.md', desc: '特殊目标 self（自我施法目标）' },
+    // ↓ 以下为随包发布的内置副本新增主题（knowledge-local/ 下），本机不存在时自动走内置
+    'auto-guide': { file: '(已瘦身)自动化指北——哪些自动化需要用到什么？.md', desc: '自动化指北 393KB（中文）：哪些效果需要哪些模块/写法，做自动化前先查这张总表。大文件先 query 定位' },
+    'macro-compendium': { file: '(已瘦身)宏相关.md', desc: '宏相关汇编 103KB：挂宏位置/宏类型/常用写法总集。大文件先 query 定位' },
+    'dnd5e-quickref': { file: 'dnd5e官方写法速查-5.3.3.md', desc: 'dnd5e 官方写法速查（已按 5.3.3 校准，不是 wiki 现行的 6.0.0）：字段与路径权威出处' },
+    'midi-guide': { file: 'midi入门指南（必看）.md', desc: 'midi 入门指南 28KB（中文）：midi-qol 从零到能用的完整教程' },
+    'cpr-universe': { file: '(已瘦身)CPR宇宙使用指南.md', desc: 'CPR 宇宙使用指南 27KB（中文）：Cauldron of Plentiful Resources 全貌' },
+    'overtime': { file: 'OvertimeActivity使用说明.md', desc: 'OverTime 行动版使用说明（行动级持续伤害写法）' },
+    'map-troubleshoot': { file: 'Foundry地图加载问题排查手册.md', desc: '地图加载问题排查手册（场景打不开/加载失败）' },
+    'aeris-tokens': { file: 'Aeris-Tokens-设置中文化方案.md', desc: 'aeris-tokens 设置中文化方案（模块 UI 汉化做法）' },
+    'world-sync': { file: '血的教训\\血的教训-世界同步装置篇.md', desc: '世界同步装置踩坑史 40KB：跨世界同步的完整失败与正解' },
+    'code-review': { file: '血的教训\\血的教训-代码审阅自检清单篇.md', desc: '代码审阅自检清单（交付前逐项过）' },
+    'release-check': { file: '血的教训\\血的教训-发布校验与查证纪律篇.md', desc: '发布校验与查证纪律：发布前必数产物 / 被质疑先查证' },
+    'aeris-rework': { file: '血的教训\\血的教训-Aeris-Tokens改版篇.md', desc: 'aeris-tokens 改版踩坑史 50KB（拖拽寻路禁区）' },
+    'third-party-sync': { file: '血的教训\\血的教训-第三方同步模块并发写设置篇.md', desc: '第三方同步模块并发写设置坑' },
 };
 /** 默认资料库根目录（可用 config.json 的 knowledgeDir 覆盖）。 */
 const DEFAULT_KNOWLEDGE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团工具\\FVTT技术资料';
@@ -98,12 +121,12 @@ export function registerKnowledgeTools(REG, getKnowledgeDir, getSampleDir) {
     const builtinTopics = Object.keys(BUILTIN_TOPICS);
     const tool = {
         name: 'foundry_knowledge',
-        description: '按需读 FVTT 技术知识。四级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 原样文档库（topic:"manuals"，随插件发布，任何环境可用）：28 个模块的官方文档 + 57 篇飞书知识库原文——查模块 API/字段/函数签名的原始出处来这里，别猜；③ 本机资料库（血泪教训/数据字典/图标真源/世界宏金标准，若配置了 knowledgeDir 才有，主题：' + topics.join('/') + '）；④ 本地样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"manuals"/"samples" 不带 file 参数 = 列出索引（manuals 列文档清单，samples 列样本文件名+大小+标签）；② 带 file 参数（索引里的路径）= 读原文（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
+        description: '按需读 FVTT 技术知识。五级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 原样文档库（topic:"manuals"，随插件发布，任何环境可用）：28 个模块的官方文档 + 57 篇飞书知识库原文——查模块 API/字段/函数签名的原始出处来这里，别猜；③ 资料库主题（topic 见下，**已随插件发布内置副本，任何环境可用**；本机 knowledgeDir 有更新版本时自动优先用它）：数据字典/怪物规格/自动化指北/宏汇编/midi 指南/CPR 宇宙/坑书/方法论等；④ topic:"local" = 内置资料库全索引（列全部文件路径，其余文件用 topic:"local", file:"<路径>" 读）；⑤ 样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"manuals"/"samples"/"local" 不带 file 参数 = 列出索引；② 带 file 参数（索引里的路径）= 读原文（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
         parameters: {
             type: 'object',
             properties: {
-                topic: { type: 'string', description: '知识主题。内置：' + builtinTopics.join(' / ') + '；原样文档库："manuals"（模块官方文档 + 飞书知识库原文）；本机资料库：' + topics.join(' / ') + '；本地样本库："samples"（世界导出的真实配置实体，抄改首选）' },
-                file: { type: 'string', description: '可选：文档/样本路径（topic 为 "manuals" 或 "samples" 时用，传对应索引里列出的完整路径）' },
+                topic: { type: 'string', description: '知识主题。内置：' + builtinTopics.join(' / ') + '；原样文档库："manuals"（模块官方文档 + 飞书知识库原文）；资料库（随包发布内置副本，本机有则优先）：' + topics.join(' / ') + '；"local"（内置资料库全索引，列全部文件路径）；样本库："samples"（世界导出的真实配置实体，抄改首选）' },
+                file: { type: 'string', description: '可选：文档/样本路径（topic 为 "manuals" / "samples" / "local" 时用，传对应索引里列出的完整路径）' },
                 query: { type: 'string', description: '可选：按行搜索关键词（如 "OverTime"/"光环"/"图标"），返回最多 40 行匹配（含行号）。大文件先 query 定位再 offset 读原文。' },
                 offset: { type: 'number', description: '可选：从第几个字符开始读原文（无 query 时生效，默认 0）。返回值里有 nextOffset 与 hasMore 用于翻页。' },
             },
@@ -271,32 +294,93 @@ export function registerKnowledgeTools(REG, getKnowledgeDir, getSampleDir) {
                 }
                 return { topic, file: fileName, error: '样本文件未找到：「' + fileName + '」。file 请用 samples 索引里列出的路径（内置样本带分类文件夹前缀）。' };
             }
-            // 本机资料库主题：依赖用户环境的 knowledgeDir
+            // 内置资料库总索引：topic="local"（随包发布的脱敏资料库副本，任何环境可用）
+            if (topic === 'local') {
+                if (!existsSync(BUILTIN_LOCAL_DIR)) {
+                    return { topic, error: '内置资料库副本不存在：' + BUILTIN_LOCAL_DIR + '（插件包不完整，请重装插件）' };
+                }
+                const fileName = args.file === undefined ? '' : String(args.file);
+                if (fileName) {
+                    const rootResolved = resolve(BUILTIN_LOCAL_DIR);
+                    const target = resolve(join(BUILTIN_LOCAL_DIR, fileName));
+                    const inside = target.startsWith(rootResolved + '\\') || target.startsWith(rootResolved + '/');
+                    if (!inside || !existsSync(target)) {
+                        return { topic, file: fileName, error: '资料未找到：「' + fileName + '」。file 请用 topic:"local" 索引里列出的相对路径。' };
+                    }
+                    let text;
+                    try {
+                        text = (await readFile(target, 'utf8')).replace(/^\uFEFF/, '');
+                    }
+                    catch (e) {
+                        return { topic, file: fileName, error: '资料读取失败：' + (e instanceof Error ? e.message : String(e)) };
+                    }
+                    return servePage(args, topic, fileName, '内置资料库原文（随插件发布，已脱敏）', text);
+                }
+                let files;
+                try {
+                    files = (await walkTree(BUILTIN_LOCAL_DIR)).sort((a, b) => a.rel.localeCompare(b.rel));
+                }
+                catch (e) {
+                    return { topic, error: '内置资料库读取失败：' + (e instanceof Error ? e.message : String(e)) };
+                }
+                const tree = new Map();
+                for (const f of files) {
+                    const slash = f.rel.indexOf('/');
+                    const top = slash > 0 ? f.rel.slice(0, slash) : '(根目录)';
+                    const rest = slash > 0 ? f.rel.slice(slash + 1) : f.rel;
+                    if (!tree.has(top))
+                        tree.set(top, []);
+                    tree.get(top).push({ rel: rest, KB: Math.max(1, Math.round(f.size / 1024)) });
+                }
+                const lines = [];
+                for (const [top, items] of tree) {
+                    lines.push('  ' + top + '/');
+                    for (const it of items)
+                        lines.push('    ' + it.rel + '（' + it.KB + 'KB）');
+                }
+                return {
+                    topic,
+                    total: files.length,
+                    content: '【内置资料库索引】共 ' + files.length + ' 个文件（随插件发布，任何环境可用；已脱敏）：\n' +
+                        lines.join('\n') +
+                        '\n\n用法：① 有专用主题的直接用主题名读 —— data-dict（数据字典）/monster-spec（怪物规格）/auto-guide（自动化指北）/macro-compendium（宏汇编）/dnd5e-quickref（5.3.3 官方写法）/midi-guide/cpr-universe/cpr-mapping/pitfalls（坑书）/methodology（方法论）/iron-rules/world-macros/世界脚本相关等；② 其余文件用 topic:"local", file:"<上面的相对路径>" 读；③ 大文件先加 query 关键词 grep 定位，再 offset 翻页。\n**做自动化、写宏、查模块机制前先来这里找对应资料，别凭记忆。**',
+                };
+            }
+            // 资料库主题：① 本机 knowledgeDir（用户可能已更新）② 内置副本（随包发布，任何环境可用）
             const entry = TOPICS[topic];
             if (!entry) {
-                return { topic, error: '未知知识主题「' + topic + '」。内置：' + builtinTopics.join(', ') + '；本机资料库（若已配置 knowledgeDir）：' + topics.join(', ') };
+                return { topic, error: '未知知识主题「' + topic + '」。内置：' + builtinTopics.join(', ') + '；资料库主题（随包发布或本机 knowledgeDir）：' + topics.join(', ') + '；另有 topic:"local" 可列内置资料库全索引。' };
             }
+            // ① 本机 knowledgeDir 优先（你自己的资料可能已更新）
             const root = getKnowledgeDir();
-            if (!root || !existsSync(root)) {
-                return {
-                    topic,
-                    file: entry.file,
-                    error: '本机资料库未找到（knowledgeDir 指向「' + root + '」不存在）。当前环境没有本机资料库时，请改用内置主题：' + builtinTopics.join(', ') + '（随插件发布，覆盖结构模板/效应配方/宏体系/纪律坑）。',
-                };
+            if (root && existsSync(root)) {
+                const file = resolve(join(root, entry.file));
+                try {
+                    const text = (await readFile(file, 'utf8')).replace(/^\uFEFF/, '');
+                    return servePage(args, topic, entry.file, entry.desc + '（本机资料库）', text);
+                }
+                catch { /* 本机没有这份 → 落到内置副本 */ }
             }
-            const file = resolve(join(root, entry.file));
-            let text;
-            try {
-                text = (await readFile(file, 'utf8')).replace(/^\uFEFF/, '');
+            // ② 内置副本兜底（随包发布，别人没有本机资料库也能用）
+            // 注：内置副本里把坑书目录名简化为「血的教训」，此处做路径映射（本机仍用原目录名）
+            const legacyDir = '搓怪物做效果做mod任何时候，看到了一定要看仔细看\\';
+            const mappedFile = entry.file.startsWith(legacyDir) ? '血的教训\\' + entry.file.slice(legacyDir.length) : entry.file;
+            const builtinCopy = join(BUILTIN_LOCAL_DIR, mappedFile);
+            if (existsSync(builtinCopy)) {
+                let text;
+                try {
+                    text = (await readFile(builtinCopy, 'utf8')).replace(/^\uFEFF/, '');
+                }
+                catch (e) {
+                    return { topic, file: mappedFile, error: '内置副本读取失败：' + (e instanceof Error ? e.message : String(e)) };
+                }
+                return servePage(args, topic, mappedFile, entry.desc + '（随插件发布的内置副本）', text);
             }
-            catch (e) {
-                return {
-                    topic,
-                    file: entry.file,
-                    error: '资料库文件读取失败：' + file + '（' + (e instanceof Error ? e.message : String(e)) + '）。可检查 config.json 的 knowledgeDir 指向资料库根目录。',
-                };
-            }
-            return servePage(args, topic, entry.file, entry.desc, text);
+            return {
+                topic,
+                file: entry.file,
+                error: '资料「' + entry.file + '」在本机 knowledgeDir 与内置副本中都不存在（本机 knowledgeDir 指向「' + root + '」）。用 topic:"local" 可看内置资料库完整文件清单。',
+            };
         },
     };
     REG(tool);

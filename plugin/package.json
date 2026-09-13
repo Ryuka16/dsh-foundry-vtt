@@ -1,7 +1,7 @@
 {
   "name": "@dsh-external/dsh-foundry-vtt",
-  "version": "1.1.9",
-  "description": "DSH 原生 FVTT 控制工具包（90 工具：掷骰/怪物/自动化/遭遇/场景/聊天/声音 + 省 token 建武器 create+update 双步 + 内置结构参考库 20 主题 + 内置原样文档库 manuals（189 篇模块官方文档与飞书知识库原文）+ 内置部署排障手册 deploy + 一键出配对码 + 408 自诊断 + 多世界自动路由），经 relay HTTP 驱动 ThreeHats 模块。全家桶另带一键工具箱：体检 / 修复装配 / 覆盖式升级 / relay 开机自启",
+  "version": "1.2.0",
+  "description": "DSH 原生 FVTT 控制工具包（90 工具：掷骰/怪物/自动化/遭遇/场景/聊天/声音 + 省 token 建武器 create+update 双步 + 内置结构参考库 20 主题 + 内置原样文档库 manuals（189 篇模块官方文档与飞书知识库原文）+ 内置资料库 knowledge-local（70 个文件：数据字典/怪物规格/自动化指北/宏汇编/midi 指南/CPR 宇宙/坑书 14 篇，已脱敏，别人没有本机资料库也能用）+ 内置图标真源 6560 条 + 图标分类地图 + 内置部署排障手册 deploy + 一键出配对码 + 408 自诊断 + 多世界自动路由），经 relay HTTP 驱动 ThreeHats 模块。全家桶另带一键工具箱：体检 / 修复装配 / 覆盖式升级 / relay 开机自启",
   "type": "module",
   "main": "./lib/index.js",
   "types": "./lib/types/index.d.ts",

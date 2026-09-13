@@ -1,0 +1,137 @@
+玩家客户端只能改自己拥有的东西；对别人（敌人）和场景动手，必须交给 GM。
+一、玩家能做 vs 不能做
+玩家本地能做的（不用委托）：动自己的 token、给自己加临时生命/buff、掷骰、发聊天、放 Sequencer 动画（纯视觉）、读取任何可见 token 的 flag/属性（读不需要权限）。
+玩家做会报 的（必须委托 GM）：给敌人加/删 Active Effect（倒地、状态、标记）、移动敌人 token、改敌人 HP/属性/flag、创建或删除场景文档（Region、Drawing、Tile、Wall、Light、Note 等）、增删 token。lacks permission
+判断口诀：这个操作改的是“我自己”还是“别人/场景”？后者一律走 GM。
+二、你现在已经搭好的基础设施（以后直接复用，不用重造）
+
+your-dm-toolkit的 module.json 里 —— 开通了 这个 socket 频道，是一切委托的前提。"socket": truemodule.your-dm-toolkit
+world-scripter 里两段常驻脚本：传送门专用的 ，和通用的 YGM。以后新物品直接用 YGM，不用再写 socket。PortalDevice
+
+三、以后写物品/特性的标准做法
+
+优先让系统自己做：活动的 、伤害、豁免，交给 midi/dnd5e——midi 把效果应用到敌人时会自动走 GM，你不用管。手写宏只补系统做不了的（强制位移、特殊清理、连招逻辑）。effects
+宏里凡是“对敌/对场景”的操作，别直接写 ，改成收集 ops 交给 YGM。模板：target.actor.createEmbeddedDocuments(...)
+
+JS// —— 对敌/对场景：收集后交给 GM ——
+const ops = [];
+ops.push({ tokenId: tgt.id, addStatuses: ["prone"] });               // 加状态
+ops.push({ tokenId: tgt.id, move: { x, y, animate: true } });        // x,y 是左上角坐标
+ops.push({ tokenId: tgt.id, deleteFlag: { scope: "world", key: "xxx" } }); // 删带某 flag 的效果
+ops.push({ tokenId: tgt.id, createEffects: [ /* AE 数据 */ ] });
+if (ops.length) await globalThis.YGM?.request({ sceneId: canvas.scene.id, ops });
+
+// —— 对己：直接本地做 ——
+await token.document.update({ x, y }, { animate: true });
+await actor.applyTempHP(10);
+
+YGM 不够用时，就往它的 里加一种新 op 类型（一处加、所有物品共享），别在每个物品里各写一套 socket。apply
+
+四、反复踩的坑（写之前对照一遍）
+
+socket 频道：，且该模块 manifest 必须 。借没开 socket 的模块（如 world-scripter）发消息 → 石沉大海。用你自己的 。game.socket.emit/on("module.<模块>")"socket": trueyour-dm-toolkit
+监听注册时机：放进 （world-scripter 在 init 期求值时 / 还没就绪，顶层注册会丢）。Hooks.once("ready", ...)game.socketgame.users
+主 GM 判定：，多 GM 时只让一个动手，避免重复执行。game.users.activeGM
+移动写法：;别用已弃用的 。tokenDoc.update({x,y}, {animate:false/true})MidiQOL.moveToken(tk, pos, 布尔)
+坐标：token 的 x/y 是左上角;拿中心点要减 （大体型也对）。(width*格子尺寸)/2
+跨场景：委托时带 ，GM 端用 ，别用 （GM 可能在看别的图）。sceneIdgame.scenes.get(sceneId)canvas.scene
+Region/传送门：先把目标搬到位再造门，避免刚搬进去就被 Region 传走。
+分清真失败 vs 无害日志：midi 替你把效果挂到敌人身上时，PL 端会记一条 permission 日志，但其实由 GM 成功完成——那是噪音;只有宏自己直接对敌操作才是真失败，要委托。
+五、自动化机制本身不靠谱，必须进游戏实测的
+
+被动/反射伤害（碰到就掉血、光环掉血）最容易翻车。灼炉/凛冬之躯我们试了三种：CPR （能用但要手动点卡）、（实测无效）、ActiveAuras+OverTime 光环（图标挂上但不掉血），最后回到 touchDamage。结论：这类机制别指望一次成，优先选最简单能用的，留"挂图标+手动判"退路。touchDamageauraDamageEnd
+OverTime 经 ActiveAuras 光环送达 → midi 不处理，不掉血。
+effectmacro 的长休钩子（、）实测不触发 → 改用原生 + 。onLongRestdnd5e.longRestusesrecovery: lr
+双向 Region 传送：先搬人再造门，否则刚搬进去就被传走。
+
+六、绝不猜标识符，一律从真实来源取
+
+图标路径：我猜过一个不存在的锤子图标，结果空白;必须 grep 图标库拿真路径。
+self-centered AoE 目标配置：资料库规范原来写的是 `affects.type:"creature"`+`special:"-self"`，实测不生效（碎镜猎刃碎镜爆发）。正确配置是 `affects.type:"self"`+`special:"-self"`——`type:"self"` 让模板以自身为原点展开，再 `-self` 排除施法者。2026-07-20 已修正规范 §M3/§5.2/§6。
+不要在卡面描述里写无机制对应的纯风味文字：碎镜猎刃镜影残像原来写了"折射光线让攻击者短暂目眩"，但没有任何致盲/劣势/骰子惩罚——这种文字是骗人的。卡面每个效果描述都必须有对应的真实机制。
+autoanimations 的 JB2A 键名是模块专属、还分版本：不能手写猜。要么复制一份能用的配置、要么  让 AA 自动匹配、要么找你要一份导出。isCustomized:false
+模块 ID / manifest 地址 / 这种规则，从官方仓库或 Foundry 文档查证（world-scripter 的 id 和 socket 规则都是查出来的，不是记的）。socket:true
+
+七、源文件可能是脏的，我的记忆也可能漂
+
+导出的  可能被污染/损坏（篡位者的死颅源文件就是），这种直接重建干净的，别沿用。activities
+别拿“我上一轮的设计”当真相：上个会话那只 saruk 我加过暗蚀、19-20 重击，跟你原卡不符。你重新发原卡后，得读真实导出而不是我的总结。规矩：每次重读真实文件。
+
+八、调试方法论（最省时间的几条）
+
+日志里成片的 v13 弃用警告（Ray / PreciseText / ChatMessageMidi#user / Math.clamped / CanvasAnimation...）多半是别的模块的噪音，不是 bug。先过滤掉，只盯真正的 :p ermission、undefined、unregistered handler。Error
+“DM 能用、PL 不能用”是最强信号：基本就是权限 / socket / 场景视角三件事之一。凡是给玩家用的，必须以玩家身份实测，别只在 DM 端验就交付。
+
+九、内容/卡面规范（写之前对一遍）
+
+卡面只写官方口吻的规则文字；实现注释、"DM手动判"、自动化元信息只进自动化日志，不上卡。
+带 Active Effect 的条目：效果定义（状态名+限制什么+多久）写两处——母条目描述 + 该 AE 自己的 ;两处都不写自动化元信息。description
+官方法术（《5E万法大全》里有的）绝不手写描述/活动，只给清单你自己配；只有自创/改动的法术才写全。
+术语照 §36：necrotic=暗蚀、psychic=心灵;拿不准别自译，问你。
+
+十、格式与校验硬规则
+
+16 位随机字母数字 id;中英文名间两个空格;名字无括号;一物品一活动（怪物可多活动）。
+宏校验： 只查语法;FVTT 是 async 执行环境，复杂逻辑要按 AsyncFunction 那套贴近真实环境验。node --check
+动态数值（晶槽数、价格）实时从 actor/item 读，别写死。
+
+十一、MIDI/dnd5e 协作
+
+系统能办的（活动 、伤害、豁免）就交系统，midi 应用效果到敌人会自动走 GM。effects
+save 施加状态： + 该 effect 带 。activity.effects:[{_id, onSave:false}]statuses
+同一 socket 频道可挂多个监听，各按 门控，互不干扰（传送门和 YGM 就是共用一个频道）。action
+═══════════════════════════════════════════════
+十二、权限转交 / 临时操控类（附身符这串硬骨头的总结）
+
+凡是"让玩家临时操控一个原本不属于他的 token"（附身、魅惑、临时召唤同盟、夺取载具）都会连环踩到下面这几个，每一个都让人以为是别的问题，实则独立。出之前逐条对。
+
+1. socket 频道名：world.* 不会被广播，必死。
+   game.socket.emit/on 只转发 module.<id> 和 system.<id> 两种命名空间。写 "world.possessionCharm" 这种自定义 world.* 名 → Foundry 服务器静默丢弃，PL emit 的请求 GM 永远收不到。现象极具迷惑性："GM 自己用能成（走本地直调没过 socket），PL 用没反应"。一律用 your-dm-toolkit 那条已开 socket:true 的合法频道，靠 action 字段区分动作。
+
+2. effectmacro 的 onCreate/onDelete 在【effect 拥有者那一端】跑，不是 GM 端。
+   把收尾 effect 挂在玩家自己的角色上（如附身的"出窍"），它的 onDelete 就在玩家客户端执行。这时候在 onDelete 里写 if(!game.user.isGM) return; → 整段收尾在玩家端被自己挡掉，啥也没干（GM 端压根没跑这个 effect 的 onDelete）。又是"DM 测正常、PL 翻车"。
+   正解：onDelete 不加 GM 守卫，里面需要 GM 权限的活（收回控制权、删敌人标记、代敌人豁免）打包成一个 cleanup，经 socket 委托给 GM 执行。委托函数自己 game.user.isGM ? 直接做 : emit 给 GM。
+
+3. ★最坑★ actor.update({ ownership }) 是【深合并】，不是替换。
+   doGrant 往 ownership 里加 PL=3（合并，加成功）。收回时写回"不含该 PL 的旧 ownership 对象" → 合并语义下 Foundry 只是"没动"那个 key，PL=3 纹丝不动地留着，控制权根本没收回。诊断打出来是"恢复后该玩家权限: 3"。
+   删一个 ownership key 必须用 Foundry 删除语法：
+     await actor.update({ ownership: { ["-=" + userId]: null } });   // 删除该 key
+   要还原成旧值就 ownership: { [userId]: 旧值 }。注意 delete localObj[key] 再整体 update 也没用——删的是本地副本，DB 里的 key 照样在。
+   （这条对所有"临时给权限再收回"的设计通用：加权限用合并没问题，收权限必须 -= 删除。）
+
+4. unlinked（非链接）token 改谁的 ownership？改【基础世界 actor】的。
+   tokenDoc.actor.isToken===true 时，改 tokenDoc.actor（synthetic）的 ownership 不生效；要改 game.actors.get(tokenDoc.actorId) 那个基础 actor，投影 token 继承到 OWNER，玩家才能控制。副作用：附身期间那只怪会临时出现在玩家的角色目录里，收回后消失，正常。
+
+5. 改完 ownership，玩家手里正选着的那个 token 不会自动松手。
+   ownership 数据收回 ≠ 玩家当前选中被取消。Foundry 不会去掰开玩家正握着的 token，他还能拖。收回后顺手发个 release 信号（同频道一个 action，所有端都处理、放在 GM 守卫之前），让控制它的客户端 canvas.tokens.get(id)?.release()。再点就因为没权限点不动了。
+
+6. "受伤挣脱"取真实旧 HP 用 preUpdateActor，不靠 updateActor 的 opts。
+   preUpdateActor 里 actor.system.attributes.hp.value 还是更新【前】的真血量，拿它和新值比最稳。updateActor 的 opts.dnd5e.hp.value 在 AlwaysHP/midi/手改血 各路径下不可靠，别拿它当门控。另：污染计数器之类"不含 HP 的杂改"会进 updateActor，用"本次 change 里没有 hp.value 就 return"挡掉，避免误触发。
+
+7. 一次性物品自己控销毁，别让系统自动销毁打架。
+   附身这种"用了之后还要跑一长串后续"的一次性物品，autoDestroy 设 false、由宏在恰当时机自己删/退费，否则系统中途把物品销毁会打断流程。智力够高免疫这类"没生效"的情况要退费（uses.spent-1）不是销毁。
+
+调这一串的通用方法论：每一步都加一行"诊断 console.log"打出关键值（grant 后权限=?、revoke 后权限=?），用真实数值定位是哪一环没成，别靠猜。这次就是 revoke 诊断打出"还是 3"才一锤定音锁到深合并问题——没有那行诊断，会一直以为是 PL 端没刷新。
+十三、做光环用 Aura Effects（auraeffects），关键在效果的 type
+属性增减益光环最稳的做法是 auraeffects，不是 ActiveAuras。要点：
+
+“开光环的开关”=把效果的类型设成 “auraeffects.aura”。光挂 ActiveAuras 的 旗标不够，真正让它变光环的是这个 type（在效果编辑器里类型会变成“光环”）。isAura:true
+所有配置在效果的  块里：system
+
+distanceFormula：半径，如 （这是光环范围，别找 radius）。"30"
+disposition：作用对象——1=友方、-1=敌方、0=全体（所有人都生效）。注意  不是"仅中立"，是"全体"。0
+color：光环环的颜色，如 。"#b63535"
+opacity：显示透明度（如 ）； 才显示那圈范围环。0.25showRadius:true
+applyToSelf：源自身是否也受影响。
+collisionTypes:["move"]：让墙阻挡光环。
+还有 、、 等按需。disableOnHiddencombatOnlycanStack
+
+
+changes：照常写要施加的属性（AC=、速度乘= mode1、武器伤害=、全豁免=、状态免疫=...键见 §27）。system.attributes.ac.bonussystem.attributes.movement.walksystem.bonuses.mwak/rwak.damagesystem.bonuses.abilities.savesystem.traits.ci.value
+旗标补 （模块标记原始类型）。flags.auraeffects = {"originalType":"base"}
+效果挂在发光环的 token身上（如旗帜/图腾 Actor 的一个被动特性的 transfer 效果）：token 在就持续发光环，删除/摧毁即停。
+描述双写照旧（母特性 description + 效应 description 各写一遍真实作用）。
+
+避坑回顾： 伤害类光环别用 、也别指望 OverTime 经光环送达——两者都实测不掉血。光环只做属性增减益（AC/速度/命中/豁免/优劣势/状态免疫），用 auraeffects 最稳。auraDamageEnd
+十四、导入带 effectmacro 的效果后，回合钩子可能要“再保存一次”才注册
+带 （及其它回合钩子）的效果，导入后钩子不一定立刻生效——表现为只触发一两次后失灵，或干脆不触发。修复：打开那条效果原样再保存一次（或重载世界 F5），钩子即被重新注册、之后每轮稳定触发。验证方法：在脚本顶部加 ，看 F12 是否每轮都打印。flags.effectmacro.onTurnStartconsole.log("...触发", game.combat?.round)
