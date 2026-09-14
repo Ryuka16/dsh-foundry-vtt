@@ -1294,6 +1294,7 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
     '・race：raceSubtype（生物类型，默认 humanoid）+ movement + senses + identifier。⚠️ lang 里的 raceLegacy 只是旧显示的别名（en.json `TYPES.Item.raceLegacy`），**type 值仍然是 race**——实测传 itemType:"raceLegacy" 会被 dnd5e 拒 400\n' +
     '・background：identifier + description\n' +
     '・facility：subtype(basic 基础设施 / special 特殊设施，默认 basic) + facilityLevel（设施等级）。⚠️ 其余字段（building/craft/progress/enlargeable 等）由 dnd5e 默认填，本工具不碰\n' +
+    '・cpr：**CPR（chris-premades）flags**，原样写入 flags["chris-premades"]（填 id 调用 CPR 现成通用特性，或绑自定义宏）。⚠️ 先查 foundry_reference{topic:"cpr"}，别猜键名\n' +
     '⚠️ 实测冷知识：**酒水也是 subtype:"food"**（不是 "drink"）；loot 没有 uses 字段；container 没有 system.type。\n' +
     '⚠️ 动态引用（@ 公式）落点错了会被静默忽略：伤害公式 → damage.formula；DC → save.dc 字符串；被动加值 → changes[].value；OverTime 参数 → overTime 串内；不确定先 foundry_reference{topic:"roll-data"} 查。\n' +
     '典型用法：毒牙 = itemType:"weapon" + damage{number:1,denomination:6,types:["piercing"]} + save{ability:"con",dc:13} + statuses:["poisoned"] + overTime:"turn=start,damageRoll=1d4,damageType=poison,saveDC=13,saveAbility=con,saveCount=1-,label=中毒"。\n' +
@@ -1316,6 +1317,7 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
       movement: { type: 'object', description: '【race】移速，如 {walk:30,fly:60}——**实测 race 的移速在 system.movement 下，不走 5.3.x 的 attributes 路径**' },
       senses: { type: 'object', description: '【race】感官，如 {darkvision:60}' },
       facilityLevel: { type: 'number', description: '【facility】设施等级（据点系统，实测默认 5）' },
+      cpr: { type: 'object', description: '【CPR】Cauldron of Plentiful Resources（模块 id chris-premades）的 flags，**原样深合并进 flags["chris-premades"]**。三种形态 —— ①通用特性（填 id 调现成的 44 条）：{ config: { generic: { "<id>": { applied: true, ...字段 } } }, macros: { midi: { item: ["<id>"] } } }；②自定义宏绑定物品：{ info: { identifier: "...", rules: "legacy"|"modern" }, macros: { midi: { item: ["..."] } }, equipment: { identifier: "..." } }；③★嵌入式宏（就地写 JS，不依赖宏对象）：{ embeddedMacros: [ { name: "Poison Tick", type: "midi-item", pass: "rollFinished", priority: 50, macro: "<JS 代码字符串，体内可直接裸用 workflow / effectUtils / rollUtils 等 CPR utils，可 await>" } ] }。⚠️ 嵌入式宏的 type / pass 取值见 foundry_reference{topic:"cpr"} 的事件表（17 类事件、midi-item 的 11 个 pass），别猜；macros.midi.item 填的是【宏名数组】，{pass,macro,priority} 是【宏对象内部】的结构，两者别混。' },
       price: { type: ['number', 'string'], description: '价格数值（**13 类通用**）。落 system.price.value，形如 {value:25,denomination:"gp"}。不传 = 不在卡面标价（建完还得再补一次 update）' },
       priceDenomination: { type: 'string', description: '价格币种，默认 gp（铜币 cp / 银币 sp / 金币 gp / 白金币 pp）' },
       weight: { type: 'number', description: '重量（磅，**13 类通用**）。落 system.weight = {value,units:"lb"}。不传 = 卡面重量空' },
@@ -1499,6 +1501,17 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
           if (e && typeof e === 'object') e.origin = 'Item.' + uuid
         }
       }
+      // CPR（Cauldron of Plentiful Resources / 模块 id chris-premades）flags 透传：
+      // 用户给什么就原样深合并进 flags["chris-premades"]，本工具不解释内容
+      // —— CPR 的 schema 随版本变，写法见 foundry_reference{topic:"cpr"}。
+      const cprGiven = (args as Record<string, unknown>).cpr
+      if (cprGiven && typeof cprGiven === 'object' && !Array.isArray(cprGiven) && Object.keys(cprGiven as object).length > 0) {
+        const fl = (dataAsRec.flags as Record<string, unknown>) ?? {}
+        const prev = (fl['chris-premades'] as Record<string, unknown>) ?? {}
+        fl['chris-premades'] = { ...prev, ...(cprGiven as Record<string, unknown>) }
+        dataAsRec.flags = fl
+        notes.push('CPR flags 已写入 flags.chris-premades')
+      }
       const { doc: updData } = h.normalizeDocIds(data)
       await h.callRelay('PUT', '/update', {
         query: { ...h.targetingQuery(args), uuid: 'Item.' + uuid },
@@ -1633,7 +1646,7 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
       macroCommand: { type: 'string', description: '宏代码（函数体，可直接用 token/game/MidiQOL/args 等；⚠️ 勿用 JSON.stringify(token)）' },
       macroScope: { type: 'string', description: "'global'（默认）或 'actor'" },
       onUseMacroName: { type: 'string', description: '高级用法：直接覆盖 flags["midi-qol"].onUseMacroName 原串（传了就忽略 macroPass）' },
-      flags: { type: 'object', description: '要合并的任意 flags（深合并），如 {"autoanimations": {...}}——AA 动画就挂在这' },
+      flags: { type: 'object', description: '要合并的任意 flags（深合并），如 {"autoanimations": {...}}——AA 动画就挂在这；CPR 用 {"chris-premades": {...}}（先查 foundry_reference{topic:"cpr"}）' },
       unsetFlags: { type: 'array', items: { type: 'string' }, description: '要删除的 flags 点号路径，如 ["midi-qol.onUseMacroName","dae.macro"]' },
     },
     ['uuid'],

@@ -9,6 +9,21 @@
 
 const REFERENCE: Record<string, string> = {
   'activity-deep': `【活动与工作流深层语义 · 2026-09-15 源码级核实（dnd5e release-5.3.3 / midi-qol v13.0.55）】
+⚠️ 2026-09-16 补两条（第四批源码级转述）：
+① 【要「到底扣了多少血」就读 damageList】workflow.damageList（Workflow.ts L590）——
+   preTargetDamageApplication 起有数据，每目标一项
+   { actor, oldHP, newHP, tempHP, hpDamage, tempDamage, totalDamage }。
+   不要自己拿 damageRolls 求和 —— 会漏掉抗性 / 易伤 / 临时生命。
+   豁免侧另有：saveRolls / saveResults / saves / fumbleSaves / criticalSaves / targetSaveDetails。
+   状态机位置看 workflow.currentAction（L629）与 args[0].macroPass；
+   ⚠ optional 类宏里 macroPass 是【旧值】，要判断当前是不是 optional 用 args[0].tag === "optional"。
+   官方完整字段表在 midi 仓库 docs/workflowfields-2026-02-01.md。
+② 【物品层真正能生效的 flags 只有三个】onUseMacroName（格式 macroPass1:macroName[;...]）/
+   optional.*（trigger = attack/damage/save/utility，也可作 AE changes 的 key）/ rollModifiers ——
+   而 rollModifiers 是【AE changes 的前缀】（flags.midi-qol.rollModifiers.attack. / .damage.），【不是物品键】。
+   ★ 纠正：use.consumed / use.otherScaling 写在【chatCard（聊天消息）】上，【不在物品上】
+     （MidiActivityMixin L436-483；dnd5e 5.2 时代的旧位置是 flags.dnd5e.use.consumed）。
+     要在宏里判断「这个子活动结算过没有」，读 chatCard 的 flags，别读 item.flags。
 ⚠️⚠️ 2026-09-17 Q8 已【实机实测】（世界「特醇佳酿」Foundry 13.351，execute_js 建临时 AE 读真实字段后立刻删除）：
   实测表（duration 输入 → 解析结果）：
     {seconds:60}                      → type="seconds" ｜ remaining=60 ｜ label="60 秒" ｜ isTemporary=true
@@ -1391,6 +1406,243 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
 配套写法（本插件 create_item_minimal 的默认形态）：
   物品级 AE = { transfer:false, statuses:[...], changes:[{key:'flags.midi-qol.OverTime', mode:0, priority:20, value:'turn=start,...'}] }
   持续伤害的结束由 OverTime 的 saveCount=1- 负责，**duration 留全 null（永久）** 才是正确做法 —— 见 midi-over-time 主题。`,
+
+  'fx-anim': `【特效与动画三件套 · AA / Sequencer / TokenMagic · 2026-09-14 源码级转述（本机无这三个模块源码，未二次复核）】
+① AutoAnimations（模块 id autoanimations，世界内 6.8.1，仓库 theripper93/autoanimations）
+  - 落点：flags.autoanimations，读取顺序【弹药 → 活动 → 物品 → 全局名字匹配】（src/system-handlers/findAnimation.js L19-68）
+  - 最小可抄（走名字匹配）：{ isEnabled:true, isCustomized:false, version:5 }
+  - 按活动区分：活动级 isCustomized:true 时优先用活动自己的配置
+  - midi 的 killAnim:true 为真时不播动画
+  - ⚠ 与 midi otherActivity 的连带活动【没有去重】—— 每个活动各配各播
+  - ⚠ animation 内部键未核实；要精调就在 app 里配好后导出 JSON 照抄
+
+② Sequencer（模块 id sequencer，世界内 3.6.11，仓库 fantasycalendar/FoundryVTT-Sequencer）
+  - 播放链：new Sequence() .effect() .file() .atLocation() .spriteScale() .duration() .wait() .play()
+  - ⚠【是 .spriteScale() 不是 .scale()】—— 易错点
+  - flags.sequencer 存的是【特效宿主文档（场景）】，与物品无关；物品宏里播放序列【不写 flags】
+  - ⚠ 文件 404 时的容错行为未核实
+
+③ TokenMagic（模块 id tokenmagic，世界内 0.7.6.3，仓库 Feu-Secret/Tokenmagic）
+  - 落点：flags.tokenmagic.filters，挂在【token】上（不挂物品、不挂 AE）
+  - filterType 全集 46 键（filters.js L47-90）
+  - ⚠【没有 poisoned / burning 这类 D&D 状态名】—— 要中毒变绿用 ddTint、灼烧用 fire 或 xfire、麻痹用 electric
+  - 签名：TokenMagic.addUpdateFilters(token, [{ filterType, filterId, ... }])
+         TokenMagic.deleteFilters(token, filterId, filterType, filterInternalId)
+  - 要写 token 级 flags 请用 foundry_update_entity（token 文档）或 execute_js，不要用改物品的 flags 参数`,
+
+  'item-fields': `【物品字段补遗 · target / consumption / 未鉴定 / 同调 · 2026-09-14 源码级转述】
+① target（活动目标）
+  - template{ count, contiguous, stationary, type, size, width, height, units } + affects{ count, type, choice, special }
+  - template.type 9 键：circle / cone / cube / cylinder / line / radius / sphere / square / wall（config.mjs L2797-2862）
+  - ⚠【每个 template.type 自带 sizes 表，决定该用 size 还是 width/height】—— 不是「优先级」关系：
+    cone / radius / sphere / square / circle 只读 size；line 长宽都读；cube 用 size 或 width/height
+  - affects.type 9 键：self / ally / enemy / creature / object / space / creatureOrObject / any / willing
+  - affects.type = self 时 count 自动置 null
+
+② consumption.targets[].type（消耗来源）【6 键全集】（config.mjs L1117-1160）
+  activityUses（消耗活动次数）/ itemUses（消耗物品次数）/ material（消耗材料）
+  / hitDice（消耗生命骰）/ spellSlots（消耗法术位）/ attribute（消耗属性值，如 attributes.hp.value）
+  - ⚠【池子不足时抛 ConsumptionError，阻止这次使用并弹警告 —— 不会静默、也不会扣成负数】
+    （MissingAttribute / NotEnough / MissingItem）
+  - 常见字段形态：{ type, target, value, scaling:{ mode, formula } }
+
+③ 未鉴定（identified）
+  - identified + unidentified{ name, description } 是【纯展示层】：非 GM 且 identified:false 时换名、藏细节
+    （item-sheet.mjs L181 / L439-442）
+  - ⚠【actor.identifiedItems 与鉴定毫无关系】—— 它是按 item.identifier 索引的 Map，别被名字骗
+
+④ 同调（attunement）
+  - attunement 字段【无枚举约束】，惯例值 ""（不需要）/ "required"（必需）/ "optional"（可选）
+  - attributes.attunement.max 默认 3，value 由已调谐物品累计
+  - ⚠ dnd5e 5.3【没有超限拦截逻辑】—— 同调 4 件不会报错，靠 GM 自觉
+  - ★ 核心判据（item.mjs L487-490 areEffectsSuppressed）：
+    !attuned && attunement === "required" → 【该物品的全部 AE 被抑制】（既不应用、也不转移）
+    所以 +1 武器若写 attunement:"required"，未调谐时它的魔法加值效果【是不生效的】
+  - 另：magicAvailable = (attuned || attunement !== "required") && properties.has("mgc")
+    —— 决定伤害/攻击是否按魔法处理`,
+
+  'cpr': `【CPR（Cauldron of Plentiful Resources）· 模块 id chris-premades · 原名 Chris's Premades】
+⚠️ 2026-09-17 实机验证通过（CPR 1.5.15 / foundry 13.351 / dnd5e 5.3.3），四条实测结论：
+
+■ API 真入口 = window.chrisPremades（【不是】game.modules.get("chris-premades").api —— 那个是空对象）
+  · utils 共 22 个：activityUtils / actorUtils / animationUtils / combatUtils / compendiumUtils / constants / crosshairUtils / devUtils / dialogUtils / effectUtils / errors / genericUtils / itemUtils / macroUtils / regionUtils / rollUtils / socketUtils / spellUtils / templateUtils / thirdPartyUtils / tokenUtils / workflowUtils
+  · macroUtils 12 个函数：registerMacros / getMacro / getEmbeddedMacros / addEmbeddedMacro / removeEmbeddedMacro / getEmbeddedActivityShapeMacros / addEmbeddedActivityShapeMacro / removeEmbeddedActivityShapeMacro / getDocumentPasses / getEventTypes / getAllDocumentPasses / getAllEmbeddedMacros
+  · ★ macroUtils.addEmbeddedMacro(doc, {name,type,pass,priority,macro}) = 官方写入函数。Activity → setFlag(doc.item,"chris-premades","embeddedActivityMacros."+id,arr)；其他文档 → setFlag(doc,"chris-premades","embeddedMacros",arr)。【不必手拼 flag】。
+  · ★ effectUtils.createEffect(targetActor, effectData, {concentrationItem, parentEntity, identifier, vae, interdependent, strictlyInterdependent, unhideActivities, rules, macros, conditions, animate}, {animationPath, animationSize, animationFadeIn, animationFadeOut, animationSound}) —— 第一参=目标 actor，第二参=effectData，第三参 options【可带 macros 与 conditions】。
+  · ★ rollUtils.requestRoll(actor, rollType, abilities[], options) —— 内部走 MidiQOL.socket().executeAsUser("rollAbility", ...)。
+  · combatUtils 只有辅助函数：currentTurn / inCombat / combatStarted / perTurnCheck / setTurnCheck / getCurrentCombatantToken / isOwnTurn（【执行入口不在这层】）。
+
+■ 事件与 pass（实测，非文档）
+  · macroUtils.getEventTypes() 返回 17 类：check / save / aura / combat / item / death / effect / midi-item / midi-actor / movement / region / rest / skill / template / toolCheck / d20 / time
+  · 嵌入宏的 type 用连字符形（midi-item）；getEmbeddedMacros 内部有 t.replace(".","-")，所以写 midi.item 等价。
+  · ★ 实测 pass 直方图（扫全部 575 个内置宏统计）：
+    midi-item：rollFinished 283 ｜ preambleComplete 48 ｜ preTargeting 27 ｜ damageRollComplete 19 ｜ attackRollComplete 4 ｜ postAttackRoll 3 ｜ preItemRoll 2 ｜ preAttackRollConfig 2 ｜ utilityRollComplete 1 ｜ applyDamage 1 ｜ targetPreItemRoll 1
+    effect：deleted 19 ｜ created 2 ｜ actorCreated 2
+    combat：turnStart 20 ｜ turnEnd 7 ｜ turnStartNear 7 ｜ turnEndNear 5 ｜ combatEnd 5 ｜ everyTurn 2 ｜ combatStart 1
+    （第三方流传的 11 个 midi-item pass 表【漏了 targetPreItemRoll】；combat 的 turnStartNear / turnEndNear / everyTurn / combatStart 也常被漏）
+  · 注意 EmbeddedMacros.PARTS 只是 UI 模板（header/navigation/form/footer），【不是 pass 表】。
+
+■ ★ 宏体形参（实测可用，这是嵌入宏与引用型宏的最大区别）
+  · midi-item 宏：可直接用 workflow / trigger / ditem；实测 workflow.failedSaves.size、workflow.item.name 全部取到真实值。
+  · combat 宏：★【trigger 直接可用】—— 实测 trigger.entity（= 效果文档本身）、trigger.entity.parent.name（= 宿主 actor 名）、trigger.token.name 三个全部取到真实值。
+    内置宏的写法是 async function({trigger:{entity:e,token:t}})，那是【解构】；嵌入宏按字符串执行（new AsyncFunction(...argNames, "{"+script+"}")），trigger 本身就是形参名 ⇒ 直接写 trigger.xxx 即可，别照抄内置宏的解构写法。
+  · ★【执行是异步的，前置有 await MH.sleep(50)】—— 实测同一回合推进：await combat.nextTurn() 返回的瞬间读全局日志【是空的】，稍后才写入。
+    ⇒ 验证 combat 宏时必须在【下一次交互或延迟之后再读】，不能立刻断言「没触发」。（我为此误判过一轮。）
+
+■ ★ 四层链路实测（全部通过）
+  1 静态落库：create_item_minimal 的 cpr 参数 → flags.chris-premades.embeddedMacros 落库正确（type / pass / priority / macro 全对）。foundry_diff 4/4。
+  2 midi-item 宏执行：打一次木桩 → 宏被调用（failedSaves 数量正确）→ effectUtils.createEffect 成功建出效果。
+  3 效果级宏被读取：getEmbeddedMacros(effect, "combat", {pass:"turnStart"}) 返回 1 条。
+  4 ★ combat/turnStart 执行：推进回合到宿主回合 → 宏真的跑了（日志带回 round、宿主名、token 名）。
+  附：CPR 的 combat 收集器（bundle 内函数）逻辑 = 遍历 SF.getEffects(actor, {includeItemEffects:true})，对每个 effect 取【引用型 macros.combat】+【嵌入宏 getEmbeddedMacros(effect,"combat",{pass})】，
+      过距离/disposition 过滤后按 priority 升序执行；非 source 类 pass 还会再遍历 actor.items。
+  CPR 的战斗 hook 共 5 个：combatStart / deleteCombat / dnd5e.rollInitiative / preUpdateCombat / updateCombat。
+  ⚠️ 子活动 automationOnly 技巧：物品有 ≥2 个可结算活动时 use() 会弹「选择活动」窗；给子活动加 midiProperties.automationOnly:true 可让它从候选消失（不再弹窗），而 attack 仍能通过 otherActivityId 调用它。
+⚠ 别再叫它 Complete Protector Rules —— 那是错的；官方全称是 Cauldron of Plentiful Resources。
+生态：CPR = chris-premades ｜ GPS = gambits-premades（依赖 auraeffects/sequencer/region-attacher）｜ MISC = midi-item-showcase-community。
+CPR 依赖：midi-QOL、socketlib、DAE、Times-up、lib-wrapper。
+
+【三条接入途径（按用途选）】
+① 通用特性（最常用）：不写宏，只填 flag 调用 CPR 现成的通用特性（共 44 条）
+   "flags": { "chris-premades": {
+     "config": { "generic": { "<id>": { "applied": true, "<字段>": <值> } } },
+     "macros": { "midi": { "item": ["<id>"] } } } }
+   字段类型：activities=活动id数组 / activity=单个活动id / text=字符串或公式 / number / checkbox /
+             select / select-many / damageTypes / creatureTypes / abilities / skills / items=UUID数组 / file=图片路径
+   ⚠ 纯被动特性（不死坚韧、集群战术、自爆等）只放 flags，不用配活动。
+   ⚠ 经真实导出印证：config.generic.<id> 里除 applied 外无隐藏字段，不填的取默认。
+
+② 内嵌官方法术（导入即带 CPR 脚本自动化、连医药箱都不用点）
+   flags.chris-premades.info.identifier = CPR 内部 camelCase 标识符（如 magicMissile / crimsonMist / blight / huntersMark）
+   ⚠ 因脚本靠 identifier 触发、且多数 CPR 法术是多 activity 结构，光有这层 flag 通常不够 ——
+     最稳是【在 app 里匹配好后整张导出 JSON 复用】（identifier + 全 activity 一起带）。
+
+③ 自定义宏（fork CPR 官方宏 —— 想做 CPR 没有的自动化时）
+   六步：a. 建宏合集包（CPR 配置 → 合集包选项 → 宏合集包）
+        b. 去 CPR GitHub 找目标宏拉到底，数有几个 export let（决定建几个宏）
+        c. 复制各 export 引用的 async function（【不要复制 import 开头的行】）
+        d. 把 export let xxx = 改成 return，其余内容贴到宏底部，并加 identifier
+           + rules:"legacy"(2014 规则) 或 "modern"(2024 规则)
+        e. 默认【覆盖】原 CPR 自动化；要做新的就把 identifier 改成唯一值
+        f. 绑到物品：加 flags.chris-premades（子键随宏的 export 部分而定）
+   宏对象骨架（储法戒指实例）：
+     return { identifier:'ringOfSpellStoring', name:'Ring of Spell Storing (0/5)', rules:'legacy', version:'1.1.0',
+              midi: { item: [ { pass:'rollFinished', macro:use, priority:50 } ] },
+              equipment: { ringOfSpellStoring: { equipCallback:equipOrUpdateRing, unequipCallback:unequipRing } },
+              ddbi: { renamedItems: { 'Ring of Spell Storing': 'Ring of Spell Storing (0/5)' } } };
+   物品绑定 flags：
+     "chris-premades": { "info": { "identifier": "ringOfSpellStoring", "rules": "legacy" },
+                         "macros": { "midi": { "item": ["ringOfSpellStoring"] } },
+                         "equipment": { "identifier": "ringOfSpellStoring" } }
+
+【★ 嵌入式宏（Embedded Macros）—— 2026-09-17 源码级核实（chris-premades master，自报 0.12.x）】
+⚠️ 关键区分：嵌入宏与上面的「引用型宏 flags.macros.*」是【两条完全不同的路】，混了就全错：
+  · 引用型宏 = flags.chris-premades.macros.<事件>.<子类> 填【宏名字符串数组】（如 ["damageTurnStart"]），
+    指向内置/合集包里的宏对象；{pass, macro, priority} 是【宏对象内部】数组项的结构。
+  · 嵌入宏 = flags.chris-premades.embeddedMacros 填【数组】，每项自带 {name, type, pass, macro}，
+    macro 是【JS 代码字符串】，在编辑器里就地写，不依赖任何宏对象。
+
+① 落库结构（Q1）
+  - 非 Activity 文档（item / activeeffect / measuredtemplate / region）：
+    flags.chris-premades.embeddedMacros = [ { name, type, pass, macro } ]（可带 priority）
+    源码：scripts/applications/embeddedMacros.js L121-123 写回；scripts/lib/utilities/macroUtils.js L7-16 读取
+  - Activity 文档：写到【其父 item】的 flags.chris-premades.embeddedActivityMacros.<activityId> = [ ... ]
+    （embeddedMacros.js L119-120；macroUtils.js L8-10）
+  - 活动形状宏：embeddedActivityShapeMacros.<activityId>.<entityType>（macroUtils.js L38-52）
+  - 元素 schema：{ name(编辑器标签), type(事件类型，如 "midi-item"), pass(具体 pass，如 "rollFinished"),
+    macro(JS 代码字符串，可 await / const / return), priority?(可选) }
+
+② 事件系统 17 类（Q2）—— 出自 embeddedMacros.js L4-939 的 eventStructure
+  check / save / aura / combat / item / death / effect / midi-item / midi-actor /
+  movement / region / rest / skill / template / toolCheck / d20 / time
+  ⚠️ midi-item 与 midi-actor 是【带引号的键】
+  midi-item 的 11 个 pass（embeddedMacros.js L357-558）：
+    preTargeting / preItemRoll / preambleComplete / preAttackRollConfig / postAttackRoll /
+    attackRollComplete / savesComplete / damageRollComplete / rollFinished / applyDamage / utilityRollComplete
+  ★ 与 midi-qol 的关系（scripts/hooks.js L48-58）：【不是】一一对应 midi 的 macroPass ——
+    CPR 挂在 midi-qol 的 premades hook 空间上（midi-qol.premades.postNoAction / postPreambleComplete /
+    postWaitForAttackRoll / postAttackRollComplete / preDamageRollComplete / preUtilityRollComplete /
+    postSavesComplete / postRollFinished / preAttackRollConfig）+ 两个原生 hook
+    （midi-qol.preTargeting、preTargetDamageApplication）。
+    pass 名是 CPR 自己起的逻辑名，部分与 macroPass 同名但【触发 hook 不同】。
+
+③ 执行与签名（Q3）—— scripts/events/custom.js L87
+  new foundry.utils.AsyncFunction(...argNames, '{' + script + '}\n')
+  ⇒ 异步函数 + 花括号块体，代码里可 await / const / return。
+  默认全量注入的 utils（直接裸用，无需解构，custom.js L68-83）：
+    activityUtils / actorUtils / animationUtils / combatUtils / compendiumUtils / crosshairUtils /
+    dialogUtils / effectUtils / genericUtils / itemUtils / macroUtils / rollUtils / socketUtils /
+    spellUtils / templateUtils / tokenUtils / workflowUtils / thirdPartyUtils /
+    constants / Crosshairs / Summons / Teleport / DialogApp
+  midi-item 额外注入：{ trigger, workflow, ditem }（scripts/events/midi.js L179）
+  midi-actor 额外注入：{ trigger, activity, token, actor, config, dialog, message }（L224）
+  combat 额外注入：{ trigger }（scripts/events/combat.js L227；trigger 含 { entity, token, ... }）
+  ★ 返回值语义（midi.js L195-197）：return 真值 = 【短路该 pass 剩余宏】；undefined / falsy = 继续跑下一个宏。
+
+④ 执行顺序与查找（Q6，midi.js L37-46）
+  执行序：flags 引用宏（collectItemMacros）→ item 级嵌入宏 → activity 级嵌入宏 → enchantment 效果的宏
+  identifier 三源查找（custom.js L33-36）：【宏合集包 → registerMacros 注册列表 → 内置文件】，先命中即覆盖。
+  ★ 只写 flags 不建宏合集包【能跑】—— getMacro 会 fallback 到内置宏文件
+    （前提：identifier 与内置导出名一致，如 "damageTurnStart"）。
+  宏合集包（设置 macroCompendium）只是让你自定义/覆盖宏的途径。
+
+⑤ 引用型宏对象 schema（Q4）—— 以内置 damageTurnStart 为例
+  { identifier(缺省 = name.slugify()), name, translation(i18n 键),
+    version(字符串，如 '0.12.78'), rules('legacy' | 'modern'，缺省 'modern'),
+    midi: { item: [ { pass:'rollFinished', macro:late, priority:50 } ] },
+    combat: [ { pass:'turnStart', macro:turnStart, priority:50 } ],
+    isGenericFeature: true, genericConfig: [ ... ] }
+  ⚠️ version 【不进查找键】—— getMacro 只按 identifier + rules 查（custom.js L33-36）；
+     version 是 Medkit 决定「是否用源文档重刷」的追踪字段（升级判定细节未逐行核，不采信猜测）。
+  rules：'legacy' = 2014 变体（legacyMacros.js），'modern' = 2024（macros.js）；
+     按物品当前规则版本取对应变体（midi.js L28）。
+  ★ flags.macros.midi.item 的真实结构 = 【identifier 字符串数组】（midi.js L17-19）—— 不是 {pass,macro,priority}。
+     解析链：getMacro(identifier, rules) → 过滤 midi.item 中 pass 匹配 → flatMap →
+     再过滤 ( !n.activities?.length || n.activities.includes(activityIdentifier) )
+     ⇒ 即事件项还能带 activities 键，按活动 identifier 过滤（「按活动区分」的正解）。
+  priority：数字【小】先跑（getSortedTriggers 里 sort((a,b) => a.priority - b.priority)，midi.js L172）。
+  ⚠️ 嵌入宏元素不写 priority 时 comparator 得 NaN（按收集顺序）—— 这条是按 sort 语义推的，未在源码看到显式处理。
+  macros 下全部子键（medkit-item.js L541-620+）：midi.item / midi.actor / aura / combat / movement /
+     check / save / skill / toolCheck / death / rest / …（同第 ② 节事件表）。
+
+⑥ 「可编辑」+ Medkit 关系（Q7）
+  - 开关：设置 → general → enableEmbeddedMacrosEditing（scripts/settings.js L965，【默认 false】）；
+    打开后物品卡标题栏出现按钮（scripts/extensions/titlebar.js L114）。
+  - 编辑器操作的是【该文档自己的】embeddedMacros flag（不是宏合集包副本），
+    新增/删除/保存全部直写 flag（_apply → entity.update({[flagPath]: macros})，embeddedMacros.js L126-129）。
+  - ★ Medkit 【不会】覆盖嵌入宏（medkit-item.js L863-865 显式 mergeObject 保留现有嵌入宏）；
+    【唯一会清掉嵌入宏的路径】= Medkit 里把自动化源选成 NONE（L888 flags.-=chris-premades 全清）或手动删 flags。
+  - ⚠ 但 ItemMedkit.update 会用源文档重建【活动/效果结构】—— 活动级嵌入宏（embeddedActivityMacros）
+    若挂在被重建的活动上（新 id），旧 id 的宏会变孤儿。【物品级嵌入宏不受影响】。
+
+⑦ 最小可跑骨架（Q8，对方未实机验证）—— 「命中 → 豁免失败 → 每回合 1d6 毒素直到豁免成功」
+  前提：物品带 attack 活动 + save 活动（体质豁免，save.dc 配好）。
+  在物品上开嵌入宏编辑器，加【1 个】宏：type = "midi-item"、pass = "rollFinished"、priority = 50。
+  宏体要点（注意：reference 模板串里不能写反引号，DC 用字符串拼接或直接写数字）：
+    if (!workflow.failedSaves.size) return;
+    const saveDC = workflow.activity?.save?.dc?.value ?? 13;   // 取 save 活动 DC，兜底 13
+    for (const target of workflow.failedSaves) { ... }
+      → 给每个失败目标 effectUtils.createEffect(target.actor, effectData, {})
+        effectData = { name, origin: workflow.item.uuid, changes: [...],
+          flags: { 'chris-premades': { embeddedMacros: [ { name:'Poison Tick', type:'combat',
+            pass:'turnStart', macro: '<每回合掷体质豁免；成功 effect.delete()，失败 1d6 毒素>' } ] } } }
+  机制链：rollFinished 建 AE（AE 上再挂 combat/turnStart 嵌入宏）→ 每回合开始 combat 事件
+    收集【效果上的】嵌入宏（combat.js L47 对 effect 收集 getEmbeddedMacros(effect,'combat')）→
+    豁免成功就 effect.delete()（效果没了自然不再触发）。
+    ★ 「直到豁免成功」由宏内 delete 实现，【不需要 DAE specialDuration】。
+  ★ 不需要关联活动 id —— rollFinished 宏对该物品【所有】活动触发，
+    workflow.failedSaves 已经是「命中且豁免失败」集合（savesComplete 在 rollFinished 之前，hooks.js L55/L57）。
+    怕多活动互相干扰，就把宏挂到活动级（embeddedActivityMacros.<activityId>）按活动隔离。
+  ⚠ 两处代价：① DC 若用拼接固化进代码字符串，改 DC 要重存宏；
+    ② 宏内直接 Roll 掷豁免，【不走 midi 的豁免 UI/自动化】—— 想要 midi 标准豁免流程
+    得走引用型宏 + MidiQOL API，那是另一条路。
+
+【本机资料库位置（查 CPR 先看这里，别上网）】
+  01_跑团工具\\FVTT技术资料\\(已瘦身)CPR宇宙使用指南.md（26.4 KB）
+  01_跑团工具\\FVTT技术资料\\模块文档\\Chris Premades (CPR)\\（6 篇：FAQ / Getting-Started / Home / Info / README / _Sidebar）
+  01_跑团工具\\FVTT技术资料\\dnd5e_classpack-cpr-mapping.json（477 条 collection/id/name/identifier/version —— 查 CPR identifier 用它）
+  FVTT-data-dict-v9_1.md 的 §12-§22（CPR 自包含章节：设置依赖 / 通用特性 / 44 条字段目录 / select 全集 / 效果级选项 / 内嵌官方法术 / 自定义宏流程）
+  插件包内置副本：lib/samples/08-法术与特性/dnd5e_classpack-cpr-mapping.json`,
 }
 
 /**
@@ -1404,7 +1656,7 @@ export function registerReferenceTools(REG: (t: { name: string }) => void) {
   const tool: { name: string } & Record<string, unknown> = {
     name: 'foundry_reference',
     description:
-      '内置 dnd5e 5.3.3 结构参考库（本地模板，零 HTTP 延迟，秒回省 token）。**建物品/加自动化/写怪物前先查这里，别再 search+get_entity 拉完整样本怪照抄（一次几十 KB 白花钱）。** 结构模板：weapon=武器物品（伤害骰放 damage.base 铁律）；roll-data=**动态引用 @公式总表**（写任何公式/DC/加值前先查，别写死数字）；save-activity=豁免活动（咬中过豁免中状态）；effect=ActiveEffect 自动化（statuses+changes）；creature=NPC 数值骨架（僵尸样例）；feat=被动特性物品；spell=法术物品；status-list=常用状态 id。效应配方：bonuses=加伤/减益/改动键速查；midi-over-time=持续伤害 OverTime；midi-flags=midi-qol 常用 flags+macroPass 表；other-activity=**活动间绑定 otherActivity**（多活动共存/连带结算/双伤害模型/automationOnly）；probe=**F12 控制台运行时探针**（midi workflow 五面快照，卡面全对但打起来不对时先跑它）；activity-types=**dnd5e 5.3.3 全部 12 种活动类型**（含三个常见误解 + 双形态武器正确做法）；activity-deep=**活动与工作流深层语义**（relevantLevel 等级门槛如何算 / check.dc 是判定线 / transform 变身骨架 / flags.dnd5e.scaling 升环 / 消费 flag 真键是 use.consumed / 活动 uuid 稳定契约 / 读改运行时值的正确时点）；midi-properties=**midiProperties 全部 29 键语义**；daelink=**物品级效果施加链**（命中→豁免→中毒，含 _id 一致性与「必须装 DAE」两条硬约束）；item-macro=物品宏三件套+宏体骨架；aura=光环效果；dae=DAE 主动效果机制（特殊时长/macro.execute/change-key 配方）；conditions=激活条件全集（运算符/变量/示例）；enchant=附魔键值（改物品/行动）+ **附魔活动 schema**（5.3.3 的 riders/restrictions/self）；optional=Optional 可选加值全集；trigger=自动化路由+反应触发/触发行动；overtime-activity=行动版 OverTime（⚠键名未坐实）。工作纪律：iron-rules=开工七铁律（先查证再动手）；pitfalls=高频坑速查（effects 层级/DC 两说/图标 404 等）。',
+      '内置 dnd5e 5.3.3 结构参考库（本地模板，零 HTTP 延迟，秒回省 token）。**建物品/加自动化/写怪物前先查这里，别再 search+get_entity 拉完整样本怪照抄（一次几十 KB 白花钱）。** 结构模板：weapon=武器物品（伤害骰放 damage.base 铁律）；roll-data=**动态引用 @公式总表**（写任何公式/DC/加值前先查，别写死数字）；save-activity=豁免活动（咬中过豁免中状态）；effect=ActiveEffect 自动化（statuses+changes）；creature=NPC 数值骨架（僵尸样例）；feat=被动特性物品；spell=法术物品；status-list=常用状态 id。效应配方：bonuses=加伤/减益/改动键速查；midi-over-time=持续伤害 OverTime；midi-flags=midi-qol 常用 flags+macroPass 表；other-activity=**活动间绑定 otherActivity**（多活动共存/连带结算/双伤害模型/automationOnly）；probe=**F12 控制台运行时探针**（midi workflow 五面快照，卡面全对但打起来不对时先跑它）；activity-types=**dnd5e 5.3.3 全部 12 种活动类型**（含三个常见误解 + 双形态武器正确做法）；activity-deep=**活动与工作流深层语义**（relevantLevel 等级门槛如何算 / check.dc 是判定线 / transform 变身骨架 / flags.dnd5e.scaling 升环 / 消费 flag 真键是 use.consumed / 活动 uuid 稳定契约 / 读改运行时值的正确时点）；midi-properties=**midiProperties 全部 29 键语义**；daelink=**物品级效果施加链**（命中→豁免→中毒，含 _id 一致性与「必须装 DAE」两条硬约束）；item-macro=物品宏三件套+宏体骨架；aura=光环效果；dae=DAE 主动效果机制（特殊时长/macro.execute/change-key 配方）；conditions=激活条件全集（运算符/变量/示例）；enchant=附魔键值（改物品/行动）+ **附魔活动 schema**（5.3.3 的 riders/restrictions/self）；optional=Optional 可选加值全集；trigger=自动化路由+反应触发/触发行动；overtime-activity=行动版 OverTime（⚠键名未坐实）；fx-anim=**特效与动画三件套**（AA 动画 flags / Sequencer 播放链 / TokenMagic 46 种滤镜，含两个易错点：是 .spriteScale() 不是 .scale()、TokenMagic 没有 DND 状态名）；item-fields=**物品字段补遗**（target 9 种模板各自读哪个尺寸字段 / consumption 6 种消耗来源与「池不足抛错阻止使用」/ identified 是纯展示层 / attunement 为 required 时未调谐会抑制全部 AE）；cpr=**CPR（chris-premades）**（通用特性 flags 两段式 / 内嵌官方法术 / 自定义宏 fork 六步 + 宏对象骨架 / ★嵌入式宏 Enable Embedded Macros Editing）。工作纪律：iron-rules=开工七铁律（先查证再动手）；pitfalls=高频坑速查（effects 层级/DC 两说/图标 404 等）。',
     parameters: {
       type: 'object',
       properties: {
