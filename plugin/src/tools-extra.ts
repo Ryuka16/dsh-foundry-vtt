@@ -673,4 +673,103 @@ export function registerExtraTools(h: ExtraHelpers, reg: Reg): void {
   reg(simple(h, 'foundry_player_list',
     '列出玩家/用户简表（GET /players）。',
     'GET', '/players', {}, [], [], []))
+
+  // ═══ 动画/音效检索（2026-09-17 新增，对标 foundry_search_icon）══════════
+  // 起因（实测事故）：AI 给武器配了 AA 动画却没配声音，只写了 sound:{enable:false}。
+  // 用户判断「我感觉是数据库不全加没有强制要求的原因」—— 查证结果：
+  //   · 「数据库不全」**不成立**：jb2a / psfx / blfx 三个包全在，searchFor("sword") 返回 292 条、
+  //     ("fire") 388 条、("psfx") 19 条；AA 自己还有 aaAutorec-melee 120 条带完整 sound 的现成模板。
+  //   · 真问题是**【没有检索入口】**：图标有 foundry_search_icon，动画什么都没有 ——
+  //     那个会话里 AI 为找路径反复调了 8 次 execute_js 去摸索 Sequencer.Database。
+  // 实现：把 Sequencer.Database 包成检索工具（经 /execute-js 转发，世界内求值）。
+  // ⚠️ 依赖世界开启 execute-js（REST API 模块设置），关着的世界返回 400 —— 描述里写了降级路径。
+  reg(h.makeTool(
+    'foundry_search_animation',
+    '动画/音效检索库：在 Sequencer 数据库（jb2a / psfx / blfx 三包）里搜路径，**返回候选给你自己挑**。\n' +
+      '每项含 dbPath（数据库点分路径 —— 填 AA 的 video.customPath / sound.file 用）与 file（真实文件路径 —— 也可直接填）。\n' +
+      '用法：配 AA 动画前先搜一次，把候选看一遍再挑；**不要凭记忆拼路径**（猜错 = 不播 + 卡面裂图）。\n' +
+      '词根换法：longsword → sword、warhammer → hammer、quarterstaff → staff、暗蚀 → necrotic、火焰 → fire、冰冷 → ice。\n' +
+      '⚠️ 库里【没有】D&D 状态名（搜 poisoned / burning 不会有结果）—— 音效走 psfx.* / blfx.sound.*，动画走 jb2a 的招式名（sword / fire / ice / impact…）。\n' +
+      '⚠️ **依赖世界开启 execute-js**；若返回 400 "execute-js is disabled in REST API module settings"，让用户去 REST API 模块设置里打开，或改用 foundry_file_system 浏览 modules/jb2a_patreon/Library 目录（source 传 "data"，path 传 "modules/xxx"）。\n' +
+      '⚠️ AA 的现成模板更省事：用 execute_js 读 game.settings.get("autoanimations","aaAutorec-melee")（120 条）/ "aaAutorec-range"（159 条），全都带完整 sound。',
+    {
+      keyword: { type: 'string', description: '英文关键词（如 sword / fire / necrotic / psfx）。多个词用空格分隔，任一命中即返回' },
+      kind: { type: 'string', enum: ['all', 'video', 'sound'], description: '按文件类型过滤：video 动画 / sound 音效 / all 全部（默认 all）' },
+      limit: { type: 'number', description: '最多返回多少条（默认 30，上限 200）' },
+    },
+    ['keyword'],
+    async (args: Args) => {
+      const kw = typeof args.keyword === 'string' ? args.keyword.trim() : ''
+      if (!kw) return { error: 'keyword 必填' }
+      const limit = Math.min(200, Math.max(1, Number(args.limit ?? 30) || 30))
+      const kind = typeof args.kind === 'string' ? args.kind : 'all'
+      const words = kw.split(/\s+/).filter(Boolean)
+      // kind 过滤必须在扫描【时】就放宽：searchFor("sword") 实测 292 条、("fire") 388 条，
+      // 若只扫前 limit*3 条，这 15~90 条可能清一色是 video —— 要音效的人会拿到空结果，
+      // 明明库里有却搜不到（这是「数据库不全」错觉的来源）。所以按类型搜时扫到 500 条再筛。
+      const scan = kind === 'all' ? limit * 3 : 500
+      const script =
+        'const words = ' + JSON.stringify(words) + ';\n' +
+        'const scan = ' + scan + ';\n' +
+        'const seen = {};\n' +
+        'const out = [];\n' +
+        'for (const w of words) {\n' +
+        '  let hits = [];\n' +
+        '  try { hits = Sequencer.Database.searchFor(w) || []; } catch (err) { continue; }\n' +
+        '  for (const p of hits) {\n' +
+        '    if (seen[p]) continue;\n' +
+        '    seen[p] = 1;\n' +
+        '    let f = ""; let mod = "";\n' +
+        '    try { const ent = Sequencer.Database.getEntry(p); f = (ent && ent.file) || ""; mod = (ent && ent.moduleName) || ""; } catch (err2) {}\n' +
+        '    out.push({ dbPath: p, file: f, module: mod });\n' +
+        '    if (out.length >= scan) break;\n' +
+        '  }\n' +
+        '  if (out.length >= scan) break;\n' +
+        '}\n' +
+        'return { total: out.length, entries: out };\n'
+      let raw: Record<string, unknown>
+      try {
+        // ⚠️ /execute-js 的返回是包一层的：{ success: true, result: <脚本的返回值> }
+        // （实测踩过：直接读 raw.entries 永远是 undefined，页面看着「检索到 0 条」）
+        const env = h.asObject(await h.callRelay('POST', '/execute-js', { body: { script } }))
+        raw = env.result && typeof env.result === 'object' && !Array.isArray(env.result)
+          ? (env.result as Record<string, unknown>)
+          : env
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e)
+        const disabled = /execute-js is disabled/i.test(msg)
+        return {
+          error: true,
+          message: msg,
+          hint: disabled
+            ? '⚠️ 这个世界没开 execute-js，本工具用不了。降级路径：① 让 GM 去 REST API 模块设置里打开；② 改用 foundry_file_system（source:"data"、path:"modules/jb2a_patreon/Library"）浏览真实目录看有哪些动画。'
+            : '调用 relay 失败，先 foundry_list_worlds 确认世界在线。',
+        }
+      }
+      const entries = Array.isArray(raw.entries) ? (raw.entries as Array<Record<string, unknown>>) : []
+      const isSound = (f: string) => /\.(mp3|ogg|wav|m4a|flac|aac)$/i.test(f)
+      const picked = entries
+        .filter((e) => {
+          const f = String(e.file ?? '')
+          if (kind === 'video') return !isSound(f)
+          if (kind === 'sound') return isSound(f)
+          return true
+        })
+        .slice(0, limit)
+      const videoCount = entries.filter((e) => !isSound(String(e.file ?? ''))).length
+      return {
+        keyword: kw,
+        kind,
+        totalScanned: entries.length,
+        videoCount,
+        soundCount: entries.length - videoCount,
+        returned: picked.length,
+        entries: picked,
+        hint:
+          picked.length
+            ? '把 dbPath 或 file 照抄进 flags.autoanimations 的 video.customPath / sound.file（sound 还要补齐 enable/file/volume/delay/startTime/repeat/repeatDelay 七个字段，见 foundry_reference{topic:"fx-anim"}）。'
+            : '这个关键词没搜到（或都被 kind 过滤掉了）。换个更粗的词根重试，例如 longsword→sword、warhammer→hammer；音效试 psfx，动画试 jb2a。',
+      }
+    },
+  ))
 }

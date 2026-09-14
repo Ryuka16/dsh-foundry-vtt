@@ -289,9 +289,17 @@ effects[].changes[].value              OverTime 串内 "saveDC=@attributes.spell
 description.value                      富文本：@UUID[Compendium.包.Item.id]{名字}（可点实体链接）、[[lookup @name lowercase]]、[[/r 3d6]] 内联掷骰、[[/check dex dc=@abilities.con.dc]]
 attributes.ac.formula                  "12 + @abilities.int.mod"（配合 attributes.ac.calc）
 
-【DC 的坑】save.dc.calculation 实际可用取值只有两种：""（自定义，formula 可写数字也可写公式）、"spellcasting"（跟随使用者的施法 DC）。
-⚠️ "flat" 被本资料库两条独立记录判定为不合法（formula 会被忽略、DC 丢回默认值），样本库 98 个 DC 实例中有效使用者为 0。
-最省事的写法：不算数，直接引用 @attributes.spelldc 或 @abilities.con.dc。
+【DC 的坑 · 2026-09-17 源码 + 实测双证】save.dc.calculation 的官方枚举（dnd5e save-sheet 下拉）共 8 项：
+  ""（自定义：用 formula 算 DC）｜"spellcasting"（跟随使用者法术 DC）｜str｜dex｜con｜int｜wis｜cha（用**持用者该属性的 DC**）。
+  ⚠️ "flat" **不在这个枚举里**，但它是 truthy，源码里会走「属性分支」：
+    F:\\FVTT\\data\\systems\\dnd5e\\dnd5e.mjs L24798 prepareFinalData：
+      if ( this.save.dc.calculation ) ability = this.ability; else this.save.dc.value = simplifyBonus(this.save.dc.formula, rollData);
+    L24743-24747 get ability()：不在 CONFIG.DND5E.abilities 里的值（如 flat）→ 回退 this.save.ability.first()
+  ⇒ 写 "flat" 的真实后果 = **formula 被整段跳过，DC 变成持用者 save.ability 第一个属性的 DC**（写 ["con"] 就是体质 DC）。
+    ⚠️ 这不是「DC 丢回默认值」——**8 只是物品没挂到角色身上（this.actor 为空）时的兜底**，很误导人（我据此误报过 DC 坏了）。
+  ⇒ 想要「DC 随持用者变」→ 写官方的 "con" / "dex"，**别用 "flat"**（行为相同，但 flat 依赖 save.ability 的排列顺序，不稳且 UI 选不到）。
+  ⇒ 想要「固定 DC」→ 写 "" + formula:"16"。两种都对，按设计意图选，别混。
+  ⇒ 验证方法：把物品挂到角色身上，execute_js 读 a.save.dc.value。
 
 【公式不生效时的排查顺序】① 是否写进了会被 5.3.3 清洗的字段（典型：activity.damage.parts[].formula 会被清空）② custom.enabled 是否为 true ③ 引用路径是否拼错——F12 打 canvas.tokens.controlled[0].actor.getRollData() 看真实可用键`,
     weapon: `【dnd5e 5.3.3 武器物品模板 · 已验证】
@@ -654,6 +662,13 @@ label=放血（显示名）
     'other-activity': `【活动间绑定 otherActivity · 多活动共存 / 连带结算（源码核查 + 实机验证）】
 一句话：同一 item 上可以放多个「会结算」的活动，**每个活动的 otherActivityId 显式写 "none" 就互不干扰**；不写（attack 默认空串 = 自动探测）就会被 midi 串到别的活动上，一次点击打出双份。
 
+⚠️ **两个活动都留空串会【互相绑定】（2026-09-17 实测，本条最容易漏）**：空串 = 自动探测，它的候选是「同 item 上其他类型合格（possibleOtherActivity）且 otherActivityCompatible 为真的活动」，**只要恰好只有一个候选就绑上去**。
+  ⇒ 两个活动各自把对方当唯一候选时 → A 绑 B、B 绑 A。实测案例《遗嘱执行人》：两个 save 活动（誓约烙印 / 血雾）都留空串，
+    用「血雾」结算时把「誓约烙印」的物品级效果也一起施加到了目标身上（血雾自己的 effects 是空的）。
+  ⇒ 修复：不需要联动的活动**全部显式写 "none"**。注意各类型原生默认：**attack = ""（自动探测）**，check / save / utility = "none"。
+  ⇒ 排查手法（比读原始字段可靠）：execute_js 遍历 item.system.activities.contents，读每个 a.otherActivity —— **getter 返回的是运行期实际解析结果**，
+    绑定成功时是活动对象、未绑定时为 null。只看 otherActivityIdRaw 看不出「谁被谁绑了」。
+
 - otherActivityId 是 **midi-qol 注入的字段，不是 dnd5e 核心**（核心唯一「活动引用活动」的机制是 Forward 活动，module/data/activity/forward-data.mjs 的 activity.id）。它定义在 midi 的 src/module/activities/{Attack,Check,Save,Utility}Activity.ts 活动 schema 顶层。
 - **绑定方向 = 主 → 子**：写在**主活动**顶层，值是**被引用子活动**的 id（或 identifier）。只有 attack / check / save / utility 能当主（Changelog:1246 把该设置从 summon/cast/damage/forward/enchant/heal 上移除了）。
 
@@ -877,7 +892,10 @@ ActiveEffect 关键字段：
 五大病根（反向警示）：臆造优先于查证 / 把资料当实测 / 未验证即交付 / 绕路不复盘 / 教训不闭环。`,
     pitfalls: `【高频坑速查 · 出自用户资料库血泪教训系列 + 本插件实测翻车记录】
 1. effects 层级（多多剑翻车）：save/attack activity 的 effects 是空壳 {_id, onSave:false}，塞 name/statuses/duration 会被 5.3.3 清洗成空。挂状态必须写物品顶层 effects（ActiveEffect 结构）。activity.effects 里每个 effect 带 statuses 的写法是另一个模块语境（§十一），REST 通道写物品时按本插件 weapon/save-activity/effect 模板走。
-2. save.dc 两说：calculation:"flat" 官方合法、多多剑实测落库保留；但用户资料库另记载「flat 被丢回默认 10」（网格构筑师实测）。DC 不生效时改 calculation:"" + formula:"16" 再验。
+2. save.dc.calculation **别写 "flat"**（不在官方 8 项枚举里，见 roll-data 主题「DC 的坑」，2026-09-17 源码+实测双证）。
+   一句话：非空 calculation ⇒ **formula 被跳过**、DC 取持用者属性 DC；空串 ⇒ 才用 formula。
+   ⚠️ 物品躺在世界目录（没有持有者）时 dc.value 读到的是兜底 **8**，**那不是最终值，别据此判定 DC 坏了** —— 我曾这么误报过。
+   要「DC 随持用者变」写 "con"/"dex"；要「固定」写 "" + formula。
 3. activity._id 必须 16 位字母数字（如 dnd5eactivity100），非法值被清洗。
 4. Import Data（FVTT 导入）只认单对象 JSON，不认数组。
 5. 宏 JSON：导入世界宏要删 _id/author 字段。
@@ -1380,19 +1398,43 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
 配套写法（本插件 create_item_minimal 的默认形态）：
   物品级 AE = { transfer:false, statuses:[...], changes:[{key:'flags.midi-qol.OverTime', mode:0, priority:20, value:'turn=start,...'}] }
   持续伤害的结束由 OverTime 的 saveCount=1- 负责，**duration 留全 null（永久）** 才是正确做法 —— 见 midi-over-time 主题。`,
-    'fx-anim': `【特效与动画三件套 · AA / Sequencer / TokenMagic · 2026-09-14 源码级转述（本机无这三个模块源码，未二次复核）】
+    'fx-anim': `【特效与动画三件套 · AA / Sequencer / TokenMagic · 2026-09-17 补齐 AA 完整外壳与 sound 7 字段（世界实测）】
+⚠️ **做武器 / 法术 / 消耗品 / 特性时，动画与声音是标配，不用等用户提。**
+   只配 video 不配 sound = 半成品；AA 的 sound 有 7 个字段，只写 enable:false 等于根本没配
+   （实测事故：AI 给武器配了动画但 sound 只写 {enable:false}，用户发现「没有声音」）。
+
 ① AutoAnimations（模块 id autoanimations，世界内 6.8.1，仓库 theripper93/autoanimations）
-  - 落点：flags.autoanimations，读取顺序【弹药 → 活动 → 物品 → 全局名字匹配】（src/system-handlers/findAnimation.js L19-68）
-  - 最小可抄（走名字匹配）：{ isEnabled:true, isCustomized:false, version:5 }
-  - 按活动区分：活动级 isCustomized:true 时优先用活动自己的配置
-  - midi 的 killAnim:true 为真时不播动画
-  - ⚠ 与 midi otherActivity 的连带活动【没有去重】—— 每个活动各配各播
-  - ⚠ animation 内部键未核实；要精调就在 app 里配好后导出 JSON 照抄
+  - 落点：item 顶层 flags.autoanimations（读取顺序【弹药 → 活动 → 物品 → 全局名字匹配】，src/system-handlers/findAnimation.js L19-68）
+  - **完整外壳（照抄骨架，改 menu 与字段即可）**：
+    {
+      "id": "<随机 uuid>", "label": "<招式名>",
+      "macro": { "enable": false, "playWhen": "0" },
+      "menu": "<melee|range|templatefx|ontoken|preset>",
+      "isEnabled": true, "isCustomized": true, "fromAmmo": false, "version": 5,
+      "primary": {
+        "video": { "dbSection": "melee", "menuType": "weapon", "animation": "sword", "variant": "fire", "color": "red", "enableCustom": false, "customPath": "" },
+        "sound": { "enable": true, "file": "psfx.weapon-attacks.sword.v1", "volume": 0.75, "delay": 0, "startTime": 250, "repeat": 1, "repeatDelay": 250 },
+        "options": { "delay": 0, "elevation": 1000, "isWait": false, "opacity": 1, "repeat": 1, "repeatDelay": 500, "size": 1, "zIndex": 1 }
+      },
+      "secondary": { "enable": false },
+      "soundOnly": { "sound": { "enable": false } },
+      "source": { "enable": false },
+      "target": { "enable": false }
+    }
+  - ★★ **sound 的 7 个字段（缺哪个都可能不响）**：enable(bool) / file(路径) / volume(0.75) / delay(毫秒，延迟播放) / startTime(从音频第几毫秒起播) / repeat(1) / repeatDelay(250)
+    实测真实条目（世界 aaAutorec-melee 挖出）：{ "enable": true, "file": "psfx.weapon-attacks.sword.v1", "volume": 0.75, "delay": 0, "startTime": 250, "repeat": 1, "repeatDelay": 250 }
+  - **video 两种写法都行**：① 走菜单 enableCustom:false + dbSection/menuType/animation/variant/color；② 直引 enableCustom:true + customPath:"jb2a.xxx"（路径从「动画数据库查看器」取，须精确）。
+  - **sound.file 两种写法都行**：数据库路径（psfx.weapon-attacks.sword.v1）或直接文件路径（modules/dnd5e-animations/assets/sounds/Spells/Hum/spell-hum-2.mp3）；也支持通配符（modules/.../Melee_Natural/*）。
+  - 按活动区分：活动级 isCustomized:true 时优先用活动自己的配置。
+  - 五形态要点：melee（primary 挥砍 + secondary/source/target + meleeSwitch 远程切换）/ range（primary 弹道 + secondary 命中爆）/ templatefx（primary 落模板，持续地带设 options.persistent:true + persistType:"attachtemplate"）/ ontoken（primary.options.playOn:"target" 落目标、"source" 落自身）/ preset + presetType:"teleportation"（⚠ start/end 的启用键 AA 拼作 "enabe" 少个 l，照抄勿改）。
+  - ⚠ 与 midi otherActivity 的连带活动【没有去重】—— 每个活动各配各播。midi 的 killAnim:true 为真时不播动画。
+  - ★ **现成可抄（最省事）**：game.settings.get("autoanimations","aaAutorec-melee") 120 条、aaAutorec-range 159 条（158 条带声音）、aaAutorec-aura 1 条 —— 全是带完整 sound 的模板，改个名和路径即可。⚠ aaAutorec-onToken / aaAutorec-template 不是注册设置（读会报 is not a registered game setting）。
 
 ② Sequencer（模块 id sequencer，世界内 3.6.11，仓库 fantasycalendar/FoundryVTT-Sequencer）
   - 播放链：new Sequence() .effect() .file() .atLocation() .spriteScale() .duration() .wait() .play()
   - ⚠【是 .spriteScale() 不是 .scale()】—— 易错点
   - flags.sequencer 存的是【特效宿主文档（场景）】，与物品无关；物品宏里播放序列【不写 flags】
+  - 查数据库：Sequencer.Database.searchFor("sword")；★ Sequencer.Database.entryExists("jb2a.xxx") —— **返回路径字符串 = 存在，返回 undefined = 不存在**（execute_js 实测对照过）
   - ⚠ 文件 404 时的容错行为未核实
 
 ③ TokenMagic（模块 id tokenmagic，世界内 0.7.6.3，仓库 Feu-Secret/Tokenmagic）

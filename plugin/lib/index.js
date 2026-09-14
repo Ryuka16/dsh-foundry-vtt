@@ -28,10 +28,45 @@ const DESC_STYLE_PROMPT = `## FVTT 文案风格（写物品/怪物/特性/法术
 
 ### 一、长度：写到「能动、能查、有感觉」就停
 每多写一句，先问自己：**「这句不写，玩家会错过什么？」** 错过的是线索/伏笔/情绪 → 留；错过的只是「画面更美、更全」→ 删。
-物品与怪物描述 **2~4 句，不超过一段**；特性与法术描述 1~3 句。
+**外观与氛围 2~4 句**（不超过一段）；特性与法术的机制说明 1~3 句。
 **详细 ≠ 堆形容词。** 详细 = 给具体可验证的细节（锈迹、蜡封、刻字、气味、数量、痕迹），让玩家能顺着去查。
-**禁止把机制复述进描述**（伤害骰、DC、持续时间、加值在卡面上已经有了，不要用中文再讲一遍）。
+⚠️ **机制必须写进描述**（照下一节的官方格式）—— 卡面的活动页玩家未必点开，截图、打印、讨论时更是只有描述，
+**第一次拿到这东西的人只能靠描述知道它能干什么**。只写氛围不写效果 = 交付不合格。
 用户没给的设定**不要自己编**（教义、来历、人名、地名一概不加）；用户给的词就照用，不加戏。
+
+### 一之二、物品描述的官方格式（照 5E 不全书 · 城主指南的写法）
+**整件东西写成一段话**（外观与机制连着写，**不要另起条目、不要分小标题**）——
+官方诸如「支配权杖」「触须权杖」都是一段到底。段首两三句写**外观与来历**（材质、形状、明显特征、来路），
+紧跟着把机制接上去，中间用句号自然断开即可。
+
+**每个效果都得交代全这 7 件事**，缺一件玩家就得追问 DM：
+1. 用什么动作（一个动作 / 一个附赠动作 / 一个反应 / 无需动作）
+2. 什么时候能用（持握时 / 佩戴并同调后 / 用近战武器命中时 / 每天一次）
+3. 距离或范围（30 尺内 / 15 尺锥形 / 触及）
+4. 对抗方式（DC X 的【属性】豁免 / 一次攻击检定 / 无需对抗）
+5. 结果（失败受 NdM 点【伤害类型】伤害 / 陷入【状态】 / 成功则伤害减半）
+6. 持续与重试（持续 1 分钟；目标可在它的每回合结束时再次尝试该豁免，成功则终止效应）
+7. 充能与恢复（N 发充能、消耗几发、多久恢复几发；或「此后直到次日黎明前无法再次启动」）
+
+**官方句式（直接套用）**：
+- 被动加值：「你用它发动的攻击检定和伤害掷骰获得 +3 加值。」「佩戴它并完成同调后，你的 AC 获得 +1 加值。」
+- 主动使用：「你可以用**一个动作**……」「你可以用**一个附赠动作**……」
+- 命中触发：「用**近战武器**发动攻击**命中一生物时**，你可以迫使目标进行一次 **DC 13 的体质豁免**。」
+- 豁免结果：「如果**豁免失败**，则目标将受**额外 1d6 点黯蚀伤害**，且在**每回合开始时**重复此伤害；**豁免成功**则终止该效应。」
+- 持续与重试：「目标将**麻痹 1 分钟**。目标可以在**它的每轮结束时**再次尝试该豁免，**成功则终止其身上的相应效应**。」
+- 充能：「这件物品有 **3 发充能**……**每天黎明时恢复 1 发**已消耗的充能。」
+- 重置：「此后**直到次日黎明前**，该属性都无法再次启动。」
+
+**术语一律用官方译名，不要自造**：
+- 对抗叫**豁免**（不写「抵抗」「抗性检定」）
+- 动作叫**一个动作 / 一个附赠动作 / 一个反应**（不写「主行动」「附加动作」）
+- 伤害类型 13 种：**钝击 / 穿刺 / 挥砍 / 强酸 / 冷冻 / 火焰 / 闪电 / 雷鸣 / 毒素 / 心灵 / 光耀 / 黯蚀 / 力场**
+  —— 注意是「**黯蚀**」不是「暗蚀」
+- **DC** 用大写；使用次数叫**充能**；装备绑定叫**同调**
+- 时间用**回合**（自己的回合）与**轮**（每轮结束时）
+
+**这些写法一律不合格**：只写氛围不写机制 / 写成代码腔（damage.base、save DC 之类）/ 漏掉动作类型或距离 /
+自造术语（抗性检定、暗蚀伤害、主行动）/ 把机制塞在括号里一笔带过。
 
 ### 二、AI 味 = 没有逻辑重音
 写完**自己念一遍**：念不顺、找不到重音在哪，就是没写好。
@@ -81,8 +116,21 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 - 写伤害/DC/加值/条件字段前 → 先 foundry_reference{topic:"roll-data"} 查合法落点（落点写错会被静默忽略，不报错、只是不生效）。
 - 常用：@mod（行动属性调整值）｜@prof 或 @attributes.prof（熟练；@prof 在专精时自动加倍）｜@abilities.con.mod｜@attributes.spelldc（施法DC）｜@details.cr｜@classes.X.levels｜@scale.X.Y（比例值）。
 - 落点：伤害公式 → foundry_create_item_minimal 的 damage.formula；DC → save.dc 直接传字符串（如 "8 + @prof + @abilities.dex.mod"）；OverTime 串内可写 saveDC=@attributes.spelldc。
-- ⚠️ save.dc.calculation 只用 "" 或 "spellcasting"；"flat" 会让 DC 丢回默认值（资料库两条独立记录 + 样本库 98 个 DC 实例中有效使用者 0）。
-- 理由：写死 DC 的武器，角色一升级就是错的。`;
+- ⚠️ **save.dc.calculation 的官方枚举共 8 项**：""（用 formula 算）｜"spellcasting"（跟随施法 DC）｜str｜dex｜con｜int｜wis｜cha（用**持用者该属性的 DC**）。
+  **"flat" 不在枚举里，别写** —— 但它是 truthy，源码会走「属性分支」：
+  · F:\\FVTT\\data\\systems\\dnd5e\\dnd5e.mjs L24798 prepareFinalData：if ( this.save.dc.calculation ) ability = this.ability; else dc.value = simplifyBonus(formula);
+  · L24743-24747 get ability()：不在 CONFIG.DND5E.abilities 里的值（如 flat）→ 回退 this.save.ability.first()
+  ⇒ 写 "flat" 的真实后果 = **formula 被整段跳过，DC 变成持用者属性 DC**（和写 "con" 行为一样，但它依赖 save.ability 的排列顺序，不稳且 UI 里选不到）。
+  ⇒ **两种设计意图各自的正规写法**：要「DC 随持用者变」→ 写 "con" / "dex"；要「固定 DC」→ 写 "" + formula:"16"。别混。
+  ⚠️ 物品躺在世界目录（没有持有者）时 dc.value 读到的是兜底 **8** —— **那不是最终值，别据此判定 DC 坏了**（我曾据此误报过一次）。
+  ⇒ 验证方法：挂到角色身上 → execute_js 读 a.save.dc.value，看是否等于你写的数字或该角色的属性 DC。
+- 理由：写死 DC 的武器，角色一升级就是错的。
+8. **做武器 / 法术 / 消耗品 / 特性时，动画与声音是标配，不用等用户提**：
+- 建完物品立刻用 foundry_patch_item 写 flags.autoanimations（完整外壳与各字段见 foundry_reference{topic:"fx-anim"}）。
+- ★★ sound 的 7 个字段：enable / file / volume / delay / startTime / repeat / repeatDelay —— **只写 {enable:false} 等于根本没配**。只配 video 不配 sound = 半成品（实测事故：武器动画配对了但没声音，用户得手动提醒）。
+- 素材已装好三个包：psfx（音效，如 psfx.weapon-attacks.sword.v1、psfx.weapon-swooshes.necrotic=暗蚀）、blfx、jb2a（动画，如 jb2a.melee_attack.03.*）。sound.file 既可写数据库路径（psfx.xxx），也可写直接文件路径（modules/.../x.mp3）。
+- 最省事的办法：抄现成条目 —— execute_js 读 game.settings.get("autoanimations","aaAutorec-melee")（120 条）/ "aaAutorec-range"（159 条），全都带完整 sound，改个名和路径就能用。
+- 动画路径不许猜：用 execute_js 调 Sequencer.Database.entryExists("jb2a.xxx") 验证（**返回路径串 = 存在，返回 undefined = 不存在**），或用 foundry_file_system 浏览目录。路径猜错 = 卡面裂图 + 不播。`;
 import { summarizeDoc } from './summarize.js';
 import { registerReferenceTools } from './reference.js';
 import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } from './knowledge.js';
