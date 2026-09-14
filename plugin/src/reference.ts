@@ -9,6 +9,164 @@
 
 const REFERENCE: Record<string, string> = {
   'activity-deep': `【活动与工作流深层语义 · 2026-09-15 源码级核实（dnd5e release-5.3.3 / midi-qol v13.0.55）】
+⚠️⚠️ 2026-09-17 Q8 已【实机实测】（世界「特醇佳酿」Foundry 13.351，execute_js 建临时 AE 读真实字段后立刻删除）：
+  实测表（duration 输入 → 解析结果）：
+    {seconds:60}                      → type="seconds" ｜ remaining=60 ｜ label="60 秒" ｜ isTemporary=true
+    {rounds:3}                        → type="**turns**" ｜ remaining=**undefined** ｜ isTemporary=true
+    {turns:5}                         → type="turns"     ｜ remaining=undefined ｜ isTemporary=true
+    {rounds:3, turns:2}               → type="turns"     ｜ remaining=undefined ｜ isTemporary=true
+    {seconds:60, rounds:3}            → type="**seconds**" ｜ remaining=60    ｜ ← **seconds 优先！**
+    {combat:null, startRound:2, startTurn:1} → type="none" ｜ remaining=null ｜ label="无"
+    {turns:null, rounds:null, seconds:null}  → type="none" ｜ remaining=null ｜ label="无"
+    （测试时世界内无激活战斗；所有 startTime 都被核心写成当前 worldTime）
+  ⇒ **三条修正（此前文档写的都不准确）**：
+    ① **rounds 与 turns 不是「合成结束点」** —— 实测两者都解析成 type="turns"，核心把回合制统一归为 turns；
+       rounds 与 turns 的内部换算关系【仍需在真实战斗中测】（无战斗时 remaining 直接 undefined，算不出来）。
+    ② **seconds 优先级【高于】rounds** —— 同时给 seconds 和 rounds 时，type 判成 seconds、remaining=60，rounds 被忽略
+       （至少 type/remaining 层面）。⇒ 想用回合制就【绝对不要】同时写 seconds。
+    ③ **没有 combat 引用时，type 直接是 "none"、label「无」**（既不是 seconds 也不是 turns）—— 不是「退化到秒制」。
+  ⇒ 实务结论：要「打 3 轮后消失」写 {rounds:3}（**不要**写 seconds）；战斗中会由 core 按 combat turn 计算 remaining。
+     要「现实时间 60 秒」写 {seconds:60}。两条推断（合成结束点 / 过期是 inactive 还是删除）中，
+     「合成结束点」**【已被实测证伪】**，改按上面 ① 理解。
+⚠️ 2026-09-17 第三批核实补三条（Q4 / Q5 / Q8；Q4 与 Q5 的冲突项已本机 5.2.5 源码实锤）：
+
+▸ Q4 · uses.recovery 的合法值与 formula 语义
+  limitedUsePeriods 【完整 9 键】（config.mjs L1432-1473，本机 5.2.5 dnd5e.mjs L42922 起逐行核对【完全一致】）：
+    lr ｜ sr ｜ day ｜ dawn(formula:true) ｜ dusk(formula:true) ｜ initiative(type:"special")
+    ｜ turnStart(type:"combat") ｜ turnEnd(type:"combat") ｜ turn(type:"combat")
+  第 10 项 recharge 是【recoveryOptions getter 尾部附加的】（L1479-1490），【不在】 limitedUsePeriods 里；
+    uses.max === 1 时 UI 显示为 "Recharge"。
+  recovery schema（uses-field.mjs L21-27）：{ period(initial "lr"), type(initial "recoverAll"), formula(FormulaField) }
+  type 合法值【3 个】（recoverUses L138-180 的分支）：
+    recoverAll → spent = 0 ｜ loseAll → spent = max ｜ formula → 掷 BasicRoll 决定恢复多少
+    （day/dawn/dusk + gritty variant 时额外 alter(7,0,{multiplyNumeric:true})）
+  formula 语义【两种】：day / dawn / dusk 上是【恢复量骰】（掷出多少回多少）；
+    period="recharge" 时是【判定线】（掷出 ≥ 该值才恢复）。
+  ⚠️ sr（短休回复）是【系统原生】，触发点 actor.mjs L2554-2565 —— 短休时 recoverShortRestUses() 对 period==="sr" 的项
+    恢复并 unshift("sr")；长休/新一天同理处理 lr / day+dawn+dusk。【不需要任何模块配合】。
+    我们样本库 sr 命中 0 只是没人用，不是系统不支持。
+
+▸ Q5 · transform 的 settings（合法性 + 一个实锤冲突）
+  schema（transformation-setting.mjs L1-110）：四类 Set（effects / keep / merge / other），
+    initial 取 CONFIG.DND5E.transformation[对应目录] 里 default:true 的键（#initial 在 L60-64，本机 5.2.5 对应 L28431）；
+    另有 minimumAC(FormulaField) / preset(String nullable) / spellLists(Set) / tempFormula(FormulaField) / transformTokens(Boolean initial true)。
+  合法值集 = CONFIG 目录键（config.mjs L3409+）：
+    effects = all / origin / otherOrigin / background / class / feat / equipment / spell（all 会禁用 effects.* 其余项）
+    keep = physical / mental / saves / skills / gearProf / languages / proficiencies / feats / equipment / spells / bio / type / hp / tempHP / resistances / vision / self
+      （saves ↔ merge.saves 互禁；self 会禁用 keep.* + merge.* + minimumAC + tempFormula）
+    merge = saves / skills ｜ other = 空
+  不写 settings 的运行时行为（transform-data.mjs L86-92）：customize:false 时 new TransformationSetting(...) 用默认 initial
+    （即 CONFIG 各目录 default 键）；!customize 时改用 presets[preset] 全套 settings
+    ⇒ 【等效于「用该 preset 的完整配置」，不是「什么都不保留」】。
+  ⚠️ 【实锤冲突】CONFIG 的 transformation.keep 目录里有 equipment 键，但 transformInto（actor.mjs L35428 起）
+    的物品过滤 switch 【不消费它】—— 本机 5.2.5 逐行核对：case "subclass"→keep.class||keep.hp、case "feat"→keep.feats、
+    case "race"→keep.type，其余走 **default: return settings.keep.has("items")**（dnd5e.mjs **L35568**）。
+    全表 30+ 处 keep.has(...) 里【没有任何 keep.has("equipment")】。
+    ⇒ **保留装备加值的生效键是 keep.items，不是 keep.equipment**（后者在 transformInto 里无消费点）。
+  spellLists 的 id 经 dnd5e.registry.spellLists.forType(id) 解析（L115-117），合法形如 subclass:moon / class:druid。
+  运行时消费：keep.self → 全保留（L35447 起）；merge.saves/skills → 熟练取 max（L35518/L35524）；
+    spellLists 有值时按标识符过滤保留法术（L35471 起），keep.spells 只是无 spellLists 时的兜底。
+
+▸ Q8 · Foundry 核心的 ActiveEffect 时长计算 —— 【行级实现未核，明确标注】
+  官方仓库 github.com/foundryvtt/foundryvtt 只有 releases 说明、无运行源码；npm 镜像与第三方仓库均取不到 v12/v13 的
+  client/esmodules/foundry/client/documents/active-effect.mjs。**行号给不出**。以下是官方 API 文档（foundryvtt.com/api v12 client.ActiveEffect）确认的方法语义：
+    updateDuration()      → 把 remaining / label 做成【懒 getter】，仅需要时重算
+    _prepareDuration()    → 返回 { type, duration, remaining, label }
+    _requiresDurationUpdate() → 【双判据】：seconds 制看 worldTime 是否变化；turns 制看 combat turn 是否变化（且目标是 combatant）
+    _getCombatTime(round, turn, nTurns?) → 把「轮+回合」编码成十进制时间码（回合制比较用）
+    getInitialDuration()  → { duration: { startTime } }
+  秒制 vs 回合制的切换判据：duration.combat 有值且目标是 combatant → 回合制；否则秒制（worldTime）。
+  rounds 与 turns 同时给：实现级优先级【未确证】。按 _getCombatTime(round, turn, nTurns) 语义与 DAE 只写 startRound/startTurn 的行为推断：
+    回合制里二者不是二选一，而是【合成结束点】（startRound = 当前轮+rounds、startTurn = 当前回合+turns）。【推断，非确证】
+  过期行为（inactive 还是删除）：核心把过期效果标记 inactive，删除由 DAE 的 expireEffects 负责
+    —— 【分工为推断，待实测】。
+  验证法（三组对照，F12）：对同一效果分别写 {seconds:60} / {rounds:3,turns:2} / {combat,startRound,startTurn}，
+    读 effect.duration.remaining 与 effect.isTemporary 对照即可把上面两条推断升级为实证。
+⚠️ 2026-09-16 第二批源码核实（10 条答复中的 7 条。来源：第三方核 dnd5e release-5.3.3 / midi v13.0.55 / DAE 主分支。
+   本机只有 dnd5e 5.2.5（项目跑 5.3.3）且【无 midi / DAE 源码】，故以下属「转述第三方核验结论」，未二次复核；能本地核的已注明）：
+
+▸ P4 · check.dc 的读取路径
+  check-data.mjs 的 prepareFinalData（L61-74）：calc 非空 → actor.system.abilities[ability].dc ?? 8 + prof（L70-71）；
+  calc 为空 → simplifyBonus(dc.formula, rollData)（L69）；算不出来 → null（L73）。与 save 同构。
+  消费点：check.mjs 的 #rollCheck L94-100 → rollData.target = Number.isFinite(dc) ? dc : this.check.dc.value
+  ⇒ F12 直接读 item.system.activities.get("<id>").check.dc.value（物品 prepare 之后就是具体数值）；宏里读 workflow.activity.check.dc.value。
+
+▸ P5 · duration 三套计时：dnd5e 不参与剩余时长计算
+  dnd5e 5.3.3 的 active-effect.mjs 全文 grep startRound / remaining 的计算逻辑【0 命中】（只有 L449/L1001 的读取）
+  ⇒ 剩余时长完全由 Foundry 核心 v13 决定：【有 combat 引用且 startRound 已记录 → 按战斗回合制；否则按 startTime + seconds 现实时间制】。
+  谁写：startTime 由核心在创建效果时写（Date.now()）；combat / startRound / startTurn 由核心在战斗中创建时记录，
+    且 **DAE 施加 AE 时也显式写**（DAE GMAction.ts L390-396：aeData.duration.startRound = game.combat?.round；startTurn = game.combat?.turn）。
+    dnd5e 5.3.3 自身不写（migration.mjs L1051-1052 只在迁移时把这三项清 null）；midi 不写。
+  seconds 与 rounds/turns 同时给 → 核心按「战斗中 / 非战斗」二选一，不会两套都算；**惯例是二选一**：要 3 回合就写 rounds:3，别写 seconds。
+  无战斗时 rounds 仍有意义（核心按 dnd5e 默认 1 回合 = 6 秒换算成现实时间继续倒计时），但「3 回合」的语义只在战斗内精确。
+  ⇒ 我们的做法（duration 留 null = 永久 + midi OverTime 的 saveCount 控止血）是官方组合，不必给默认秒数 —— 给 60 秒反而会在长战斗里提前消失。
+  F12 验证：const e = game.actors.getName("X").effects.find(e => e.name === "中毒"); e.duration; 推进回合后重读 e.duration.remaining。
+
+▸ P6 · flags.dnd5e.riders = dnd5e 自己维护的【派生缓存】，工具不要主动写
+  谁写：Item5e#preUpdateActivities（module/data/item/templates/activities.mjs L390-414）——
+    任何 system.activities 变更时，从所有 enchant 活动的 effects[].riders.{activity,effect} 汇总成 Set，
+    非空写 flags.dnd5e.riders、空则写 flags.dnd5e.-=riders 删除（**只含 activity / effect 两个键，item 不进 flag**）。
+  谁读：① Activity#isRider（base-activity.mjs L179，item.getFlag("dnd5e","riders.activity")?.includes(id)）→ 编辑器显示；
+        ② **功能性读取**：Actor5e#allApplicableEffects（actor.mjs L360-365）—— riders.effect 里列出的效果【被跳过、不单独生效】
+           （rider 效果由附魔链自己管理）。
+  冲成 {} 的后果：isRider 全 false（编辑器把 rider 活动当普通活动）；actor.mjs L364 的过滤失效（rider 效果若在角色身上会被重复当作适用效果）。
+    **但它是派生缓存，下一次任何 system.activities 更新会自动重算覆盖** ⇒ 一般不持久。
+  ⇒ 工具策略：不要主动写、不要依赖它存在。走 Item.update 且带 system.activities 变更时 dnd5e 自动重算；
+    若更新绕开该路径（直接 patch flags / 只动 effects），自己按同规则补写。
+  ⚠️ 本机核实：样本库 105 个导出件里 riders 命中 **368** 处 ⇒ 字段真实且普遍存在。
+
+▸ P7 · spell 的 prepared：0 / 1 / 2 = 未准备 / 已准备 / 始终准备（本主题原先的推断正确）
+  字段：module/data/item/spell.mjs L53 → prepared: NumberField({required, nullable:false, integer, min:0, initial:0})
+    —— **没有 max 约束**，写 3 也能落库（不报错，UI 按 0/1/2 解释）。
+  语义：CONFIG.DND5E.spellPreparationStates（config.mjs L3148-3161）：0=unprepared、1=prepared、2=always；
+    迁移确认（spell.mjs L301）if (this.prepared === 2) return {mode:"always", prepared:1}。
+  **0 = 未准备**（不是「非准备型」）。是否参与准备计数由施法方式决定：
+    canPrepare（L183-186）= !!CONFIG.DND5E.spellcasting[method]?.prepares；
+    countsPrepared（L226-229）= prepares && level>0 && prepared===1。
+  非准备型方法：施法方式表（config.mjs L3060-3120）里只有 pact、spell 带 prepares:true；atwill / innate / ritual 无
+    ⇒ 这些法术的 prepared 不参与计数、不影响施放（施放门槛是 actor 的槽位）。写 0 或 1 无功能差别。
+  ⚠️ 一个系统简化值得知道：dnd5e 5.3 里【术士法术的 method 也是 "spell"】（系统只有 spell / pact 两种带槽位的方法，且 spell 标了 prepares:true）
+    ⇒ 按系统实际行为，术士法术**也会**显示 prepared 开关并计数。这与规则书「术士不准备法术」不同，是系统简化，不是 bug。
+
+▸ P8 · 检定 / 攻击加值落点：原先列的三个都对，**漏了第四个 —— attack 活动自带 attack.bonus**
+  tool：module/data/item/tool.mjs L54 → bonus: FormulaField({required:true}) —— **存在**，支持 @ 数据绑定；
+    消费在 check.mjs 的检定（tool 匹配时读 item.system.bonus）。
+  攻击加值：attack-data.mjs 的 getAttackData（L260-274）把各部分**全部合进同一个 parts 数组求和**：
+    mod（ability≠none 时）+ prof + **bonus: this.attack.bonus（活动级！）**
+    + weaponMagic（weapon.magicAvailable ? weapon.magicalBonus，需武器带 mgc 属性才计入）
+    + ammoMagic + actorBonus（actor.system.bonuses[actionType].attack）+ situational。
+  ⇒ **system.magicalBonus 与 system.bonuses.mwak.attack 不互斥、不覆盖，是同一次掷骰里的两个加项**；magicalBonus 额外要求 magicAvailable。
+  ⇒ **活动级入口确实有**：attack 活动的 attack.bonus（attack-data.mjs L26，FormulaField）+ 暴击伤害 damage.critical.bonus（L38）。
+    这是攻击唯一的活动级加值入口；check / save / damage 活动没有对应的通用 bonus 字段。
+  （本工具 create_item_minimal 的 toHit 参数正是写进 attack.bonus，位置正确。）
+
+▸ P9 · facility 完整结构（本主题原先只写了 type + level）
+  完整 system 键（module/data/item/facility.mjs 的 defineSchema L36-79，另混入 ActivitiesTemplate + ItemDescriptionTemplate）：
+    building: {built(bool), size("cramped")} ｜ craft: {item(DocumentUUID Item), quantity(1)}
+    defenders: {value[], max} ｜ disabled(bool) ｜ enlargeable(bool) ｜ free(bool)
+    hirelings: {value[], max} ｜ level(initial **5**) ｜ order(str)
+    progress: {value(0), max, order} ｜ size("cramped")
+    trade: {creatures{value[],max}, pending{creatures, operation(buy|sell), stocked, value}, profit, stock{stocked,value,max}}
+    type: {value:"basic", baseItem:false}
+  baseItem:false 的设计意图：其他物品类型的 baseItem 是字符串（指向基础物品、供武器变体继承）；
+    facility 没有「基础物品」概念，它是独立结构体，所以此处用布尔 false 表示「本类型无基础物品维度」。
+  只写 type.value + level：物品能被核心识别（type=facility 已注册于 itemTypes），
+    但建造进度 / 产出 / 贸易等据点工作流会读 progress{value,max,order}、order、trade —— 不写则面板显示未建造、功能空。
+    要「可用」的最小集建议：level + progress{value,max,order} + order + size；craft / defenders / hirelings / trade 是各子系统，不用就不写。
+  ⚠️ 诚实标注（第三方原话）：sheet 对 null 字段的逐项容忍未逐个实测，建议落库后开据点面板过一眼。
+  ⚠️ 本机核实：样本库 105 个导出件里 progress / trade 命中 **0** —— 与我们「只写 type + level」的现状一致，暂无对照样本。
+
+▸ P10 · 多活动「选择活动」弹窗：**没有**「两个都能手动点 + 永不弹窗」的正规设置
+  候选计算：MidiActivityChoiceDialog.getActivities（src/module/apps/MidiActivityChoiceDialog.ts L13-24）——
+    activities.filter(a => a.canUse !== false && !riders.includes(a.id) && !a.midiProperties?.automationOnly && !a.inProgress)。
+    **automationOnly 确实在这一步被过滤**（L18）。
+  弹窗判据：create（L27-34）：0 个 → null（整个使用不掷骰）；1 个 → 直接执行不弹；**2+（或 chooseActivity:true）→ 弹窗**。
+    这个 ActivityChoiceDialog 是 **dnd5e 核心的类**（dnd5e.applications.activity.ActivityChoiceDialog），midi 只是继承它
+    ⇒ **不装 midi 也会弹**（本主题原来只写了 midi 侧，补上这条）。
+  hook 签名确认：asyncHooksCallAll("midi-qol.itemUseActivitySelect", { activities, item })（L22）
+    —— 我们记的 ({activities, item}) 正确；可删数组条目，删到 1 个就不弹。
+  可行变通（社区正规途径）：a) automationOnly:true —— 从候选消失、不再是「手动可点」，但仍是合法活动（otherActivityId 可触发、宏可直接 use()）；
+    b) hook 里把 activities 替换成目标单元素（等于指定默认活动）；c) 宏 / 快捷键直接调 item.system.activities.get(id).use(...)，绕过选择弹窗。
 何时用：写多活动物品、做变身、让效果按等级生效、读/改运行时值。
 
 ▸ relevantLevel（效果等级门槛 · 决定 AE 生不生效）
@@ -592,6 +750,92 @@ DAE 侧 AE 宏走的是【完全不同的 args 世界】，别混用：
 AI 实操：先用 foundry_create_entity{entityType:"Macro", data:{name,type:"script",command}} 建世界宏，再用 foundry_update_entity 改物品 flags；或直接 create_entity 建带完整 flags 的物品。`,
 
   aura: `【光环效果 auraeffects · 出自用户资料库「之前踩过的坑.txt」§光环】
+⚠️⚠️ 2026-09-17 【实机实测】世界「特醇佳酿」Foundry 13.351 + dnd5e 5.3.3 + **Aura Effects 1.5.2**（用户实际装的是 1.5.2，
+   下面引用的「机制」来自对方核的 1.3.4 —— **版本差两个大版本，不能直接外推**）：
+  ✓ 已实证（createEmbeddedDocuments 建源 AE 后立刻读回）：
+    · 传入 changes:[{key:"system.attributes.ac.bonus",mode:2,value:"+1"}] → 读回 **changes: [] 【被清空】**，
+      但 system 里**确实有 stashedChanges / stashedStatuses 两个键** ⇒ 「运行时暂存进 stashed* 再清空顶层」机制成立。
+    · system 实测 **16 个键**（不是对方说的 14）：applyToSelf / bestFormula / canStack / collisionTypes / color /
+      combatOnly / disableOnHidden / distanceFormula / disposition / evaluatePreApply / opacity / overrideName /
+      script / stashedChanges / stashedStatuses / showRadius。
+    · **system.distance getter 求值成功 = 10**（distanceFormula "10"）⇒ 半径求值机制成立。
+    · flags.auraeffects.originalType = "base" 正确保留。
+  ✗ 第一次没复现 → **已查明根因并复现成功**（源码 + 实测双实锤）：
+    ▸ 我第一轮建完 AE 后做了 tok.update({x: tok.x})，**恰好撞上 1.5.2 的 early return**：
+      auras.mjs 的 updateToken（L155 起）在 L178 写着
+        if (("x" in updates) || ("y" in updates) || ("elevation" in updates)) return;
+      ⇒ **位置变化在 1.5.2 里交给 moveToken hook，updateToken 直接退出** —— 同值更新自然什么都不发生。
+    ▸ **1.5.2 的真实 hook 面**（auras.mjs registerHooks，L390-412）：
+      createActiveEffect / deleteActiveEffect → addRemoveEffect
+      createToken / deleteToken / updateToken / **moveToken（1.5.2 主触发）** / updateActiveEffect / deleteActiveEffect
+      renderActiveEffectConfig → injectAuraButton（在 AE 配置页注入「转为光环效果」按钮）
+      可视化层：canvasInit / drawGridLayer / drawToken / destroyToken / refreshToken / initializeLightSources
+    ▸ **1.5.2 已经不用 Region 了**：auras.mjs 全文件搜 canvas.regions / Region **0 命中**，
+      可视化搬到了 auraVisualization.mjs。⇒ 「Region 没自动创建」是【按 1.3.4 思路找错了东西】，不是缺陷。
+    ▸ 前置条件（updateToken L158-167 的顺序）：game.user.id === userId（发起者）→ **game.users.activeGM 必须存在**
+      （否则 ui.notifications.warn("AURAEFFECTS.NoActiveGM") 并 return）→ token.actor 存在。
+    ▸ 送达机制（updateActiveEffect L300-321）：
+      getNearbyTokens(token, radius, {disposition, collisionTypes}) → executeScript(token, target, effect) 逐目标判定
+      → activeGM.query("auraeffects.applyAuraEffects", actorToEffectsMap)（socket query 送达）
+      其中 radius = effect.system.distance（getter 求值 distanceFormula）。
+    ▸ **实测复现**（源 AE：type "auraeffects.aura"、distanceFormula "500"、disposition 0、changes 带 AC+1，
+      挂在场景内 PC「西格蒙德 / PC (2)」上，然后**真移动 token ±80px**）：
+      deliveredCount = 1 → actor "伊莱里伦"、type "base"、origin "Actor.dngPu7Di1tv5DxMB.ActiveEffect.Iktdxww7TgEezgoz"、
+      **changes 带值** [{key:"system.attributes.ac.bonus", value:"+1", mode:2, priority:20}]、statuses []。
+      移回原位 + 删源 AE 后**送达 AE 零残留**。
+    ▸ ✅ **同时实证了对方标为「未验证」的那条**：送达 AE 的 changes **确实带值**（对方原注：属模块设计推断，建议 F12 验证）
+      ⇒ 光环 AE 的 changes 照常写在顶层即可，送达端能拿到。
+
+    · game.modules.get("auraeffects").api 实测只暴露一个方法：**migrateActiveAuras**。
+  ⇒ **结论：1.3.4 的「自动建 Region + 自动送达」在 1.5.2 上未复现**，不能当成事实写进方案。
+     **待用户确认**：你平时在世界里是怎么配光环的？（挂在 actor 上还是 token 上？用模块设置面板还是直接建 AE？）
+     只有你知道实际操作路径 —— 拿到这条才能定位是我建法不对，还是 1.5.2 换了机制。
+⚠️ 以下 1.3.4 机制保留作参考（来源：第三方克隆 Aura Effects v1.3.4 源码核验，本机无该模块源码）：
+⚠️ 2026-09-17 完整可运行骨架 + 机制（来源：第三方克隆 Aura Effects v1.3.4 源码核验；本机无该模块源码，未二次复核）：
+  【挂载位置】挂在 **actor 的 effects 上**（token.actor.effects）。模块在 createToken / updateToken hook（scripts/auras.mjs）
+    里扫 actor effects 中 type === "auraeffects.aura" 的效果，自动建场景 Region 并做 GM 送达。
+    ⇒ **全自动，不需要 active-auras 之类的另一个模块**；但【没有 active GM 时不会生效】（模块自带 checkActiveGM 提示）。
+  骨架（存为 actor 上的 AE）：
+    { "name":"火灵气", "type":"base", "disabled":false, "transfer":false, "statuses":[], "changes":[],
+      "system": { "distanceFormula":"10", "disposition":-1, "applyToSelf":false, "collisionTypes":["move"],
+                  "color":"#ff0000", "opacity":0.5, "showRadius":true, "evaluatePreApply":true,
+                  "overrideName":"", "combatOnly":false, "disableOnHidden":true,
+                  "customCheck":"", "script":"", "bestFormula":"" },
+      "flags": { "auraeffects": { "originalType": "base" } } }
+  【stashedChanges / stashedStatuses 真相】（AuraActiveEffectData.mjs L74-80 的 prepareDerivedData）：
+    运行时把 changes 暂存进 stashedChanges、statuses 暂存进 stashedStatuses，然后**清空顶层 changes / statuses**
+    —— 目的就是让光环 AE 的改动【不会作用在持有者自己身上】（光环的改动是「送达」给别人的）。
+    ⇒ **落库时照常写顶层 changes**（标准 AE 字段）。送达时走 effect.toObject()（queries.mjs L37-55、L57）：
+      送达 AE 是 type = originalType ?? "base"、transfer:false、flags.auraeffects.fromAura = <源 uuid> 的【普通 AE】。
+    ⚠️ 第三方标注：toObject 展开语义属模块设计推断，**建议 F12 验证送达 AE 的 changes 确实带值**。
+  【script 不是每 tick 宏】（helpers.mjs L5-19）：Function("actor","token","sourceToken","rollData", "return Boolean(script)")
+    —— 对【每个候选目标 token 判定一次】（决定它进不进光环），返回 false 就跳过该目标。
+  【bestFormula / evaluatePreApply】（queries.mjs L64-68、helpers.mjs L111-116）：多个同源光环冲突且 canStack:false 时，
+    掷 bestFormula 取最大值择优；evaluatePreApply 控制无 DAE 时是否先在送达前把 changes 公式求值
+    （有 DAE 时总是先替换 ## → @ 再算）。
+  【半径】system.distance getter = new Roll(distanceFormula || "0", ...).evaluateSync(...).total（格数）；
+    Region 半径 = distancePixels * system.distance（helpers.mjs L265）。applyToSelf:false 时持有者自己的 token 被
+    auraShouldApply 排除（helpers.mjs L69）。
+  【「10 尺内敌人每回合 1d4 火伤」怎么写】把 flags.midi-qol.OverTime 直接写在【源 AE】上
+    （turn=end,label=Fire Aura,damageRoll=1d4,damageType=fire,saveAbility=dex,saveDC=13）—— 送达时 flags 整体复制，
+    目标 AE 带上 OverTime 后由 midi 每回合跑。
+    ⚠️ 第三方标注的验证点：源 AE 自己也带 OverTime，midi 对【持有者自己】是否触发需 F12 实测
+    （applyToSelf:false 只影响送达，不影响 midi 遍历自己的 effects）；若会触发，需用 script / DAE specialDuration / 改成送达后再施加来隔离。
+⚠️ 2026-09-16【完整字段表】（来源：第三方克隆 Aura Effects v1.3.4 源码核验；本机无该模块源码，未能二次复核）
+  定义文件 = scripts/AuraActiveEffectData.mjs 的 AuraActiveEffectData#defineSchema()
+  类型名：module.json 注册 documentTypes.ActiveEffect.aura，核心自动加模块前缀
+    → 实际 type = "auraeffects.aura"（auras.mjs L278/326/372 判 effect.type !== "auraeffects.aura"；
+      lang 里是 TYPES.ActiveEffect.auraeffects.aura）⇒ 本主题原来的 type 写法正确。
+  字段（14 个，括号内为 initial）：
+    applyToSelf(true) ｜ distanceFormula("0") 半径公式 ｜ disposition(0：-1 敌 / 0 任意 / 1 友)
+    collisionTypes(Set{light,move,sight,sound}，initial ["move"]) ｜ combatOnly(false) ｜ canStack(false)
+    color(Color) ｜ opacity(0.25) ｜ showRadius(false) ｜ overrideName("") ｜ bestFormula("")
+    evaluatePreApply(false) ｜ disableOnHidden(true) ｜ script(JavaScriptField)
+    stashedChanges(Array{key,value,mode,priority}) ｜ stashedStatuses(Set)
+  distanceFormula 【确实在 system 下】（TypeDataModel 把字段挂到效果的 system 命名空间）✓
+  flags.auraeffects.originalType 【确实存在】（AuraActiveEffectSheet.mjs L35，默认回退 "base"）✓
+  ⚠️ 版本：该模块 master(2.2.1) 已转 Foundry v14（minimum 14）；v13 环境用 1.3.4 是对的。
+  ⚠️ active-auras（Kandashi 的另一模块）用的是 flags.ActiveAuras.isAura 那套，与 auraeffects 无关，别混。
 ⚠️ 2026-09-16 定性（源码核实）：auraeffects 是【独立模块】（Aura Effects，v1.3.4 出现在 midi 的兼容模块清单
 setupModules.ts 里，但 midi 源码【0 处运行时集成】；DAE 也无任何 aura 处理）。
   midi 唯一的光环感知 = OverTime 处理里跳过 effect.flags.ActiveAuras.isAura && ignoreSelf 的源效果
@@ -645,6 +889,21 @@ ActiveEffect 关键字段：
 10. 汉化：系统自带 5e_chn 翻译模块（world-info 已确认 5.3.0），实体名可直接写中文。`,
 
   dae: `【DAE/AE 主动效果机制核心 · 出自用户资料库 data-dict §25/§26/§27】
+⚠️ 2026-09-17 specialDuration 完整白名单（来源：DAE 仓库 src/module/Systems/DAEdnd5e.ts L650-700；回合类两项在 src/module/dae.ts L80-87）：
+  回合类：turnStart ｜ turnEnd ｜ turnStartSource ｜ turnEndSource ｜ combatEnd ｜ joinCombat
+    （后两项【仅当 times-up 模块 active 且版本 > 0.0.9 才注册】）
+  动作类：1Action ｜ "Bonus Action" ｜ "Reaction" ｜ "Turn Action" ｜ 1Spell ｜ 1Attack ｜ 1Hit ｜ 1Critical ｜ 1Fumble ｜ 1Reaction ｜ DamageDealt
+    带参形式：1Attack:<type> ｜ 1Hit:<type>
+    ⚠️ 【"Bonus Action" / "Reaction" / "Turn Action" 三个键名带空格】——写错就静默失效，别自作聪明去掉空格。
+  受击类：isAttacked ｜ isDamaged ｜ isHealed ｜ zeroHP ｜ isHit ｜ isHitCritical
+  掷骰类：isSave ｜ isSaveSuccess ｜ isSaveFailure ｜ isConcentrationSave ｜ isConcentrationSaveFail ｜ isConcentrationSaveSuccess ｜ isCheck ｜ isSkill ｜ isInitiative
+  带参修饰：isSave.<ability> ｜ isSaveSuccess.<ability> ｜ isSaveFailure.<ability> ｜ isCheck.<ability> ｜ isDamaged.<damageType> ｜ isDamaged.healing
+  其他：isMoved ｜ longRest ｜ shortRest ｜ newDay
+  None = 空串 ""（不设特殊时长）
+  触发时机差异：1Attack 只在【攻击动作结算时】清；1Action 在【标准动作完成时】清。
+    midi 的 expireMyEffects 只清 1Action / 1Spell / 1Attack / 1Hit / 1Critical / 1Fumble 六种（Workflow.ts L2729），其余值由 DAE 自身的战斗/受击/掷骰 hook 清。
+  ⚠️ 写白名单外的值：值集是【精确比对】，不匹配则 DAE 永不主动清 ⇒ 效果变永久。
+     此条为【推断】（第三方只定位到值集与 UI 读写，消费端 expire 分支未逐行核），要用就 F12 实测确认。
 ActiveEffect 本身就是 DAE 体系（DAE=Dynamic Active Effects 模块），effects[].changes 之外的进阶能力：
 - 表达式「为假则移除 / 为真则禁用」：changes 外、效果上的 JS 表达式字段，仅支持角色掷骰数据（如 attributes.hp.value < 50 → HP≥50 移除；!!attributes.ac.equippedArmor → 着甲禁用）
 - 持续时间：duration.seconds 自动换算轮数（60秒=10轮）；可填掷骰公式（@abilities.int.mod+2d4 单位秒）；「特殊持续时间」=移动时结束/一次攻击后结束/来源或目标下回合开始等
@@ -680,6 +939,26 @@ ActiveEffect 本身就是 DAE 体系（DAE=Dynamic Active Effects 模块），ef
 ⚠ 怪物「在某条件下才……」的能力几乎都靠这层。`,
 
   enchant: `【附魔键值 · 改物品/行动本身 · 出自用户资料库 data-dict §28】
+⚠️ 2026-09-17 官方样例骨架（来源：dnd5e 官方包 packs/_source/equipment24/weapons/magical/weapon-1-2-or-3.yml L14-60 活动 / L157-190 AE；
+  本机核对 5.2.5：applyEnchantment(profile, item, {...}) 在 dnd5e.mjs L22678、isAppliedEnchantment L21446、hook dnd5e.preApplyEnchantment L22715 ✓）：
+  活动 = { type:"enchant", name, activation{...}, consumption{scaling{allowed:false}, spellSlot:true, targets:[]},
+           description{chatFlavor:""}, duration{units:"inst", concentration:false, override:false},
+           effects:[ { _id:"<aeId>", level:{min:null,max:null}, riders:{activity:[],effect:[],item:[]} } ] }
+  物品顶层 effects[0] = { _id:"<aeId>", name:"Weapon +1", type:"enchantment", disabled:true,
+    changes:[ {key:"system.magicalBonus", mode:4, value:"1", priority:null},
+              {key:"system.rarity", mode:5, value:"uncommon", priority:null},
+              {key:"system.properties", mode:2, value:"mgc", priority:null},
+              {key:"system.description.value", mode:5, value:"<p>+1 魔法武器。</p>", priority:null},
+              {key:"system.price.value", mode:2, value:"400", priority:null} ] }
+  ⚠️ 更正：本主题此前给的骨架用 system.bonuses.mwak.attack / .damage（mode 2）——那是【临时攻击加值】的正规落点，
+     但【+1 魔法武器】的官方标准写法是 **system.magicalBonus（mode 4）** + properties 加 mgc + rarity 提档 + 价格。
+     两者都合法、用途不同：装备本体永久强化用 magicalBonus；buff 式临时加值用 bonuses.*。别混。
+  ⚠️ 活动 effects[]._id 【必须】与物品顶层 effects[]._id 一致（否则附魔弹窗里没有可选 profile）。
+  enchant.self（enchant.mjs 的 _triggerSubsequentActions L121-133）：默认 false → 打开「附魔」弹窗选 profile，可应用到任意物品；
+    true → 跳过选择、直接把 profile 应用到【本物品】（先删已有的同源附魔再建）。
+  附魔 AE 挂哪：applyEnchantment L190 ActiveEffect.create(enchantmentData, { parent: item }) → **挂在目标物品上**，不是角色。
+    F12 查 item.effects.get("<aeId>")；生效标志是 isAppliedEnchantment getter（active-effect.mjs L98，靠 flags.dnd5e.isAppliedEnchantment）。
+    AE 的 transfer 保持 false（物品级原地生效，不往角色传）。
 附魔=特殊主动效果，改【物品】而非角色（与 dae 主题的角色侧键不互通）。格式 activities[<类型>].<路径>（类型=attack/save/heal/damage/utility；base 表通用）或 system.*。
 - 行动通用：activation.type/value；consumption.spellSlot(仅法术)/targets；duration.concentration；target.affects.count/.type/.special(-self 排除自身)；uses.max/spent/recovery；range.units/.value
 - 攻击：attack.ability 覆盖；attack.bonus 加；attack.critical.threshold（降级=覆盖阈值/加=增减）；attack.flat（固定命中）；attack.type.classification/value
@@ -713,7 +992,15 @@ ActiveEffect 本身就是 DAE 体系（DAE=Dynamic Active Effects 模块），ef
   ⚠️ AE 的 type 必须是 "enchantment"，transfer 必须 false（与 daelink 里说的「type 不能是 enchantment」正好相反 ——
      那条说的是**普通效果**不能伪装成附魔，这条说的是**附魔效果**就该是 enchantment，两者别搞混）。
 
-▸ riders 三个 Set（activity / effect / item）= **纯编辑期展示元数据，运行时完全不读**。
+▸ riders 三个 Set（activity / effect / item）= **2026-09-16 更正**：此前写「纯编辑期展示元数据、运行时完全不读」【不准确】。
+  精确说法：**enchant.mjs 的应用主流程不读**（applyEnchantment L147-210 只按 _id 取 AE，全文件 grep riders 0 命中）；
+  但**附魔 AE 创建之后有一个读取点** —— ActiveEffect5e#_onCreate（active-effect.mjs L607-612）在 isAppliedEnchantment 时
+  调用 createRiderEnchantments（L512-576），它读 profile.riders.activity / .effect / .item（L521/L538/L554），
+  把 rider 活动（复制＋新 _id＋flags.dnd5e.dependentOn）、rider 效果（删 _id、origin 继承）、
+  rider 物品（Item5e.createWithContents + flags.dnd5e.enchantment.origin）创建到目标。
+  ⇒ **留空不影响附魔**（结论不变）；空数组与完全不写【等价】（SchemaField 内的 SetField，缺省即空集）；
+    塞不存在的 id 【静默忽略】（L523 continue、L540/L557 filter(_=>_)），不报错、不中断。
+
   依据：enchant-sheet.mjs L44-46 用它渲染「该效果还挂到哪些活动/效果/物品」的选择器，item-sheet.mjs 用它显示 rider 区；
   运行时 enchant.mjs **只按 effects[]._id 克隆 AE 到目标物品**、并把 origin 设为本活动 uuid。
   ⇒ **留空数组不影响任何功能**；要填就填「这个附魔效果同时关联到的」活动 id / 效果 id / 物品 uuid（给 GM 看的归属标注）。
@@ -838,6 +1125,41 @@ flags.midi-qol.optional.<NAME>.*（mode 0 自定义），NAME=唯一串（建议
 ⚠️ 这是【只读探针】：不改判定逻辑、不写任何数据，跑完可以留着直到刷新页面。`,
 
   'activity-types': `【dnd5e 5.3.3 活动类型完整清单 · 出自 config.mjs:4403 DND5E.activityTypes · 共 12 种】
+⚠️ 2026-09-17 第三批源码核实补两条：
+▸ cast 活动（此前本主题只列了名字，没说它干什么）：
+  schema（cast-data.mjs L16-39，构造时 delete schema.effects）：
+    spell: { ability, challenge: { attack:Number, save:Number, override:Boolean }, level:Number,
+             properties: Set(initial ["vocal","somatic","material"]), spellbook: Boolean(initial true),
+             uuid: DocumentUUID(类型约束 Item，且 validate 必须是 spell) }
+    本机核对（5.2.5 dnd5e.mjs L11221 class BaseCastActivityData / L11230 challenge / L11237 spellbook initial true）✓ 结构一致。
+  运行时（cast.mjs 的 use() L71-95）：非嵌入/非 owner 直接 return → 从 actor.sourcedItems.get(spell.uuid)
+    按 flags.dnd5e.cachedFor === relativeUUID 找【缓存的法术副本】→ 找不到就 getCachedSpellData() 在 actor 上
+    createEmbeddedDocuments("Item", ...) 建副本 → spell.use({...usage, legacy:false}, ...) 委托给法术物品自己的 use 流程；
+    首尾各一个 hook：dnd5e.preUseLinkedSpell / dnd5e.postUseLinkedSpell。
+  ⇒ 本质：cast 【自己不结算】，它是「把当前物品当作一个链接法术来施放」的中转站 —— 命中/豁免/伤害全部由
+    spell.uuid 指向的那个法术物品的 activities 结算。displayInSpellbook（canUse && magicAvailable !== false && spell.spellbook）
+    决定它是否出现在法术书里。
+  ⇒ 什么时候需要：普通法术物品【不需要】cast（法术书里点「施放」走的是法术物品自身）；
+    只有「这个物品去调用另一个法术物品」时才需要（法杖/卷轴/特性引用施放）。判据：spell.uuid 必须指向真实法术，
+    spellbook:true 才进法术书候选。
+▸ advancement（class / subclass / race / background / feat 的 system.advancement）：
+  注册表 8 类（config.mjs L4451-4481；本机核对 5.2.5 L45908 表一致）：
+    AbilityScoreImprovement（background/class/race/feat）｜ HitPoints（class）｜ ItemChoice（全部）｜ ItemGrant（全部）
+    ｜ ScaleValue（全部）｜ Size（race）｜ Subclass（class）｜ Trait（全部）
+  基础 schema（base-advancement.mjs L29-42）：{ _id(randomID), type(validate=typeName), configuration(AdvancementDataField),
+    flags, value(AdvancementDataField), level(Number 可选), title(String initial undefined) }
+  ItemGrant（item-grant.mjs L26-34）：items:[{uuid, optional}](required)、optional:Boolean(required)、spell:SpellConfigurationData(nullable, initial null)；
+    VALID_TYPES L43 = feat/spell/consumable/container/equipment/loot/tool/weapon（本机核对 5.2.5 L38375 完全一致）✓
+  最小骨架（class 物品的 system.advancement 数组元素）：
+    { "_id":"<randomId>", "type":"ItemGrant", "level":1, "title":"",
+      "configuration": { "items":[{"uuid":"Compendium.dnd5e.items.<featId>","optional":false}],
+                         "optional":false, "spell":null }, "value":{} }
+  ⚠️ 生效时机：advancement 【不自动生效】，走 AdvancementManager 的【用户交互弹窗】——
+    加物品进 actor（forNewItem，base-actor-sheet.mjs L1905）／升级按钮（forLevelChange L1224）／改选（forModifyChoices，item-sheet.mjs L772）／
+    删物品或删 advancement（item.mjs L1172 / advancement.mjs L262）。apply()（item-grant.mjs L87-123）fromUuid 后 actor.createEmbeddedDocuments("Item",...)。
+    automaticApplicationValue 只在无选择项时返回数据，否则仍需用户确认。
+  ⇒ advancement: [] 空数组【安全、不报错】（item.mjs L127 _needsAdvancementMigration = Array.isArray(...)、L204-208 hasAdvancements 都是兼容性判断）。
+    后果只是：class 升级时不触发任何授予/选择流程 —— 只少功能，不炸。
 ⚠️ 2026-09-16 补【summon 运行时行为】（dnd5e summon.mjs，源码逐条核实）：
   落点 = 当前场景 Token（canvas.scene.createEmbeddedDocuments("Token", tokensData)，L211）；
   Actor 本体 = dnd5e.documents.Actor5e.fetchExisting(uuid, {origin:"flags.dnd5e.summon.origin"})（必要时从 compendium 导入）。
@@ -850,6 +1172,17 @@ flags.midi-qol.optional.<NAME>.*（mode 0 自定义），NAME=唯一串（建议
   ⚠️ summon.mode：【核心只判 "cr"】（弹 CompendiumBrowser、锁 cr.max=simplifyBonus(profile.cr) 与 types 让 GM 选 NPC）；
      【其他任何值 → 直接用 profile.uuid】（L150）。所以本工具写死 mode:"cr" 是对的（官方 Conjure Animals 也是 cr）。
   summon.prompt 控制是否弹确认对话框。
+⚠️ 2026-09-16 补【summon 的 applicableEffects】（本主题此前只说了 bonuses{}）：
+  applicableEffects 【不是一个独立字段】，是活动数据基类的 getter
+    （module/data/activity/base-activity.mjs L135-143：this.effects.filter(level 覆盖 relevantLevel).map(e => e.effect)）。
+  summon-data 没有 override（有 override 的是 enchant/transform，它们返回 null）⇒ summon 走的正是基类实现。
+  ⇒ 想让「召唤物一出来就带 buff / 状态」，就在 summon 活动的 effects[] 里填条目
+    （{_id, level:{min,max}, onSave}，_id 指向物品顶层 AE —— 与普通活动 effects 写法完全一致）。
+  触发点：summon.mjs L481（getChanges 内）actorUpdates.effects.push(...this.applicableEffects.map(e => e.toObject()))
+    —— 把活动 effects[] 引用的 AE 原样复制到召唤物 actor 的 effects。
+  与 bonuses{} 【互补、不重叠】：bonuses 生成数值型临时 AE（ac/hd/hp = OVERRIDE，attackDamage/saveDamage/healing = ADD，
+    getChanges L261-366 区域）；applicableEffects 是原样复制完整 AE（状态、增减益、任意效果）。两个都写不互相覆盖，同 push 进一个数组。
+  ⚠️ 本机核实：我们样本库 105 个导出件里 applicableEffects 命中 0 —— 说明默认不写是常态。
 | 类型 | 核心字段 | 典型场景 | midi 包装 | 会结算(进弹窗候选) |
 | attack  | attack{ability,bonus,critical,flat,type} + damage{parts} | 攻击掷骰 + 伤害 | ✓ | ✓ |
 | save    | save{ability[],dc{calculation,formula}} + damage{onSave,parts} + effects[{_id,onSave}] | 豁免 | ✓ | ✓ |
