@@ -8,6 +8,59 @@
  */
 const REFERENCE = {
     'activity-deep': `【活动与工作流深层语义 · 2026-09-15 源码级核实（dnd5e release-5.3.3 / midi-qol v13.0.55）】
+⚠️ 2026-09-17 第十二批源码核实（活动键名 / use.consumed / damageList，均带行号）：
+【活动键名 = 活动 _id】
+- module/data/fields/activities-field.mjs L97-102：ActivityCollection 构造时 this.set(entry._id, entry)
+  ⇒ system.activities 的 key 就是活动 _id（恒等）。工具 create 路径拿到的随机 16 位键（如 4pdDwJpntYBAM0BQ）就是活动 id。
+- ★ dnd5eactivity000 这种名字【不是 dnd5e 生成的】—— 那是手工/旧模板写法；dnd5e 5.3.3 创建活动时 _id 由 foundry randomID() 生成。
+- 挂宏用 activity.id（= key = _id）。midi 13.0.55 语法（midi-qol.js L11576/L11586）：ItemMacro 或 ActivityMacro-<activityId> 或 Custom；
+  解析在 L12075-12076（resolveActivityMacro）。写法如 [postActiveEffects]ActivityMacro-4pdDwJpntYBAM0BQ。
+- ⚠️ 活动【没有 identifier 字段】（那是物品的）—— 别想用 identifier 挂活动宏。
+- 不依赖 id 的挂法：全局宏名 [postActiveEffects]Macro.我的宏 + 宏体自判 workflow.activity.type / name（最稳）。
+- 「先建壳再 PUT update」不破坏这个契约，只要 update 时保留 _id（activities 是 Map，用原 key 就不会换 id）。
+
+【use.consumed 的正确读法】
+- 读：workflow.chatCard.getFlag("midi-qol", "use.consumed")（或 message.getFlag("midi-qol","use.consumed")）。
+- 类型 = 对象（dnd5e 活动消费的 deltas）。写入点 midi-qol.js L6968-6984（#consumeOtherActivity）。
+- 没消耗就不写：L6956-6958 在 consumed 为空时直接 return ⇒ undefined 或 {} 都等于没消耗。
+- 判断子活动是否消耗：非空对象即消耗过（含 items / attributes 键）。配套 use.otherScaling（L7443，升环消耗）。
+- midi-qol.js L22802-22803 映射为 otherActivityConsumed 工作流数据键。
+- ⚠️ 纠正旧记录：它在 chatCard 上，不在物品上。
+
+【workflow.damageList 的读取时点】
+- 完整数据从 processDamageRoll 起（DamageRollComplete 之后的伤害处理）：midi-qol.js L13770-13807
+  （damageList 清空 → 逐 target setupDamageDetails → callDamageHooksAndMacros L13781 → damageList.push L13783 → L13792 序列化进 damage card）。
+- ⚠️ preDamageRoll 时读不到（damageList 与 damageRolls 都空）。
+- 字段最终值：setupDamageDetails（L11767-11790）hpDamage = hp.value - hpUpdate / tempHPDamage = hp.temp - tempHpUpdate / totalDamage = 两者之和。
+- ★ 要改扣血量：改 damageRolls，【不是】damageList。damageDetails 是从 damageRolls 派生算的，damageList 是应用后结果；
+  push 后再改只影响显示与卡片。正确时点 = 伤害掷骰后、应用前（用 midi-qol.DamageBonus 宏改 wf.damageRolls[i]，或 DamageRollComplete 后改 roll 结果）。
+⚠️ 2026-09-17 第十一批补两条（relevantLevel 非 spell 场景 / recovery 完整语义）
+
+▸ 【非 spell 物品的 relevantLevel】（base-activity.mjs L209-213 分支）
+  分支：spell(level>0) → item.level ｜ 有 visibility.identifier → classes.<id>.levels ｜ 其余 → details.level
+  · 武器 / 奇物 / feat 全走最后一条（details.level）：
+    - effects[].level 留 {min:null,max:null} ⇒ 任何情况都应用（(min ?? -Infinity) <= lv <= (max ?? Infinity)，null 短路）
+    - 物品躺在【世界物品目录】（没有 actor）时 details.level 为 undefined；min/max 为 null 仍短路放行；
+      但若 level 写了非空值而 lv 是 undefined，undefined <= 5 为 false ⇒ 【会被滤掉】（对方标：推断，未实测）
+    ★ 安全做法：模板物品的 effects level 一律留 null。
+    - feat 挂在角色身上：feat 无 level 字段，details.level 同样是 undefined ⇒ 同「留 null 即放行」。
+
+▸ 【uses.recovery 完整语义】（uses-field.mjs recoverUses L135-175）
+  · formula 掷出来的数字 = 【恢复量】（L172 newSpent = clamp(spent - total, 0, max)），不是判定线。
+  · gritty restVariant 时，day/dawn/dusk 的公式【×7】（L169-171 roll.alter(7,0,{multiplyNumeric:true})）。
+  · ★【dawn 与 day 核心没有差别】—— 核心没有独立黎明事件：day/dawn/dusk 在【长休恢复时一起触发】
+    （actor.mjs L2557：recovery.unshift("day","dawn","dusk")），按顺序匹配第一个 profile，功能等价；
+    dawn 的「黎明」语义要靠 times-up 这类模块。
+  · 战斗类 period（combat.mjs）：combatStart → {encounter:true}（L23）；回合切换 → {turn,turnEnd,turnStart}（L32）；
+    initiative 更新 → {initiative: combatant}（L65）；turnEnd → {turnEnd: combatant}（L114）；
+    round 推进 → {round:true}（L122）；turnStart → {turn: combatant, turnStart: combatant}（L130）
+    → _recoverUses（L165-173）→ combatant.recoverCombatUses（combatant.mjs L85-103）→ item.system.recoverUses。
+    【只在战斗回合切换时触发】。
+  · type 三值：recoverAll（spent=0）/ loseAll（spent=max）/ formula（掷出恢复量，L160）。
+  · recharge 是特例：period=recharge → formula 缺省 "6" + type 强制 recoverAll（L49-52），
+    掷骰判定走单独的 rollRecharge（L64 绑定；activities.mjs L338 在 turnStart 时对 NPC 调，受 autoRecharge 设置控制）
+    —— 掷 1d6 ≥ 值即恢复（rechargeOptions 2-6，L76-82）。
+  · period 写了但 type 没写 → 默认 recoverAll（schema initial:"recoverAll" 且 blank:false，L24）。
 ⚠️ 2026-09-16 补两条（第四批源码级转述）：
 ① 【要「到底扣了多少血」就读 damageList】workflow.damageList（Workflow.ts L590）——
    preTargetDamageApplication 起有数据，每目标一项
@@ -402,6 +455,16 @@ attributes.ac.formula                  "12 + @abilities.int.mod"（配合 attrib
 - type.value 用官方简称（simpleM/simpleR/martialM/martialR/natural）；identifier 英文小写唯一 id（如 saw-cleaver）；系统自动生成 _id/_stats/folder/ownership，不要手写
 - img 用图标真源（grep 资料库 fvtt-icon-paths.txt 或照抄示例）`,
     'save-activity': `【5.3.3 豁免活动完整模板 · 实测成功（锯肉刀流血：命中→DC11 体质豁免→失败流血）】
+⚠️ 2026-09-17 补【活动 effects[].level{min,max} 到底怎么填】（第十一批源码核实）：
+  · level 是「等级门槛」—— 只对满足 (level.min ?? -Infinity) <= relevantLevel <= (level.max ?? Infinity) 的角色生效。
+  · 【留空 = 任何等级都应用】：写 {} 或 {min:null,max:null} 都可以（null 短路放行）。本模板给的就是 "level": {}。
+  · relevantLevel 怎么算（base-activity.mjs L209-213）：spell(level>0) → item.level ｜ 有 visibility.identifier → classes.<id>.levels
+    ｜ 其余（武器 / 奇物 / feat 等）→ details.level。
+  · ★ 对武器 / 奇物 / feat 这类【没有 level 字段】的物品：details.level 是 undefined。
+    此时若 level 填了非空值，undefined <= 5 为 false ⇒ 【效果被静默过滤掉，不报错】。
+    （对方标注：该条为推断、未实测；但方向安全 —— 所以模板物品一律留空。）
+  · ⇒ 规矩：除非明确要「X 级以上才生效」，level 一律写 {} 或 {min:null,max:null}；
+    不要写 {min:1,max:20} 这类值。
 攻击命中后目标过豁免、失败中状态。三件套缺一不可：
 
 ① attack 活动必须设 "otherActivityId": "dnd5eactivity100" 指向 save 活动（漏了 = 攻击不触发豁免，多多剑翻车点之一）
@@ -720,6 +783,30 @@ label=放血（显示名）
 
 ⚠️ 出处：以上源码结论来自外部对 tposney/midi-qol v13（commit 6b10be5）与 foundryvtt/dnd5e 4.0.x–6.0.x 的逐行核查，叠加本机《挽歌》（attack + save 同 item，两者显式 "none"）实机点击验证。**本机未独立复核每一项源码坐标** —— 键名与默认值按本条引用，行号属外部报告。`,
     'item-macro': `【物品宏三件套 · 出自用户资料库「midi的物品宏使用指南」，磁轭手铳金标准实测通过】
+⚠️ 2026-09-17 补【跨物品触发：A 物品的效果能不能被 B 物品的攻击带出来】—— 结论：没有内建通道。
+背景：戒指/护符这类「本身不会被 use」的物品，想在【用别的武器命中时】触发自己，四条路逐条判定：
+
+  ① 武器宏查装备（★社区标准做法，推荐）
+     在武器的 onUseMacroName 宏里（pass 用 postActiveEffects，即命中结算后）：
+       workflow.actor.items.find(i => i.type === "equipment" && 你的判据)
+     找到戒指后，自己在宏里掷豁免、自己施加效果。
+     代价：豁免与施加要全手写；每把武器都要挂宏（可用武器模板或 Macro 名字复用）。
+
+  ② AE 宏（flags.dae.macro / macro.execute）—— ★不行，时机错
+     DAE 的宏触发点 = 【AE 创建/更新那一刻】（dae.ts L555-562：createActiveEffectHook 检测 changes 含
+     macro.execute / macro.itemMacro / macro.actorUpdate / macro.activityMacro 前缀 → actionQueue.add(daeMacro,"on",...)）。
+     戒指的 transferred AE 是【装备时创建一次】，不是每次命中 ⇒ 挂在它上面的宏只在戴上/摘下时跑。
+
+  ③ 全局 hook 宏（备选）
+     midi-qol.AttackRollComplete / RollComplete 里，workflow.actor.items 【能拿到攻击者的全部物品】，
+     自己过滤戒指。一个宏管所有攻击，但要自判命中/豁免/施加。
+
+  ④ triggeredActivityId / onUseMacroName 跨物品 —— 不行
+     triggeredActivityId 只在【同一物品的活动链】内触发；
+     onUseMacroName 的 macroName 虽支持任意 uuid（apps/Item.ts L29-51，正则 (?:\[(?<option>.*?)\])?(?<macroName>.*)），
+     但【触发条件仍是当前物品被 use】—— 戒指不被 use 就不跑。
+
+  一句话：要「装备即生效的被动监听命中」，只能走 ①（挂武器）或 ③（全局 hook），②④ 无解。
 ⚠️ 2026-09-16 v13 宏契约改版（本主题旧文里「args[0]=macroPass」的说法已过时，以本节为准）：
 所有 midi 调的宏（物品宏/世界宏/组合包宏/itemacro/DAE itemMacro/DAE activityMacro）统一走
 callMacros → callMacro → executeMacroWithScope（Workflow.ts L4262/L4489）。v13 是【命名 scope + args[0]=macroData】：
@@ -953,6 +1040,24 @@ ActiveEffect 本身就是 DAE 体系（DAE=Dynamic Active Effects 模块），ef
 逐字示例（直接抄改）：target.attributes.hp.value < target.attributes.hp.max/2（半血以下）；["lg","med","sm","tiny"].includes(target.traits.size)；target.statuses.frightened（目标被恐慌）；target.attributes.hp.value != target.attributes.hp.max（已损血）；target.items.some(i => i.name=="某物品")；["shortbow","longbow"].includes(workflow.item.system.type?.baseItem)
 ⚠ 怪物「在某条件下才……」的能力几乎都靠这层。`,
     enchant: `【附魔键值 · 改物品/行动本身 · 出自用户资料库 data-dict §28】
+⚠️ 2026-09-17 第十二批源码核实（R4 附魔的解除与清理）：
+【什么会解除】
+- 删除附魔 AE（UI 移除附魔）→ _onDelete（active-effect.mjs L668-677）：getDependents().forEach(delete)
+  （级联删 riders）+ enchantments.untrack。
+- 重复附魔 → enchant.mjs L125 existingEnchantment?.delete()（旧 AE 被删，走上面链条）。
+- 删除物品 → item.mjs L1159：删物品时 effects.forEach(e => e.getDependents().forEach(delete))（riders 先清）。
+【什么【不会】解除】
+- 卸下装备 / 解除同调：不会 —— 附魔 AE 挂在【物品自身】，与装备/同调无关。
+- 删除附魔活动 / 删除源物品：【不会自动清已应用的附魔 AE】（AE 的 origin 指向活动 uuid，活动删了就悬空 → 孤儿）。
+【flags.dnd5e.dependentOn】
+- 注册链 module/documents/mixins/dependent.mjs L13-21（prepareData 时 registry.dependents.track(dependentOn, this)）；
+  反向查询 registry.mjs L30-52 DependentsRegistry.get(effect)。用途 = 删父文档时级联删除。
+- riders 复制出的活动/效果/物品都带它（L525 / L548 / L557）。
+【孤儿清单（推断，未逐项实测）】
+- 最可能留的孤儿 = 附魔活动或源物品被删后，目标物品上的附魔 AE 残留（isAppliedEnchantment 仍 true，
+  origin?.canEnchant 在 origin 解析失败时不报错）→ 卡面显示已附魔但没法重算或解除。
+- riders 不会孤儿（dependentOn 保证级联）。
+- 处理思路：删附魔活动前，先把 item.effects 里 origin 指向该活动的 AE 删掉。
 ⚠️ 2026-09-17 官方样例骨架（来源：dnd5e 官方包 packs/_source/equipment24/weapons/magical/weapon-1-2-or-3.yml L14-60 活动 / L157-190 AE；
   本机核对 5.2.5：applyEnchantment(profile, item, {...}) 在 dnd5e.mjs L22678、isAppliedEnchantment L21446、hook dnd5e.preApplyEnchantment L22715 ✓）：
   活动 = { type:"enchant", name, activation{...}, consumption{scaling{allowed:false}, spellSlot:true, targets:[]},
@@ -1134,6 +1239,32 @@ flags.midi-qol.optional.<NAME>.*（mode 0 自定义），NAME=唯一串（建议
 核心入口就一个：MidiQOL.Workflow.getWorkflow(<chatMessageUuid>)，上面这些字段全在 v13 的 Workflow 实例上。
 ⚠️ 这是【只读探针】：不改判定逻辑、不写任何数据，跑完可以留着直到刷新页面。`,
     'activity-types': `【dnd5e 5.3.3 活动类型完整清单 · 出自 config.mjs:4403 DND5E.activityTypes · 共 12 种】
+⚠️ 2026-09-17 第十一批补：cast 到底要不要用 + summon 运行时
+
+▸ 【spell 不放 cast 行不行】—— 行，且我们的工具就是这么建的（主活动 = damage/save/attack），已确认正确：
+  · 法术书显示靠 type:"spell" + system.preparation（不依赖 cast）
+  · 点击施放 = 主活动 use；消耗法术位 = 活动 consumption.spellSlot；升环 = 施放配置改 item.level + consumption.scaling
+  · cast 只是【可选增强】：额外提供 challenge override、activation/duration/range/target override、spell.ability，
+    以及移除 properties（getSpellChanges，cast.mjs L149-180）
+  · 官方 cast.mjs 注释原文就是 "casting a spell from another item"（L65-70），且 cast.use 只在 item.isEmbedded 时跑、
+    会 clone 目标法术建副本再 use（L92-94、L118-139）
+  · 官方 SRD fireball.yml 的 packs/_source 里【没有 activities 字段】（实测 L1-60）—— 活动由编译管道生成（管道不在系统仓库）。
+    对方明标【推断】：官方法术自结算靠主活动，cast 用于卷轴/魔器/法杖里的「链接施放」。
+  · 加了 cast 后【原 damage 活动保留不会重复】（cast 委托副本，副本走自己的主活动）。
+  · cast.spell.level 与 system.level 【取 max】（cast.mjs L194），不用一致；不填则用原法术等级。
+
+▸ 【summon 运行时】（summon.mjs）
+  · profiles[].count 支持公式：new Roll(profile.count || "1", rollData)（L504-507），
+    rollData = {...this.getRollData(), summon: actor.getRollData()}（L264）
+    ⇒ 可用变量 = 施法者物品/actor 的 rollData（@item.level / @mod / @prof / @abilities.* / @classes.*.levels / @scale.*）+ @summon.*
+  · profiles 多条时【只取当前选中的那一条】，按 parseInt(count.total) 填多个 token 位（L506-507）—— 不是每条都召唤。
+  · 落点 = 【当前场景】（canvas.scene.createEmbeddedDocuments("Token", ...) L217-221）；施法者不在任何场景会失败（推断，未实测）。
+  · bonuses 六字段（getChanges L261+）：ac → 加 AC（L299-315）；hd → 调整 NPC HD（L322-335）；
+    ★hp → 【加上】（bonus effect，L341-366），不是「设为」—— 本主题旧文写 OVERRIDE 是错的，已更正；
+    attackDamage / saveDamage / healing（L391-410）→ replaceFormulaData 后加进【召唤物自己物品】的 system.damage.bonus（ADD），
+    且只加给有对应活动的物品（hasAttack→attackDamage / hasSave→saveDamage / isHealing→healing，L398-401）。
+  · 控制权：召唤者【必须是模板 actor 的 owner】（L162-164 否则 throw）；
+    token 的 linked/unlinked 由模板 actor 的 prototypeToken.actorLink 决定（getTokenData L530）。
 ⚠️ 2026-09-17 第三批源码核实补两条：
 ▸ cast 活动（此前本主题只列了名字，没说它干什么）：
   schema（cast-data.mjs L16-39，构造时 delete schema.effects）：
@@ -1399,6 +1530,79 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
   物品级 AE = { transfer:false, statuses:[...], changes:[{key:'flags.midi-qol.OverTime', mode:0, priority:20, value:'turn=start,...'}] }
   持续伤害的结束由 OverTime 的 saveCount=1- 负责，**duration 留全 null（永久）** 才是正确做法 —— 见 midi-over-time 主题。`,
     'fx-anim': `【特效与动画三件套 · AA / Sequencer / TokenMagic · 2026-09-17 补齐 AA 完整外壳与 sound 7 字段（世界实测）】
+⚠️ 2026-09-17 第十二批源码核实（AA 6.8.1 / TokenMagic 0.7.6.3）：
+【一个物品多个活动，各播各的动画与声音】
+- 两处都能挂 flags.autoanimations，【活动级优先】。读取点 aa-dnd5e.js 监听 dnd5e.rollAttackV2 / rollDamageV2 / postUseActivity，
+  把 activity 对象传进 getRequiredData({item, actor, activity, ...})。
+- findAnimation.js L19-20：item 与 activity 各读各的 flags。
+- 优先级（findAnimation.js L60-75）：① itemFlags.isCustomized → 用 itemFlags ② activityFlags?.isCustomized → 用 activityFlags（L67-68）
+  ③ 否则 itemFlags.isCustomized → itemFlags ④ 否则名字匹配：overrideNames（= activity.name，L72 / aa-dnd5e.js L102）→ itemName → extraNames。
+  ⇒ 活动级设了 isCustomized:true 就压过物品级。
+- 判定依据 = isCustomized 标记 + 名字匹配（rinseName 去空格小写）；【不是】活动 id，也【不是】activity.type（type 只用于跳过逻辑，aa-dnd5e.js L94-98）。
+- ★ 只写一份物品级 flags ⇒ 两个活动都播同一个动画。要区分必须【每个活动各写一份】。
+- 活动级最小结构（照抄）：version 5 / isEnabled true / isCustomized true / fromAmmo false / animType "melee" / animation "slash" /
+  variant "01" / color "blue" / options{menuType "weapon", enableCustom false} / sound{a01{enable true, file "...", volume 0.5, delay 100}}。
+- 禁用：activity 的 killAnim 或 isEnabled（L53）→ item 的（L56），任一禁用即不播；另有 [noaa] 写在 chatFlavor 里可跳过。
+
+【TokenMagic 多状态共存】
+- 多滤镜可并存：addUpdateFilters（tokenmagic.js L226-300）维护 getFlag('tokenmagic','filters') 数组，无硬上限（上限是渲染性能）。
+- ★ 两个 ddTint 不是覆盖、是【视觉叠加】（匹配逻辑 L254：只有 filterId 与 filterType 都相同才走「更新」，否则新建独立实例 → 颜色混合，绿+红→黄褐）。
+  正确做法：每个状态【独立 filterId + 尽量用不同 filterType】。
+- filterId = 自定义标识（不传自动 randomID L275-276）；同 filterId + filterType 再 addUpdateFilters = 更新参数而非新增实例。
+- 精确删：deleteFilters(placeable, filterId, filterType, filterInternalId)（L439-470，各参可选、AND 匹配）；
+  ⚠️ 只传 filterId（不传 type）会删该 id 下所有类型。
+- 一次清干净：TokenMagic.deleteFilters(token) 三参全空 → 清空该 token 全部滤镜（L447-450）。
+
+【AA 音效与 Sequencer 音效会重叠】
+- ★ 会同时播，【无互斥机制】：AA sound 走自己的动画流程（DataSanitizer.js L102-118 setSound 生成 seq.sound()）；
+  宏里的 Sequencer 音效独立播放 —— 两通道互不知道。
+- 分工原则：一个特效只在一处配声音。AA 管画面就【别写 sound】（flags 里整块不写或 enable:false），音效放宏里；反之亦然。
+- 延迟：AA 的 options.delay 会同时推后动画与音效（isWait=false 时）；宏里的音效可用 seq.delay() 单独对齐命中时机。
+⚠️ 2026-09-17 第十一批源码核实（AA 菜单 / options 全键 / Sequencer / TokenMagic，均带行号）：
+
+▸ AA 走菜单（enableCustom:false）的五个字段 —— 我此前只会用 customPath 直引，菜单这条路没测过：
+  五层结构 = dbSection → menuType → animation → variant → color（jb2a-menu-options.js L12-110）
+  · 菜单集（section）只有 5 个：range / return / melee / static / templatefx（L22）
+  · animation 的值域 = 数据库 jb2a[dbSection][menuType] 下的真实键（L29-48），不是 autorec 全集
+  · dbSection = 顶层集，menuType = 该集下的类型键（如 melee 下的 weapon）
+  · variant 值域 = jb2a[section][type][animation] 下的键（L60-78），"01" 与 "regular" 都是真实键
+  · 填错的下场：build-filepath.js L19-21 validateVideoPath 失败 → L46 getCleanProperty 尝试修正 menuType
+    → L49-51 getEntry(dbPath,{softFail:true}) 仍查不到 → return false。【静默不播，无报错】—— 配错动画不报错，很难查。
+  · 菜单 vs customPath：都走 buildFile（DataSanitizer.js L121-127），最终差别只有「文件对不对」——
+    菜单经 getEntry 解析成真实视频文件（L50-51），customPath 直接 {file:customPath}（L10）；
+    播放参数（缩放/锚点/延迟）不因路径方式不同，它们由 options 控制。
+  · 另：static/templatefx 需要 getTruePath（L124），melee/range 可 returnable（L125）。
+
+▸ AA primary.options 完整键表（DataSanitizer.js setPrimaryOptions L141-185）：
+  melee 15 键：contrast 0 / delay 0 / elevation 1000 / isAbsolute false / isWait false / opacity 1 /
+    playbackRate 1 / repeat 1 / repeatDelay 1 / saturation 0 / size 1 / tint false / tintColor "#FFFFFF" / zIndex 1
+  range 额外 6 键：animationSource false / fakeLocation（handler 提供）/ isReturning false / onlyX false /
+    randomOffset false / reverse false
+  ⚠️ sound 的 repeatDelay 默认 250（L68），与动画的 repeatDelay 1 不同 —— 别抄混。
+  ⚠️ repeat 在 range 会被 handler.systemData.overrideRepeat 覆盖（L170）。
+  · isWait 语义（L102-104）：false 时音效延迟叠加 delay；true 时音效等动画播完。
+  · ★ elevation 默认 1000 是 Sequencer 的【绝对高度】（0=地面，1000=屏幕上方），不是「相对 token 抬高 1000」；
+    isAbsolute（L148）切换：false = 相对目标高度叠加。此前记录含糊，以本条为准。
+
+▸ Sequencer 在物品宏里（此前只有概念，未实测）：
+  · 【不用写 flags.sequencer】—— 它是 Sequencer 自己的特效宿主/数据库配置，与「宏里 new Sequence() 播放」无关，
+    不写无副作用。特效跟不跟 token 由 atLocation/attachTo 决定，切场景残留由 Sequencer 场景清理管理。
+  · 定位三选一：atLocation(template) / atLocation({x,y})（traits/location.js L15-21 校验 object/string/placeable/document）
+    / attachTo(token)（跟随目标移动）。目标无效 → 直接抛错（L15-18）。
+  · ★ .wait() 与 .duration() 会阻塞：Sequence.play() 返回 Promise，而 midi 宏是被 await 的 ——
+    宏里 await seq.play() 会【拖住整个 workflow】。不想阻塞就别 await（裸调或 .then()）；只有必须等特效放完才 await。
+  · 文件 404：sequencer-file.js L100-108 → console.warn(...has an incorrect file path...) + isValid=false
+    → 【不抛错、静默跳过、只打控制台警告】；批量配错会每条一个 warn 刷爆控制台。
+  · 与 AA 是不同播放通道、互不干扰，但会叠在同一层 —— 自己管 zIndex/elevation 免得互相遮挡。
+
+▸ ★ TokenMagic 状态映射（说实话：46 种 filterType 里【没有 DnD 状态名】，多数状态没有专用滤镜）：
+  中毒 → ddTint + tint 0x00ff00（社区惯例）｜灼烧 → ddFlames（内置）｜流血 → ddTint + 红
+  麻痹 / 石化 → ddTint + 灰或石色（可叠低 alpha）｜隐形 → ddInvisibility 类（内置）｜魅惑 → ddTint + 粉或紫
+  昏迷 → ddTint + 暗灰｜目盲 → ddTint + 白
+  【无合适滤镜、不要硬凑】：耳聋 / 恐慌 / 束缚 / 擒抱 / 加速 / 减速 / 悬浮 / 飞行
+  · 性能：全屏/大面积/模糊类（ddFog、blur、扭曲类）最吃性能；
+    一次给 20 个 NPC 挂滤镜 = 每个 token 独立 WebGL 渲染目标，大概率卡。建议先用轻量 tint 测一轮，重滤镜只给关键目标。
+  · 打完要移除：宏里记下 filterId，postDamageRoll 后 TokenMagic.deleteFilters(token, filterId)。
 ⚠️ **做武器 / 法术 / 消耗品 / 特性时，动画与声音是标配，不用等用户提。**
    只配 video 不配 sound = 半成品；AA 的 sound 有 7 个字段，只写 enable:false 等于根本没配
    （实测事故：AI 给武器配了动画但 sound 只写 {enable:false}，用户发现「没有声音」）。
@@ -1445,6 +1649,28 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
          TokenMagic.deleteFilters(token, filterId, filterType, filterInternalId)
   - 要写 token 级 flags 请用 foundry_update_entity（token 文档）或 execute_js，不要用改物品的 flags 参数`,
     'item-fields': `【物品字段补遗 · target / consumption / 未鉴定 / 同调 · 2026-09-14 源码级转述】
+⚠️ 2026-09-17 补：描述富文本（system.description.value 里能用什么）—— dnd5e 5.3.3 module/enrichers.mjs L11-58 注册三组，另加核心 v13 两个：
+【dnd5e 自己注册的】（L13-18，写法 = 双方括号 + 斜杠 + 类型 + 配置，后可选跟 {显示文字}）
+  /attack  /check  /save  /damage  /heal  /item  /skill  /tool  /concentration  /award
+  /lookup（查 SRD 条目，如 类别 + 关键字）/ /language（L23-26）
+  &Reference[...]（L29-33）
+【核心 Foundry v13 提供】
+  @UUID[Item.xxx]{显示名}（DocumentLinkEnricher，任意文档类型）
+  /r 3d6 与 /roll /gmroll /blindroll（RollEnricher，同样双方括号包起来）
+【有效例子（照抄）】
+  @UUID[Item.abcdefghijkl]{+1 长剑}
+  双方括号 /r 3d6 后跟 {掷 3d6}
+  双方括号 /check dex 12 后跟 {敏捷检定}
+  双方括号 /save dex 14 后跟 {豁免}
+  双方括号 /lookup 规则 擒抱
+【写错会怎样】
+  不匹配任何 enricher 正则 → 原样显示为纯文本，【不抛错】。所以描述里写错只是难看，不会炸。
+【@UUID 点击行为】
+  渲染成文档链接，点击在侧栏打开该物品/法术；玩家需有该文档的查看权限（Observe 以上），无权限显示为不可点的样式。
+【可点的掷骰 / 使用按钮（最正规的一种）】
+  dnd5e 的 roll-action 链接（enrichers.mjs 文档注释 L126-156 有官方示例）：一个 a 标签，class="roll-action"，
+  带 data-type="attack"、data-formula="+8"、data-activity-uuid="…活动 uuid…"，标签内文字为按钮文字。
+  data-activity-uuid 直接绑定活动（含豁免/伤害，走核心 click 处理）。纯掷骰则用上面的 /r 写法。
 ① target（活动目标）
   - template{ count, contiguous, stationary, type, size, width, height, units } + affects{ count, type, choice, special }
   - template.type 9 键：circle / cone / cube / cylinder / line / radius / sphere / square / wall（config.mjs L2797-2862）
