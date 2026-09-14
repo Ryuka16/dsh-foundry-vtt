@@ -566,6 +566,29 @@ attributes.ac.formula                  "12 + @abilities.int.mod"（配合 attrib
 - 完整「命中→豁免→失败中毒/流血」链路 = weapon 的 attack 活动 otherActivityId 指向 save 活动 + save 活动空壳 effects + 本模板（见 save-activity）`,
 
   creature: `【dnd5e 5.3.3 NPC 数值骨架 · 核心字段已验证】
+⚠️ 2026-09-17 怪物特性自动化程度速查（搓怪前先看这张表；交付时给每个特性标「自动 / 半自动 / 手动」，DM 就不会问「点了有用吗」）：
+【配置即自动 · 无宏】
+  伤害免疫/抗性/易伤（traits.di / dr / dv，含 fromNonmagical 等标签）｜ 状态免疫（traits.ci）｜
+  魔法抗性 / 魔法易伤（midi flags）｜ 豁免优势劣势与自动成功失败（midi flags）｜
+  光环增益减益（auraeffects 模块，见 aura 主题；别自己写宏）｜
+  每回合开始/结束的伤害·治疗·豁免（OverTime，见 midi-over-time 主题）｜
+  第一方反应：护盾术、被命中反伤（reaction 活动 + useConditionText = reaction === "isHit" / "isDamaged"；midi 只支持第一方，法反式第三方不行）｜
+  充能 5-6（原生 recovery period:"recharge" + formula）｜
+  失能即效果结束（DAE 勾选 disableIncapacitated）｜
+  条件型被动开关（flags.dae.disableCondition，如「有临时 HP 时 AC+2」，见 dae 主题）｜
+  死亡时触发宏（flags.dnd5e.onDeathMacro：触发点自动，内容自己写）
+【半自动 · 一半要宏】
+  再生回血（回血部分 OverTime 自动；「受某伤害类型则停止」要宏记受伤）｜
+  传奇抗性（uses 3 次 + 宏：豁免失败时消耗一次改判成功；midi 官方示例物品合集里有）｜
+  被击中反伤 + 次数/资源限制（宏）｜
+  多重攻击（同物品活动链可自动；跨物品必须宏，见 item-macro 主题）｜
+  对物件双倍伤害（DamageBonusMacro，或给物件配 traits.dv）｜
+  免疫某来源伤害（原生只支持按伤害类型/标签，如 fromNonmagical / silver / magic；「来自某生物」要宏查来源）
+【只能宏 / 只能描述】
+  死亡爆炸（onDeathMacro 里写爆炸逻辑）｜ 传奇动作（动作点池 + 回合末结算）｜
+  濒死变身 / 相位切换（HP 阈值触发，宏）｜ 跨物品攻击链（宏）｜
+  血池与伤害分担（宏，midi 示例「守护之链」）｜
+  复杂状态联动（「有 X 效果时免疫 Y」，宏 + flags.dae.onUpdateTarget）
 ⚠️ 2026-09-17 先读这段：怪物卡实测结构（从世界样本「暮光审判官」X3aP0qNQEPXUOhiV 与构装体「铁卫」RSukGm2PyHWRYYr1 逐字核对，**比下面的骨架更权威**）：
   ★ 免疫与语言的真实路径（下面骨架里写的 attributes.damage.immunities 是错的旧路径）：
     system.traits.di = { value:[], custom:"", bypasses:[] }   ← 伤害免疫
@@ -704,6 +727,19 @@ mode 表：0=CUSTOM（交模块处理，midi flags 都用这个）/ 1=MULTIPLY�
 ⚠️ 需要 midi-qol 模块（用户已装 13.0.55）。不确定的键先 foundry_knowledge 查 data-dict 或用户世界找样本，0 样本不用。`,
 
   'midi-over-time': `【持续伤害/持续效果 OverTime · 出自用户资料库 data-dict §17 + 开工铁律】
+⚠️ 2026-09-17 知识库源码级补充（三条）：
+① condition / applyCondition 是「Overtime 效果处理/触发必须为真的条件表达式」
+   ⇒ 【每个触发时点（turn=start / turn=end）都重新求值】，不是创建时求一次。
+   官方再生示例本身就拿条件写：
+     turn=start, damageRoll=2d6, damageType=healing, applyCondition=##attributes.hp.value < ##attributes.hp.max, label="再生"
+   ⇒ 怪物「每回合回血」打到 0 血时【会自动停】。这个 condition 是必须的：没有它 midi 在 0 血时照常掷 healing，
+     会把怪物从倒地直接拉起来。
+② ★ @ 与 ## 的区别：当 OverTime 效果是【非转移效果】（被物品施加到目标身上）时，
+   @ 默认基于【施法者/来源】的掷骰数据求值，## 才指【被挂效果者】。
+   怪物自己的被动效果（transfer，效果在自己身上）：@ 与 ## 都指自己，没问题。
+   给别人的 debuff / 给别人上的 buff：务必用 ## 指目标 —— 用 @ 会拿到施法者自己的数值。
+③ OverTime 只在【战斗中回合切换】时触发，战斗外不 tick（不开战斗就不会 tick）。
+   midi v13.0.37+ 新增 saveCount/failCount（豁免计数）；旧 saveRemove 等键 v14 弃用。
 ⚠️ 2026-09-16 补齐完整参数表（midi-qol v13 parseOvertimeDetails / utils.ts，逗号分隔 key=value，值里先做 @字段 替换）：
   turn=start(默认)|end                 触发时点（目标回合开始/结束）
   label（或 name）=文本                掷骰风味名，默认用效果名
@@ -817,6 +853,20 @@ label=放血（显示名）
 ⚠️ 出处：以上源码结论来自外部对 tposney/midi-qol v13（commit 6b10be5）与 foundryvtt/dnd5e 4.0.x–6.0.x 的逐行核查，叠加本机《挽歌》（attack + save 同 item，两者显式 "none"）实机点击验证。**本机未独立复核每一项源码坐标** —— 键名与默认值按本条引用，行号属外部报告。`,
 
   'item-macro': `【物品宏三件套 · 出自用户资料库「midi的物品宏使用指南」，磁轭手铳金标准实测通过】
+⚠️ 2026-09-17 知识库源码级补充 —— 【跨物品触发（多重攻击 / 连击）】：
+midi v13 官方定义：triggeredActivityId = "Select another activity ON THIS ITEM to execute after this one completes"
+⇒ 【只限同一物品内的活动】；跨物品（feat → 武器）【无官方支持】。
+三条路径按省事排序：
+  ① 同一物品内做活动链：把两次攻击做成「多重攻击」物品里的两个 attack 活动（把武器活动数据复制一份），
+     第一个活动的 midiProperties 配触发行动指向第二个 ⇒ 点一次 = 两次自动结算。
+     代价：武器数据要在该物品里重复维护一份（武器改了这里也要改）。
+  ② 物品宏（社区标准）：feat 上写 ItemMacro，用 MidiQOL.completeItemUse(weapon) /
+     MidiQOL.completeActivityUse(activityRef) 依次结算。midi 的 use 选项支持
+     activityId / activityIdentifier / targetUuids / targetsToUse 精确控制每次用哪个活动、打哪些目标。
+  ③ CPR 预制：装了 chris-premades 直接用它的 Multiattack 自动化（见 cpr 主题）。
+备注：官方怪物图鉴（暮光审判官 X3aP0qNQEPXUOhiV / 铁卫 RSukGm2PyHWRYYr1）的「多重攻击」都是
+      feat + utility 活动，点了【只在聊天卡提示】，由 GM 手动点两次武器 —— 这是官方做法，不是偷懒。
+      要真自动就得走上面 ①②③；「步枪扫射（三次）」同理。
 ⚠️ 2026-09-17 补【跨物品触发：A 物品的效果能不能被 B 物品的攻击带出来】—— 结论：没有内建通道。
 背景：戒指/护符这类「本身不会被 use」的物品，想在【用别的武器命中时】触发自己，四条路逐条判定：
 
@@ -1044,18 +1094,34 @@ ActiveEffect 关键字段：
 15. 【怪物免疫/语言的真实路径】system.traits.di.value / traits.ci.value / traits.languages.value —— **不是** attributes 下的 damage.immunities 那套旧路径（creature 主题骨架里那行是错的，已在主题顶部更正）。`,
 
   dae: `【DAE/AE 主动效果机制核心 · 出自用户资料库 data-dict §25/§26/§27】
-⚠️ 2026-09-17 实测：enableCondition / disableCondition 的表达式【必须带 @ 前缀】，否则字段不替换。
-  验证方法（用 DAE 自己的 API 一次问清，别猜）：
-    const ev = game.modules.get('dae').api.evalExpression();
-    ev('@attributes.hp.temp > 0', actor.getRollData())   → 返回 "20 > 0"   ✅ 字段被替换成数值
-    ev('attributes.hp.temp > 0', actor.getRollData())    → 原样返回该字符串 ❌ 字段没被替换 ⇒ 条件永远为真
-  ⇒ 写法一律用 @attributes.xxx / @abilities.xxx 这种带 @ 的形式（与 midi 的 OverTime 串里一致）。
-⚠️ 但仍有一条【未解】：把 actor 的 hp.temp 从 20 改成 0 后，带 @ 的 enableCondition 【没有重新评估】——
-  实测 effect.disabled 仍为 false、AC 加值仍生效。已排除：表达式写法（带 @ 已验证替换成功）、
-  效果未挂载（appliedEffects 里有）、DAE 未加载（13.0.25 active）。
-  推测条件只在效果创建/更新时评估一次，actor 字段变化不触发重评 —— 【此条为推测，未拿到 DAE 评估时机的源码证据】。
-  实务：需要「随字段实时开关」的效果（如「有临时 HP 期间 AC+2」），改用物品宏，或让 GM 手动禁用该效果；
-  【不要依赖 enableCondition 做实时开关】。已实测的失败案例：青脑叁型·安保模块的「防护插板」现在是无条件 AC+2。
+⚠️ ★★ 2026-09-17 【重大纠正，推翻了本节上一版的错误结论】—— 条件表达式的两个字段别用错：
+  | 字段 | UI 名 | 语义 | 适用范围 |
+  | enableCondition | 表达式，如果为假将从角色中移除效果 | 假 → 【删除】效果 | 【仅非转移效果】（物品使用后施加到目标身上的效应） |
+  | disableCondition | 表达式，如果为真将禁用效果 | 真 → 【标记禁用】（不删除） | 【所有效果，含转移/被动】 |
+  DAE 变更日志原话：enable 条件是 "Added effect enable condition to non-transfer active effects"，
+  disable 条件 "works with all effects"。
+  ⇒ ★ 怪物被动特性（transfer: true 的常驻 AE）想随字段开关，【必须用 disableCondition】——
+    写 enableCondition 完全不生效，症状是「条件写了没反应、effect.disabled 不变、AC 不动」。
+    （我 2026-09-17 就在这上面卡了一整轮，并错误地得出「DAE 不重评、只能手动」的结论 —— 那是字段用错，不是 DAE 的问题。）
+  求值时机：在【效果被应用时】、以及【携带该效果的 actor 或其 token 被 update() 时】重新求值；
+    来源端（施放者/物品）更新【不触发】。不是连续监听/轮询 —— 只有真的发起 actor.update() / token.update()
+    （角色卡编辑、token HUD 拖血、midi 结算伤害、宏里调用 update）才会重评。
+    ⚠️ 测试时别在控制台直接改内存（不触发 update，看起来就是「不重评」）。
+  表达式写法：一律用 @attributes.xxx / @abilities.xxx 这种【带 @ 的形式】（与 midi 的 OverTime 串里一致）。
+    验证方法（用 DAE 自己的 API 一次问清，别猜）：
+      const ev = game.modules.get('dae').api.evalExpression();
+      ev('@attributes.hp.temp > 0', actor.getRollData())   → 返回 "20 > 0"   ✅ 字段被替换成数值
+      ev('attributes.hp.temp > 0', actor.getRollData())    → 原样返回该字符串 ❌ 字段没被替换 ⇒ 条件永远为真
+  ★ 本机实测（2026-09-17，青脑叁型·安保模块「防护插板」，效果 _id = armorPlate000001）：
+      eff.update({ 'flags.dae.disableCondition': '@attributes.hp.temp <= 0', 'flags.dae.enableCondition': null })
+      → actor.update({ 'system.attributes.hp.temp': 0 }) + 等 900ms → AC 15 / acBonus 0 / effect.disabled = true ✅
+      → actor.update({ 'system.attributes.hp.temp': 20 }) + 等 900ms → AC 17 / disabled = false ✅ 恢复
+    ⇒ 「有临时 HP 期间 AC+2」【完全自动】，不需要 GM 手动禁用，也不需要写宏。
+  更强的响应式（距离、多字段联动、事件驱动）才需要：flags.dae.onUpdateTarget / onUpdateSource + 物品宏；
+  或 DAE 的条件效果物品（DAEConditionalEffects）；或模块 SC - Conditional AE。
+  物品宏 / onUseMacro 只适合「使用时刻」的一次性逻辑，不适合持续 AC 加成。
+  配套（AC 是派生值）：加值走 system.attributes.ac.bonus（change mode 2）、覆盖走 ac.flat、下限走 ac.min；
+  直接改 ac.value 会被系统公式覆盖 —— 这也是 ac.calc 写 flat 会吞掉全部加值的根源（见 pitfalls 主题）。
 ⚠️ 2026-09-17 specialDuration 完整白名单（来源：DAE 仓库 src/module/Systems/DAEdnd5e.ts L650-700；回合类两项在 src/module/dae.ts L80-87）：
   回合类：turnStart ｜ turnEnd ｜ turnStartSource ｜ turnEndSource ｜ combatEnd ｜ joinCombat
     （后两项【仅当 times-up 模块 active 且版本 > 0.0.9 才注册】）
@@ -1724,6 +1790,35 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
   - 要写 token 级 flags 请用 foundry_update_entity（token 文档）或 execute_js，不要用改物品的 flags 参数`,
 
   'item-fields': `【物品字段补遗 · target / consumption / 未鉴定 / 同调 · 2026-09-14 源码级转述】
+⚠️ 2026-09-17 知识库源码级补充（三条实战字段，均已在本机或样本库核实）：
+① 【目标类型过滤】target.affects.type 的 9 个取值做不了「排除」（construct/undead 都算 creature，creature 会全放行）。
+   正解：写活动的【使用条件】—— 字段是活动顶层的 useConditionText（表达式字符串，【不是】 midiProperties 里的键）。
+   样本实证：怪奇独奏者 xSz4PtDQIIhYFeAF 的 useConditionText = reaction === "isDamaged"（反应类限制就这么写）。
+   例：疗愈针剂「只治疗非构装体且非不死」：
+     !raceOrType.includes("construct") && !raceOrType.includes("undead")
+   等价写法：!["construct","undead"].includes(target.actor.system.details.type.value)
+   可用变量：target.raceOrType / target.actor.getRollData() / target.actor.system.details.type.value。
+   ⚠️ 单目标场景：条件为假 → 使用被取消，语义正确（这是标准做法）。
+   ⚠️ 多目标场景：若该条件是整体判定而非逐目标剔除，需在物品宏里过滤：
+     workflow.targets = workflow.targets.filter(t => !["construct","undead"].includes(t.actor.system.details.type.value))
+     或用 midi 的 use 选项 targetsToUse / targetUuids 覆盖目标集合。
+   旁注：useConditionText 旁边还有 useConditionReason（写「为什么不能用」给玩家看）与 effectConditionText。
+② 【伤害倍率改动】（如「对物件双倍伤害」）没有配置项，标准挂点是 DamageBonusMacro
+   （flags.dnd5e.DamageBonusMacro，在伤害加值阶段自动触发）：
+   宏里判 workflow.targets.some(t => t.actor.system.details.type.value === "object") 然后翻倍。
+   ★ 更原生的替代：给世界里的物件角色配 traits.dv（对钝击易伤）
+     ⇒「钝击伤害 + 物件对钝击易伤」自动双倍，连宏都不用写。
+③ 【充能 5-6】dnd5e 原生支持，实测落库结构：
+   system.uses = { max: "1", value: 1, spent: 0, recovery: [{ period: "recharge", type: "recoverAll", formula: "5" }] }
+   ★ 判定线取自 recovery[].formula（源码 dnd5e.mjs L4530 target: parseInt(recharge.formula)），
+     【不是】物品级 system.recharge.value。
+   ⚠️ 实测：往物品级 system.recharge = {value:5, charged:false} 写，读回是 undefined
+     （该字段在 5.3.3 物品上不落库），但【功能不受影响】—— formula: "5" 已经生效；
+     落库时系统还会自动补 recovery[].recharge.options（五档枚举：充能6 / 5-6 / 4-6 / 3-6 / 2-6）。
+   「使用后掷 d6，不大于 4 则无法再次使用」≡「5-6 则仍可用」≡ 官方充能 5-6。
+   时机差异：原生是【每回合开始】掷（战斗内自动，Combat5e.recoverCombatUses → item.system.recoverUses）；
+     若原文严格要「使用即掷」，才上宏（onUse 后掷 1d6，≤4 则 item.update({"system.uses.value": 0})，
+     并把 recovery 改成不自动恢复）。
 ⚠️ 2026-09-17 补：描述富文本（system.description.value 里能用什么）—— dnd5e 5.3.3 module/enrichers.mjs L11-58 注册三组，另加核心 v13 两个：
 【dnd5e 自己注册的】（L13-18，写法 = 双方括号 + 斜杠 + 类型 + 配置，后可选跟 {显示文字}）
   /attack  /check  /save  /damage  /heal  /item  /skill  /tool  /concentration  /award
