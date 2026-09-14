@@ -67,4 +67,11 @@ fi
 
 echo "=== Compiling src → lib ==="
 "$TSC" -p tsconfig.json
+
+# tsc 只编译 .ts，**不会拷贝 .md/.txt**；而 knowledge-docs / knowledge-local / knowledge-manuals
+# 三个目录是运行时靠 import.meta.url 读的 ⇒ 不同步就等于改了文档没生效，且不报任何错。
+# （2026-09-15 的 otherActivity 勘误就是这么卡的：src 改了，lib 那份得靠手工编辑。）
+echo "=== Syncing knowledge copies (src → lib) ==="
+node "$ROOT/scripts/sync-docs.mjs"
+
 echo "=== Build complete ==="

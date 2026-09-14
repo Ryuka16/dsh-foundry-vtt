@@ -14,7 +14,7 @@
  */
 import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
-import { basename, dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -45,19 +45,42 @@ for (const f of tsFiles) {
   }
 }
 
-// ── 2. src/knowledge-docs/*.md 必须同步到 lib/knowledge-docs/ ────────
-const srcDocs = join(srcDir, 'knowledge-docs')
-const libDocs = join(libDir, 'knowledge-docs')
-for (const f of files(srcDocs).filter((f) => f.endsWith('.md'))) {
-  const out = join(libDocs, f)
-  if (!existsSync(out)) {
-    problems.push(`lib 缺知识文档：src/knowledge-docs/${f} → lib/knowledge-docs/${f}（build 后要拷贝 .md）`)
-    continue
+// ── 2. src/knowledge-{docs,local,manuals}/ 必须全部同步到 lib/ 同名目录 ──
+// 为什么三个都查：tsc 不拷贝 .md/.txt，而这三个目录都是运行时靠 import.meta.url 读的。
+// 2026-09-15 的教训：原来只查 knowledge-docs，于是 knowledge-local 里改了没同步的那份
+// 一直没人发现——运行时读到旧内容且不报任何错。一键修复：node scripts/sync-docs.mjs
+const KB_DIRS = ['knowledge-docs', 'knowledge-local', 'knowledge-manuals']
+
+/** 递归列文件（相对路径）——knowledge-local 下有子目录，不能只列顶层 */
+const walkFiles = (d, base = d) => {
+  if (!existsSync(d)) return []
+  const out = []
+  for (const e of readdirSync(d, { withFileTypes: true })) {
+    const p = join(d, e.name)
+    if (e.isDirectory()) out.push(...walkFiles(p, base))
+    else if (e.isFile()) out.push(relative(base, p))
   }
-  if (sha(join(srcDocs, f)) !== sha(out)) problems.push(`知识文档内容不一致：${f}（重新拷贝）`)
+  return out
 }
-for (const f of files(libDocs)) {
-  if (!existsSync(join(srcDocs, f))) notes.push(`lib/knowledge-docs/${f} 在 src 里没有对应源文件`)
+
+for (const d of KB_DIRS) {
+  const s = join(srcDir, d)
+  const t = join(libDir, d)
+  const srcList = walkFiles(s)
+  if (srcList.length === 0) continue
+  for (const rel of srcList) {
+    const out = join(t, rel)
+    if (!existsSync(out)) {
+      problems.push(`lib 缺知识副本：src/${d}/${rel}（跑 node scripts/sync-docs.mjs 自动补齐）`)
+      continue
+    }
+    if (sha(join(s, rel)) !== sha(out)) {
+      problems.push(`知识副本内容不一致：${d}/${rel}（跑 node scripts/sync-docs.mjs）`)
+    }
+  }
+  for (const rel of walkFiles(t)) {
+    if (!existsSync(join(s, rel))) notes.push(`lib/${d}/${rel} 在 src 里没有对应源文件`)
+  }
 }
 
 // ── 3. src/samples 与 lib/samples（若存在）───────────────────────────
@@ -87,11 +110,15 @@ if (releaseDir) {
     for (const f of b) {
       if (!existsSync(join(libDir, f))) notes.push(`release/lib/${f} 是多余残留（本机 lib 里没有）`)
     }
-    // 知识文档 + 样本也要同步
-    for (const f of files(libDocs)) {
-      const out = join(relLib, 'knowledge-docs', f)
-      if (!existsSync(out) || sha(out) !== sha(join(libDocs, f))) {
-        problems.push(`release 知识文档缺失或过旧：lib/knowledge-docs/${f}`)
+    // 知识副本（三个目录，含子目录）也要同步到 release
+    for (const d of KB_DIRS) {
+      for (const rel of walkFiles(join(libDir, d))) {
+        const out = join(relLib, d, rel)
+        if (!existsSync(out) || sha(out) !== sha(join(libDir, d, rel))) {
+          problems.push(
+            `release 知识副本缺失或过旧：lib/${d}/${rel}（跑 node scripts/sync-docs.mjs --release）`,
+          )
+        }
       }
     }
     // package.json 版本与 main 入口
@@ -111,7 +138,8 @@ if (releaseDir) {
 console.log('=== 发版产物一致性校验 ===')
 console.log(`插件根目录：${root}`)
 if (releaseDir) console.log(`release 目录：${releaseDir}`)
-console.log(`检查：${tsFiles.length} 个 TS 源 → lib，${files(srcDocs).filter((f) => f.endsWith('.md')).length} 篇知识文档`)
+const kbCount = KB_DIRS.reduce((n, d) => n + walkFiles(join(srcDir, d)).length, 0)
+console.log(`检查：${tsFiles.length} 个 TS 源 → lib，${kbCount} 个知识副本（${KB_DIRS.join(' / ')}）`)
 for (const n of notes) console.log('  · 提示：' + n)
 if (problems.length === 0) {
   console.log('\n✅ 一致，可以发版。')

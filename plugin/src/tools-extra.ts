@@ -30,6 +30,55 @@ export interface ExtraHelpers {
 type Reg = (t: { name: string }) => void
 type Args = Record<string, unknown>
 
+/**
+ * relay 端的 forbidden-patterns 黑名单 —— 逐条抄自 relay 源码
+ * `go-relay/internal/handler/helpers/validation.go:7-32` 的 `forbiddenPatterns`（共 24 条）。
+ *
+ * ⚠️ 关键事实（决定了这条预检非做不可）：relay 是**拿正则扫整个脚本文本**，
+ * 不做语法分析、也不看上下文 —— 所以这些词**出现在注释、字符串、甚至变量名里一样会被拒**。
+ * 实测：AI 在注释里写 "globalThis" 解释用法，整段脚本直接被
+ * `HTTP 400 {"error":"Script contains forbidden patterns"}` 挡下，且**不告诉你是哪个词**。
+ * 提交前先在本地扫一遍，把「撞墙 → 自己猜哪句话坏了」变成一条可读的提示。
+ */
+const FORBIDDEN_PATTERNS: Array<[string, RegExp]> = [
+  ['localStorage', /localStorage/],
+  ['sessionStorage', /sessionStorage/],
+  ['document.cookie', /document\.cookie/],
+  ['eval(', /eval\(/],
+  ['new Worker(', /new Worker\(/],
+  ['new SharedWorker(', /new SharedWorker\(/],
+  ['__proto__', /__proto__/],
+  ['atob(', /atob\(/],
+  ['btoa(', /btoa\(/],
+  ['crypto.', /crypto\./],
+  ['Intl.', /Intl\./],
+  ['postMessage(', /postMessage\(/],
+  ['XMLHttpRequest', /XMLHttpRequest/],
+  ['importScripts(', /importScripts\(/],
+  ['apiKey', /apiKey/],
+  ['privateKey', /privateKey/],
+  ['password', /password/],
+  ['Function(', /Function\(/],
+  ['Function.constructor', /Function\.constructor/],
+  ['globalThis', /globalThis/],
+  ['game.settings.set', /game\.settings\.set/],
+  ['Reflect.', /Reflect\./],
+  ['Proxy', /Proxy/],
+  ['import(', /import\(/],
+]
+
+/** 逐行扫脚本，返回命中的黑名单项（含行号与那一行原文，方便直接改）。 */
+function scanForbidden(script: string): Array<{ pattern: string; line: number; text: string }> {
+  const hits: Array<{ pattern: string; line: number; text: string }> = []
+  const lines = script.split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    for (const [label, re] of FORBIDDEN_PATTERNS) {
+      if (re.test(lines[i])) hits.push({ pattern: label, line: i + 1, text: lines[i].trim().slice(0, 160) })
+    }
+  }
+  return hits
+}
+
 function bodyOf(args: Args, keys: string[]): Record<string, unknown> {
   const b: Record<string, unknown> = {}
   for (const k of keys) if (args[k] !== undefined) b[k] = args[k]
@@ -425,14 +474,99 @@ export function registerExtraTools(h: ExtraHelpers, reg: Reg): void {
     { uuid: { type: 'string', description: '宏的 uuid' }, args: { type: 'object', description: '传给宏的参数对象（可选）' } },
     ['uuid'],
     ['args'], [], ['uuid']))
-  reg(simple(h, 'foundry_execute_js',
+  reg(h.makeTool('foundry_execute_js',
     '⚠️ 在世界内直接执行 JavaScript（POST /execute-js）。这是最高权限的底层操作：可读写世界任意数据、可调用任何 Foundry API，返回任意 JSON。\n' +
+    '**本工具会先在本地做 forbidden-patterns 预检**（relay 源码 `helpers/validation.go` 的 24 条正则）。命中就不提交，直接返回命中的词 + 行号。\n' +
+    '⚠️ **relay 是拿正则扫整个脚本文本，不做语法分析** —— 这些词**写在注释、字符串、变量名里一样会被拒**，且 relay 的报错只说 `Script contains forbidden patterns`、**不告诉你是哪个词**。\n' +
+    '24 条黑名单：localStorage / sessionStorage / document.cookie / eval( / new Worker( / new SharedWorker( / __proto__ / atob( / btoa( / crypto. / Intl. / postMessage( / XMLHttpRequest / importScripts( / apiKey / privateKey / password / Function( / Function.constructor / globalThis / game.settings.set / Reflect. / Proxy / import(\n' +
+    '**尤其注意 `Proxy` 与 `import(` 是子串匹配** —— 任何含 "Proxy" 的单词（如 ProxyToken、proxyConfig）、任何 `import(` 写法（含 `importScripts(` 之外的正则/字符串）都会中招。躲坑写法：不要在注释里解释这些词，用「该 API」之类替代。\n' +
     '**可用性取决于世界设置**：REST API 模块设置里若没开，会返回 400 "execute-js is disabled in REST API module settings. A GM must enable it to allow JavaScript execution."；开着则正常返回结果（实测有的世界是开着的）。所以：**可以直接试一次**，别因为描述里写着「默认禁用」就放弃——但报上面那条 400 就说明该世界没开，改用专用工具。\n' +
-    '优先用专用工具（foundry_update_entity 支持内嵌物品 uuid Actor.<actorId>.Item.<itemId>，可直接改 actor 身上物品的 system/effects；改物品自动化特性通常不需要 execute_js）。真正的用途是**查专用工具拿不到的运行时值**：如 save.dc 算出来的 dc.value（普通 GET /get 看不到）、token texture 是否有效、某个 flag 的真实解析结果。写脚本前先想清楚后果。',
-    'POST', '/execute-js',
-    { script: { type: 'string', description: '要执行的 JavaScript 代码' } },
+    '优先用专用工具（foundry_update_entity 支持内嵌物品 uuid Actor.<actorId>.Item.<itemId>，可直接改 actor 身上物品的 system/effects；改物品自动化特性通常不需要 execute_js）。真正的用途是**查专用工具拿不到的运行时值**：如 save.dc 算出来的 dc.value（普通 GET /get 看不到）、token texture 是否有效、某个 flag 的真实解析结果。写脚本前先想清楚后果。\n' +
+    '**报错排查**：若返回 `Error executing script: <某处的> is not a function` 之类 —— 多半是假设了字段类型（实测踩过 `(p.types || []).join is not a function`，因为 types 是对象不是数组）。先在脚本里 `return { 探到的值: typeof 某字段, 样例: 某字段 }` 探一次真实形状，再写正式逻辑；不要在类型不明时直接 .join()/.map()。',
+    { script: { type: 'string', description: '要执行的 JavaScript 代码（会先过 24 条 forbidden-patterns 预检，命中则不提交并回报行号）' } },
     [],
-    ['script']))
+    async (args: Args) => {
+      const script = typeof args.script === 'string' ? args.script : ''
+      if (!script.trim()) return { error: 'script 为空' }
+      const hits = scanForbidden(script)
+      if (hits.length) {
+        return {
+          blocked: true,
+          submitted: false,
+          note:
+            '⚠️ 脚本**未提交**：它会命中 relay 的 forbidden-patterns 校验，必然返回 400 "Script contains forbidden patterns"。' +
+            '请按下面的行号改掉这些词后重试（**注释里的也算** —— relay 用正则扫全文，不做语法分析）。',
+          hits,
+          allPatterns: FORBIDDEN_PATTERNS.map((p) => p[0]),
+          scriptLines: script.split('\n').length,
+        }
+      }
+      try {
+        return h.asObject(await h.callRelay('POST', '/execute-js', { body: { script } }))
+      } catch (e) {
+        // 2026-09-14 第三方复检提的最后一条：execute_js 报错既无行号也无上下文 ——
+        // 它跑了 27 行脚本，收到一句 "Unexpected token 'return'"，只能逐行找。
+        // 这里把脚本行号化并从报错文本里尽量解析出行号，只回出错行附近的窗口（长脚本不至于撑爆上下文）。
+        const msg = e instanceof Error ? e.message : String(e)
+        const lines = script.split('\n')
+        const suspects: number[] = []
+        const re = /(?:\bline\s+(\d{1,4})\b|:(\d{1,4}):\d{1,4}\b)/gi
+        let m: RegExpExecArray | null
+        while ((m = re.exec(msg)) !== null) {
+          const n = Number(m[1] ?? m[2])
+          if (n >= 1 && n <= lines.length && !suspects.includes(n)) suspects.push(n)
+        }
+        // relay 的报错**不带行号**，但 "Unexpected token 'X'" 这条可以反查：X 就是脚本里出现过的一个词。
+        // 实测（2026-09-14，直连世界验过）：`const a = 1 +\nreturn a` 与 `const a = (1 + 2\nreturn a`
+        // 都报 "Unexpected token 'return'"，而 `const a = 1\nreturn a` 是**成功返回 1** 的 ——
+        // 说明 return 本身合法（relay 把脚本当函数体跑），真凶是它**上一行**没写完。
+        // 所以这里把「出现该词的行」和「它的上一行」一起标出来。
+        const tk = /Unexpected token '([^']+)'/.exec(msg)
+        if (tk && suspects.length === 0) {
+          const word = tk[1]
+          for (let i = 0; i < lines.length; i++) {
+            if (lines[i].indexOf(word) >= 0) {
+              if (!suspects.includes(i + 1)) suspects.push(i + 1)
+              if (i > 0 && !suspects.includes(i)) suspects.push(i)
+              break
+            }
+          }
+        }
+        const win = 25
+        const focus = suspects.length ? suspects[0] : 1
+        const from = Math.max(1, focus - win)
+        const to = Math.min(lines.length, focus + win)
+        const numbered: string[] = []
+        for (let i = from; i <= to; i++) {
+          numbered.push(String(i).padStart(4, ' ') + ' | ' + lines[i - 1] + (suspects.includes(i) ? '   <-- 报错指向这里' : ''))
+        }
+        const hints: string[] = []
+        if (/is not a function/.test(msg)) {
+          hints.push('多半是把字段类型想错了（实测踩过 `(p.types || []).join is not a function` —— types 是对象不是数组）。先在脚本里 `return { 探到的值: typeof 某字段, 样例: 某字段 }` 探一次真实形状，再写正式逻辑。')
+        }
+        if (/Unexpected token|SyntaxError|Invalid or unexpected token/.test(msg)) {
+          hints.push('语法错。⚠️ **实测纠正**：报 `Unexpected token \'return\'` 时，问题几乎不在 return —— return 本身是合法的（relay 把脚本当函数体执行），是**它上一行**没写完，解析器才一路撞到 return。真凶通常是：缺右括号、缺操作数（`1 +` 这种末尾悬空）、字符串/引号没闭合、对象字面量缺逗号。先看标出来的第一处嫌疑行的**上一行**。')
+        }
+        if (/is not defined|not defined|Cannot read propert/.test(msg)) {
+          hints.push('变量/属性不存在或为 undefined：世界里的字段名可能与预期不同，先用 typeof 探。')
+        }
+        if (/disabled in REST API module settings/.test(msg)) {
+          hints.push('这个世界没开 execute-js（要在 REST API 模块设置里由 GM 开启）—— 改用专用工具，别在脚本里绕。')
+        }
+        return {
+          error: true,
+          message: msg,
+          scriptLines: lines.length,
+          suspectLines: suspects,
+          shownRange: from + '-' + to + '（共 ' + lines.length + ' 行）',
+          numberedScript: numbered.join('\n'),
+          hints,
+          note: '⚠️ 脚本**已提交**但执行失败。下面是带行号的脚本原文' +
+            (suspects.length ? '，报错指向的行已标出' : '（报错里没给出行号，从第 1 行给起）') +
+            '。读懂再改，不要整段重贴重试。',
+        }
+      }
+    }))
   reg(h.makeTool('foundry_structure',
     '读世界目录结构（GET /structure）：文件夹树与实体清单。types 可逗号分隔过滤（Scene/Actor/Item/JournalEntry/RollTable/Cards/Macro/Playlist）；recursive 递归子目录。\n' +
     '⚠️ **这个工具很容易一次吐出几 MB**（compendium 包会被全量带出，实测单次 3.88 MB，直接撑爆结果被截断落盘）。所以：\n' +
@@ -512,9 +646,24 @@ export function registerExtraTools(h: ExtraHelpers, reg: Reg): void {
     ['src']))
 
   // ═══ 世界信息 / 其他（3 工具）══════════════════════════════════
-  reg(simple(h, 'foundry_world_info',
-    '读世界综合信息（GET /world-info）：世界名/系统版本/Foundry 版本/已装模块/玩家列表等。',
-    'GET', '/world-info', {}, [], [], []))
+  // ⚠️ 默认裁掉已装模块清单：第三方实测反馈「foundry_world_info 每次吐回全量模块（实测 204 个），
+  // 这一轮我就为它烧掉一大块上下文」。常用的只有世界名 / 系统版本 / Foundry 版本。
+  reg(h.makeTool(
+    'foundry_world_info',
+    '读世界综合信息（GET /world-info）：世界名/系统版本/Foundry 版本/玩家列表等。⚠️ 已装模块清单**默认省略**（实测 204 个，体积很大）——确实需要完整清单时传 includeModules:true。',
+    { includeModules: { type: 'boolean', description: '是否返回完整已装模块清单（默认 false，只回 moduleCount 与提示）' } },
+    [],
+    async (args: Args) => {
+      const obj = h.asObject(await h.callRelay('GET', '/world-info', { query: {} }))
+      const mods = obj.modules
+      if (args.includeModules !== true && Array.isArray(mods)) {
+        obj.moduleCount = mods.length
+        delete obj.modules
+        obj.modulesHint = `已装 ${mods.length} 个模块，清单已省略；需要完整清单传 includeModules:true`
+      }
+      return obj
+    },
+  ))
   reg(simple(h, 'foundry_get_folder',
     '按名字查文件夹（GET /get-folder），返回文件夹 uuid（建实体时 folder 参数用）。',
     'GET', '/get-folder',

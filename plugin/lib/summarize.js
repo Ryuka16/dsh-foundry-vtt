@@ -57,6 +57,26 @@ const EFFECT_TREE = {
     duration: { seconds: true, rounds: true, turns: true, remaining: true },
     changes: [{ key: true, mode: true, value: true, priority: true }],
 };
+/** 活动级 effects 是 dnd5e 的「空壳」：`{_id, level:{}, onSave:false}`，
+ *  与物品级 ActiveEffect 完全不是一个形状。用 EFFECT_TREE 渲染只会剩 `_id`
+ *  —— 因为 onSave / level 都不在白名单里，看着像「三件套没落库」（第三方实测
+ *  报告 #7：据此误判「三件套没落库」白查一轮）。省 token 的开关产生假阴性，比没有更糟。
+ *  这里专为活动级开一棵树，保留 onSave / level，同时也兜住物品级字段。 */
+const ACTIVITY_EFFECT_TREE = {
+    _id: true,
+    // 活动级空壳专有（缺了它就只剩 _id）
+    onSave: true,
+    level: { min: true, max: true },
+    // 物品级 ActiveEffect 字段（活动 effects 偶尔也会放完整效果）
+    name: true,
+    icon: true,
+    img: true,
+    disabled: true,
+    statuses: true,
+    transfer: true,
+    duration: { seconds: true, rounds: true, turns: true, remaining: true },
+    changes: [{ key: true, mode: true, value: true, priority: true }],
+};
 /** 物品摘要：伤害结构 + 活动（攻击/豁免/伤害）+ 装备状态 + 效果。 */
 const ITEM_TREE = {
     name: true,
@@ -115,7 +135,7 @@ const ITEM_TREE = {
                 save: { ability: true, dc: { calculation: true, formula: true }, scaling: true },
                 // ⚠️ 键名是 healing 不是 heal —— 写错 heal 会让治疗法术的恢复量被整块吞掉（实测踩过）。
                 healing: { number: true, denomination: true, bonus: true, types: true, custom: { enabled: true, formula: true }, scaling: true },
-                effects: [EFFECT_TREE],
+                effects: [ACTIVITY_EFFECT_TREE],
                 uses: { spent: true, max: true, recovery: true, autoDestroy: true },
                 consumption: true,
                 scaling: { mode: true, formula: true },

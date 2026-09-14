@@ -22,9 +22,45 @@ import { join, dirname } from 'node:path'
 import { registerExtraTools } from './tools-extra.js'
 
 /** 注入系统提示的工作铁律：强制 AI 先查模板/样本/真源，再写 JSON。每个新对话 AI 自动看到。 */
+const DESC_STYLE_PROMPT = `## FVTT 文案风格（写物品/怪物/特性/法术的描述与聊天文案时，一律照此执行）
+
+出处：用户提示词库 05_扮演技巧.md 第十四节「描写的度」+ 第二十三节「祛 AI 味」、04_战斗描述.md。
+用户已因「太 AI 了」打回多次，这不是建议，是交付标准。
+
+### 一、长度：写到「能动、能查、有感觉」就停
+每多写一句，先问自己：**「这句不写，玩家会错过什么？」** 错过的是线索/伏笔/情绪 → 留；错过的只是「画面更美、更全」→ 删。
+物品与怪物描述 **2~4 句，不超过一段**；特性与法术描述 1~3 句。
+**详细 ≠ 堆形容词。** 详细 = 给具体可验证的细节（锈迹、蜡封、刻字、气味、数量、痕迹），让玩家能顺着去查。
+**禁止把机制复述进描述**（伤害骰、DC、持续时间、加值在卡面上已经有了，不要用中文再讲一遍）。
+用户没给的设定**不要自己编**（教义、来历、人名、地名一概不加）；用户给的词就照用，不加戏。
+
+### 二、AI 味 = 没有逻辑重音
+写完**自己念一遍**：念不顺、找不到重音在哪，就是没写好。
+**AI 烂句式黑名单（一律不许出现）**：
+- 显得就你知道：很多人不知道的是 / 你可能想不到 / 鲜为人知的是 / 你有没有想过 / 你会发现
+- 强行拔高：这背后隐藏着一个深刻的秘密 / 看似…实际上是 / 从某种意义上来说 / 站在历史的长河中
+- 假转折假逻辑：我们不妨换一个角度来看 / 首先我们要明确一个概念 / 值得一提的是 / 真正重要的不是…而是
+- 假装深沉强行闭环：值得我们深思的是 / 这告诉了我们一个道理 / 真正的原因是 / 背后的逻辑是 / 这也是为什么
+- 模板填空式的动作词缀：抄起 / 压低重心 / 自斜上方劈落 / 一记漂亮的
+**判据一句话**：这句话有没有「作者跳出来替角色、替玩家说话」的腔调？有，就是 AI 味，删掉或改成角色自己的话。
+
+### 三、战斗与效果文案（写 useFlavor / chatFlavor / 触发文案时）
+- 不要分段报告（第一斧、第二斧）、不要大白话（啪啪啪三下）、不要规则说明（造成 2d6 火焰伤害）、不要 DM 视角（它对玩家造成）
+- **展示，不要告知** —— 用感官（视觉/听觉/嗅觉/触觉）传达发生了什么
+- 未命中和豁免成功**也可以很精彩**：不是「你砍偏了」，而是**对手做了什么**（用矛拨开剑刃、箭矢钉入身后石壁、一口咬碎箭杆）
+- 伤害类型用感官而非数值：火焰=水泡鼓起/焦臭；冷冻=呵气成冰/关节僵死；毒素=血管发黑从伤口蔓延/视野发绿；暗蚀=肤色灰败/眼眶凹陷；心灵=颅内有异物感/念头变陌生
+- 一段话三五句，不拖沓不敷衍
+
+### 四、用户要调性时
+用户说「加点氛围」「像棺材那种厚重」「别太网文」时，**只调语气，不改长度上限，不加机制**；改完仍要满足上面三条。`
 const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须遵守）
+0. **默认先给用户过目；他说不用看，就直接建**：
+- 建东西前**默认先出一版预览**（创建类工具不带 confirmToken 即预览，不写进世界），把**名称 / 数值 / 描述文案原文 / 机制**讲给用户听。这是默认动作，不是每次都要请示。
+- **用户说「不用看 / 直接建 / 你定就行」时，不要再问一遍** —— 自己拿预览返回的 confirmToken 立刻建下去。他要的是省事，不是多一轮往返。
+- 用户说「改一下」就改参数、重出预览；**不要把「用户同意过任务」理解成「我可以随便改」**。
+- 落库后回报要具体：uuid + 实际落库的关键值，不是「已完成」三个字。
 1. 先查后写，严禁凭记忆手搓 dnd5e JSON：
-- 结构模板 → foundry_reference（主题：weapon/roll-data/save-activity/effect/creature/feat/spell/status-list/bonuses/midi-over-time/midi-flags/item-macro/aura/dae/conditions/enchant/optional/trigger/overtime-activity/iron-rules/pitfalls），模板秒回，照抄改数值。**写任何公式/DC/加值字段前先看 roll-data**。
+- 结构模板 → foundry_reference（主题：weapon/roll-data/save-activity/effect/creature/feat/spell/status-list/bonuses/midi-over-time/midi-flags/other-activity/activity-types/midi-properties/daelink/probe/item-macro/aura/dae/conditions/enchant/optional/trigger/overtime-activity/iron-rules/pitfalls），模板秒回，照抄改数值。**写任何公式/DC/加值字段前先看 roll-data**；写多活动物品前看 other-activity + activity-types；**卡面全对但游戏里不生效，第一动作是 foundry_reference{topic:"probe"} 拿一段 F12 探针给使用者跑，别改代码猜**；**「命中 → 豁免 → 中毒」不生效先看 daelink**（最常见原因：没装 DAE 模块，midi 里 hasActivityEffects = hasDAE(this) && ... 整段跳过）。
 - 真实样本 → foundry_knowledge topic:"samples" 列索引找同类实体（怪物卡/武器/状态与中毒/持续伤害OverTime/光环/物品宏/DAE特殊时长/法术特性/装备/奇物），file 读样本（大文件先 query 关键词再 offset 翻页）。0 实例的键名禁止写进文档。
 - 图标路径 → **做物品/效果/token 前，先 foundry_search_icon{keyword:"sword"} 检索，把返回的候选列表看一遍，自己挑一张最贴的填进 img / effectImg**（这是你的活，别指望插件替你选）。可加 dir:"weapons/polearms" 收窄、一次最多 200 条。搜不到就换词根（longsword → sword、warhammer → hammer、handaxe → axe、quarterstaff → staff —— 这些整词在真源里不存在），或 foundry_file_system{source:"public", path:"icons/weapons"} 翻真实目录看实物；要分类全貌时读 topic:"icon-map"（13 大类 + 效果图标对照表）。6560 条真源随插件发布，任何环境可用。**一律用 webp（真源 6248 条实物图），禁止用 icons/svg/ 那 118 条抽象方块图（aura.svg/circle.svg 之类），也不要用 systems/dnd5e/icons/svg/ 那 237 条系统 UI 图标**。禁止猜路径，猜错 = 卡面裂图。
 - **模块 API / 标志名 / 函数签名** → 先 foundry_knowledge topic:"manuals" 不带 file 列索引（28 个模块官方文档 + 57 篇飞书原文，随插件发布），再 file 读原文、query grep 定位。**要写具体模块的东西时必查**：Sequencer 特效、midi-qol flags、DAE 键名、AC5E、TokenMagic、Rest Recovery、Automated Animations、CPR 宏。**纯 dnd5e 结构不用查**（走上面第 1、2 行就够）。
@@ -217,15 +253,49 @@ function jsonRender(_args: unknown, value: unknown): Array<{ type: 'text'; text:
  */
 function pruneUndefined<T>(v: T): T {
   if (Array.isArray(v)) return v.map((x) => pruneUndefined(x)) as unknown as T
+  // ⚠️ Set / Map / Date 必须先于普通对象分支处理：它们 typeof 也是 'object'，
+  // 走 Object.entries 会得到 []（Set/Map 的条目不在自有可枚举属性上；Date 同理），
+  // 于是被静默转成 `{}` —— 不是报错，是「成功但内容没了」，
+  // 与 undefined 同类但更隐蔽（第三方实测报告：Set 传下去就崩）。
+  if (v instanceof Set) return Array.from(v).map((x) => pruneUndefined(x)) as unknown as T
+  if (v instanceof Map) return pruneUndefined(Object.fromEntries(v)) as unknown as T
+  if (v instanceof Date) return v
   if (v && typeof v === 'object') {
     const out: Record<string, unknown> = {}
     for (const [k, x] of Object.entries(v as Record<string, unknown>)) {
       if (x === undefined) continue
+      // function / symbol 同样不是 lossless JSON（序列化后整个键消失）
+      if (typeof x === 'function' || typeof x === 'symbol') continue
       out[k] = pruneUndefined(x)
     }
     return out as unknown as T
   }
+  if (typeof v === 'function' || typeof v === 'symbol') return undefined as unknown as T
   return v
+}
+
+/** 按点号路径取值，支持数组下标：`system.activities.x.save.dc.formula`、`a.b[0].c`。 */
+function readPathLoose(root: unknown, path: string): unknown {
+  const segs = path.replace(/\[(\d+)\]/g, '.$1').split('.').filter((s) => s !== '')
+  let cur: unknown = root
+  for (const s of segs) {
+    if (cur === null || cur === undefined) return undefined
+    cur = (cur as Record<string, unknown>)[s]
+  }
+  return cur
+}
+
+/**
+ * 宽松相等：dnd5e 会把很多值规范化（'' ↔ null、0 ↔ '0'、数字 ↔ 字符串），
+ * 严格比较会把「其实已经落库了」误报成不一致 —— 那正是这个工具要消灭的假信号。
+ */
+function eqLoose(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  const empty = (x: unknown): boolean => x === undefined || x === null || x === ''
+  if (empty(a) && empty(b)) return true
+  if (empty(a) || empty(b)) return false
+  if (typeof a === 'object' || typeof b === 'object') return JSON.stringify(a) === JSON.stringify(b)
+  return String(a) === String(b)
 }
 
 function makeTool(
@@ -684,6 +754,9 @@ export function apply(ctx: any): void {
     if (ctx.systemPrompt?.section) {
       const dispose = ctx.systemPrompt.section({ name: 'dsh-foundry-vtt:workflow', order: 150, text: WORKFLOW_PROMPT })
       ctx.effect?.(() => dispose)
+      // 文案风格段（order 160，紧随铁律之后）：来源 = 用户提示词库 05_扮演技巧.md §14/§23 + 04_战斗描述.md
+      const dispose2 = ctx.systemPrompt.section({ name: 'dsh-foundry-vtt:desc-style', order: 160, text: DESC_STYLE_PROMPT })
+      ctx.effect?.(() => dispose2)
     }
   } catch { /* 旧环境无 systemPrompt service 时静默降级 */ }
 
@@ -730,10 +803,10 @@ export function apply(ctx: any): void {
   // 2. foundry_search —— 按名称搜实体，返回 uuid/documentType/subType/package。
   REG(makeTool(
     'foundry_search',
-    '按名称搜索 Foundry 实体，返回 uuid、documentType、subType、package。这是把名字转成 uuid 的主要途径，供其他工具用。filter 形如 "Actor" 或 "documentType:Item,subType:weapon"，键有 documentType/subType/folder/package/resultType。**注意：世界内场景（Scene）搜不到（search 只索引 compendium），查场景用 foundry_get_scene。重要工作流：①SRD 标准怪在 package:dnd5e.monsters（如标准 Zombie），中文汉化怪多在 5e-monster-book/5e-dlc-monster/yihusishe 等包，中英文都搜、必要时换 package 过滤重搜；②用户要把世界包里的怪放地图时：foundry_search 找到现成怪 uuid → foundry_import_entity 导入世界 → foundry_place_token 放到地图，禁止自己新建怪物（新建会丢汉化/数值/特性）。③要改怪数值/加自动化时才 foundry_get_entity 读它的完整 JSON 照抄结构再改——不要从零手搓 dnd5e 文档。**',
+    '按名称搜索 Foundry 实体（GET /search），返回 uuid、documentType、subType、package、resultType。这是把名字转成 uuid 的主要途径，供其他工具用。filter 形如 "Actor" 或 "documentType:Item,subType:weapon"。⚠️ 实测要点（别踩）①resultType 只有 "CompendiumEntity" 一个有效取值，传 Actor/Item/WorldEntity 都返回 0 条——按文档类型筛选用 documentType（Actor/Item/Scene/JournalEntry/RollTable/Macro…）；②**世界内实体同样搜得到**（uuid 形如 Scene.xxx / Actor.xxx，package 为 null），并非只索引 compendium，场景可直接在这里搜，只有已知场景 id 时才用 foundry_get_scene；③relay 原始响应里**没有 total 字段**，本工具已本地补上 total/count。重要工作流：①SRD 标准怪在 package:dnd5e.monsters（如标准 Zombie），中文汉化怪多在 5e-monster-book/5e-dlc-monster/yihusishe 等包，中英文都搜、必要时换 package 过滤重搜；②用户要把世界包里的怪放地图时：foundry_search 找到现成怪 uuid → foundry_import_entity 导入世界 → foundry_place_token 放到地图，禁止自己新建怪物（新建会丢汉化/数值/特性）。③要改怪数值/加自动化时才 foundry_get_entity 读它的完整 JSON 照抄结构再改——不要从零手搓 dnd5e 文档。',
     {
       query: { type: 'string', description: '搜索词，如 goblin / longsword' },
-      filter: { type: 'string', description: '过滤，如 "Actor" 或 "documentType:Item,subType:weapon"' },
+      filter: { type: 'string', description: '过滤，如 "Actor" 或 "documentType:Item,subType:weapon" 或 "package:dnd5e.monsters"。合法键：documentType / subType / folder / package / resultType（resultType 实测只有 "CompendiumEntity" 有效）。' },
       limit: { type: 'number', description: '最大结果数（默认 50，最大 500）' },
       minified: { type: 'boolean', description: '返回精简结果（uuid/id/name/img/documentType），默认 true' },
       excludeCompendiums: { type: 'boolean', description: '排除 compendium 结果' },
@@ -748,7 +821,88 @@ export function apply(ctx: any): void {
       }
       if (args.filter) q.filter = args.filter
       if (args.excludeCompendiums !== undefined) q.excludeCompendiums = args.excludeCompendiums
-      return asObject(await callRelay('GET', '/search', { query: q }))
+      const raw = await callRelay('GET', '/search', { query: q })
+      const obj = asObject(raw) as Record<string, unknown>
+      // ⚠️ relay /search 的响应里**没有 total 字段**（实测顶层只有 type/requestId/query/results）。
+      // 第三方实测报告里那条「package: 过滤器打空，total:0」，根因就是读了这个不存在的字段；
+      // 实测 package:dnd5e.monsters 能正常返回结果。这里本地补上 total/count，省得 AI 再去猜。
+      const results = Array.isArray(obj.results) ? (obj.results as unknown[]) : []
+      const out: Record<string, unknown> = { ...obj, total: results.length, count: results.length }
+      // package 过滤返 0 时给出真实包名清单（2026-09-14 第三方复检抓的：package:dnd5e_classpack → 0 条）。
+      // 过滤器本身是好的 —— 我直调 relay 实测：package:dnd5e.items→52 条、package:dnd5e.equipment24→8 条、
+      // package:dnd5e.monsters→2 条，而真实包名是**三段**的 dnd5e_classpack.monsterspack（→2 条）。
+      // 真正的问题是「包名写错就静默返 0」，调用方会误以为这个世界压根没有这个东西。所以补一条提示。
+      if (results.length === 0 && typeof args.filter === 'string' && args.filter.indexOf('package:') >= 0) {
+        try {
+          const filterStr = args.filter
+          const q2: Record<string, unknown> = { ...q }
+          delete q2.filter
+          const dt = /documentType:([A-Za-z]+)/.exec(filterStr)
+          if (dt) q2.filter = 'documentType:' + dt[1]
+          const obj2 = asObject(await callRelay('GET', '/search', { query: q2 })) as Record<string, unknown>
+          const r2 = Array.isArray(obj2.results) ? (obj2.results as Array<Record<string, unknown>>) : []
+          const pkgs = Array.from(new Set(r2.map((x) => {
+            const parts = String(x.uuid ?? '').split('.')
+            return parts.length >= 4 ? parts.slice(1, -2).join('.') : ''
+          }).filter(Boolean))).slice(0, 12)
+          out.packageHint = '⚠️ 加了 package 过滤后 0 条。过滤器本身没坏（实测 package:dnd5e.items→52 条、dnd5e.equipment24→8、dnd5e.monsters→2），'
+            + '所以多半是**包名不完整**：compendium 包名可能是多段的 —— 例如真实包名是 dnd5e_classpack.monsterspack，只写 dnd5e_classpack 就是 0 条。'
+            + (pkgs.length
+              ? '去掉 package 后，关键词命中的结果分布在这些包里 → ' + pkgs.join(' / ') + '。照抄其中一个完整包名重试。'
+              : '去掉 package 过滤再搜一次看看。')
+        } catch {
+          /* 提示拿不到不影响主结果 */
+        }
+      }
+      return out
+    },
+  ))
+
+  // 2.5 foundry_diff —— 写完读回，跟「本来要写的」逐路径比对。
+  // 存在理由（第三方实测报告最该修的第一条）：这个包的失败模式高度一致 ——
+  // 不是报错，是「成功」。所以调用方对每次写入都条件反射读回，调用数直接翻倍。
+  // 这里把「读回 + 比对」做成一次调用，并给出 want/got 对照。
+  REG(makeTool(
+    'foundry_diff',
+    '把「你本来要写的值」和「世界里的实际值」逐路径比对（读回 + 本地 diff）。任何写操作（foundry_create_item_minimal / foundry_update_entity / foundry_patch_item / foundry_add_effect）之后用它一次确认多个字段到底落库没有，省掉「自己 get_entity 再肉眼核对」那一轮。expected 传「点号路径 → 期望值」，路径与 update 的 data 同构、支持数组下标，例：{"system.rarity":"rare","system.damage.base.denomination":8,"system.activities.dnd5eactivity100.save.dc.formula":"13"}。mismatched 非空就是没落库或被系统改写，别当成成功交付。',
+    {
+      uuid: { type: 'string', description: '要核对的实体 uuid（支持内嵌物品 Actor.<actorId>.Item.<itemId>）' },
+      expected: { type: 'object', description: '点号路径 → 期望值，如 {"system.rarity":"rare","system.attributes.hp.value":15}' },
+    },
+    ['uuid', 'expected'],
+    async (args) => {
+      const uuid = String(args.uuid ?? '').trim()
+      if (!uuid) return { error: 'uuid 必填' }
+      const expected = args.expected as Record<string, unknown> | undefined
+      if (!expected || typeof expected !== 'object' || Array.isArray(expected) || Object.keys(expected).length === 0) {
+        return { error: 'expected 必填，且至少给一个「路径: 期望值」，如 {"system.rarity":"rare"}' }
+      }
+      const raw = await callRelay('GET', '/get', { query: { ...targetingQuery(args), uuid } })
+      const rec = raw as Record<string, unknown> | undefined
+      // ⚠️ /get 通常直接返回实体，但 /create 会包一层 {uuid, entity} —— 两种都兜住。
+      const doc =
+        (rec && typeof rec.entity === 'object' && rec.entity) ||
+        (rec && typeof rec.data === 'object' && rec.data) ||
+        rec
+      const matched: Record<string, unknown> = {}
+      const mismatched: Array<Record<string, unknown>> = []
+      for (const [path, want] of Object.entries(expected)) {
+        const got = readPathLoose(doc, path)
+        if (eqLoose(got, want)) matched[path] = got
+        else mismatched.push({ path, want, got, reason: got === undefined ? '未落库（读回 undefined）' : '值不同（被 dnd5e 改写或清洗）' })
+      }
+      const total = Object.keys(expected).length
+      return {
+        uuid,
+        total,
+        matchedCount: total - mismatched.length,
+        allMatched: mismatched.length === 0,
+        matched,
+        mismatched,
+        hint: mismatched.length === 0
+          ? '全部字段与期望一致。'
+          : '看 mismatched 的 want/got：未落库多为键名不被 dnd5e 接受，值不同多为系统规范化或清洗。',
+      }
     },
   ))
 

@@ -53,6 +53,12 @@
 7. **`_stats.compendiumSource` 与 `_stats.duplicateSource` 一律为 `null`**（或整个省略 `_stats`）。绝不保留指向 `Scene.…Token.…` 的来源路径——这种失效 UUID 会在战斗中触发 `fromUuid` 未捕获错误，**中断数据库写入事务，表现为传奇点数不扣、流程卡死、莫名暂停**。⚠️ 特别注意：**若在场景 token 实例上编辑过某个 item，FVTT 会自动把该 token 的 UUID 写进 compendiumSource**；导出或复用前必须清除（或改在侧边栏 Actor 本体上编辑，而非画布 token 上）。
 8. **一个 item 只放一个"会结算"的主 activity（与 §4 通则同一条铁律）。** "会结算"指会掷命中、掷豁免或直接造成伤害/治疗的 activity（`attack`/`save`/含 `damage` 的 / `heal`）。**禁止在同一个 item 内并列两个这类 activity**（典型错误：把"单体劈砍"和"范围横扫"塞进同一把战锤）。实测后果：midi-qol 会借其 `otherActivityCompatible`/otherActivity 合并机制把它们串成**同一张卡连续结算**——先按命中结算单体伤害 → 再让目标做豁免 → 豁免失败再叠加范围伤害，使用**一次**就打出**双份**伤害。⚠️ 注意：activity 自带的 `midiProperties.otherActivityCompatible` 默认即为 `true`（来自真实导出样本），所以**只要同一 item 里有两个会结算的 activity，默认就会被合并**，不是偶发。**正确做法：拆成两个独立 item，各放一个主 activity**（单体直击=一个 `weapon`；范围震地=另一个 item，按 M3 做 `save`+模板）。回合内打几次、打哪几个，交给「多重攻击」feat（M2）的**描述**说明，DM 分别点击对应 item 触发。（同根源亦见 §M9：传奇动作也必须独立成 item。）一个 item 内放多个 activity **仅在它们彼此不结算**时才安全——例如一个 `utility` 开关 + 它要施加的被动 effect。
 
+> ⚠️ **勘误（2026-09-15 · 源码级 + 实机验证）**：本条**现象对、归因错**。真正触发连带的是**主活动的 `otherActivityId` 为空串** —— midi-qol 里 `attack` 的该字段默认即 `""` = **自动探测**（`check`/`save`/`utility` 默认 `"none"`）；`otherActivityCompatible` 只是**资格标记**（默认 true），只影响编辑期下拉与自动探测。
+> ⇒ **把每个会结算的活动的 `otherActivityId` 显式写成 `"none"`，同一 item 内即可安全共存多个活动，不必拆物品**（显式填 id 时 midi 不复查兼容标记）。
+> ✅ **已实测**：《挽歌》（attack + save 同 item）点斩不带豁免、点裂弦不带攻击、不弹「选择活动」、伤害不串、DC 正确。
+> 另：13.0.55 已**不存在**「自动合并行动」设置（`autoMergeActivityOther` 自 12.4.31 起从源码移除，只剩 i18n 文案）。
+> 详见 `搓怪物做效果做mod任何时候，看到了一定要看仔细看\midi-otherActivity-源码级结论.md`。§0 摘要版同样适用本勘误。
+
 ---
 
 ## 0bis. 描述纪律与自动化日志（卡面 / 日志分离 · v1.5 新增）
