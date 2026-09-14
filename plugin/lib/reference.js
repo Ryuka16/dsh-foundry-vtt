@@ -561,6 +561,27 @@ attributes.ac.formula                  "12 + @abilities.int.mod"（配合 attrib
 - duration.seconds：状态持续秒数（60=1 分钟=10 轮战斗）；永久状态不写 duration 或用 duration.seconds=null
 - 完整「命中→豁免→失败中毒/流血」链路 = weapon 的 attack 活动 otherActivityId 指向 save 活动 + save 活动空壳 effects + 本模板（见 save-activity）`,
     creature: `【dnd5e 5.3.3 NPC 数值骨架 · 核心字段已验证】
+⚠️ 2026-09-17 先读这段：怪物卡实测结构（从世界样本「暮光审判官」X3aP0qNQEPXUOhiV 与构装体「铁卫」RSukGm2PyHWRYYr1 逐字核对，**比下面的骨架更权威**）：
+  ★ 免疫与语言的真实路径（下面骨架里写的 attributes.damage.immunities 是错的旧路径）：
+    system.traits.di = { value:[], custom:"", bypasses:[] }   ← 伤害免疫
+    system.traits.ci = { value:[], custom:"" }                ← 状态免疫（铁卫：charmed/frightened/paralyzed/poisoned/exhaustion）
+    system.traits.languages = { value:[...], custom:"", communication:{} }  ← 语言在 traits 里，不在 attributes
+    system.traits.dr / dv 同构（dr 另有 bypasses 用于「非魔法武器」这类）
+  ★ 感官：system.attributes.senses = { units:"ft", special:"", ranges:{ darkvision, blindsight, tremorsense, truesight } }
+    ⚠️ 数值在 senses.ranges.* 下，不是 senses.darkvision 直挂。
+  ★ AC：system.attributes.ac = { calc, flat, formula, base, min, bonus, cover }
+    —— 计算值 base/min/bonus/value 由源码 L40332-40335 生成；要加值必须 calc:"natural"（见 pitfalls 11/12）。
+  ★ HP：system.attributes.hp = { value, max, temp, tempmax, formula } —— NPC 自带临时生命值就直接写 temp（安保型 20 点就落这里）。
+  ★ 技能：system.skills.<三字母>.value = 熟练等级（0 无 / 1 熟练 / 2 专精）—— 医药+4（感知0）= 2 级专精。
+    被动察觉由 10 + 察觉加值自动算出（察觉+2 → passive 12），不用手填。
+  ★ system.attributes.prof = 熟练加值（CR3 → 2）。
+  ★【多重攻击】= 一个 feat 物品 + type:"utility" 活动（activation action），**不是 system.actions**。
+    官方（暮光审判官 actMulti00000000 / 铁卫）都这么做：点了只在聊天卡提示，由 GM 点两次武器。想真自动要另配 midi，别以为建了 feat 就自动打两下。
+  ★【每回合回血】= feat 的 heal 活动（healing.custom.formula="10"）+ 物品级 AE 的 change
+    key="flags.midi-qol.OverTime" mode 0 value="turn=start, damageRoll=10, damageType=healing, condition=@attributes.hp.value > 0"
+    —— damageType=healing 就是回血的实现方式；铁卫「核心再生」逐字形态，可直接照抄。
+  ★【攻击加值】武器活动 attack.ability="str" + damage.parts[].bonus="@mod"，熟练由 dnd5e 自动加。
+  ★【物品分配】每个模块一份物品（世界目录建模板 → foundry_modify_actor give 给怪），不要把三个模块的活动塞进一张卡。
 建议先 foundry_get_entity(uuid, summary:true) 读一个现成同类怪拿准确字段路径再改；手写参考此骨架（僵尸，已验证数值）：
 
 {
@@ -990,8 +1011,34 @@ ActiveEffect 关键字段：
 7. 权限：玩家端只能改自己的；ownership 深合并收回权限用 {"-="+userId:null}。unlinked token 要改基础 world actor 的 ownership。
 8. 术语对照：necrotic=暗蚀 / psychic=心灵 / radiant=光耀 / bludgeoning=钝击 / piercing=穿刺 / slashing=挥砍。
 9. 卡面描述必须有对应真实机制（无机制的纯风味文字=坑，用户会问「这怎么触发」）。
-10. 汉化：系统自带 5e_chn 翻译模块（world-info 已确认 5.3.0），实体名可直接写中文。`,
+10. 汉化：系统自带 5e_chn 翻译模块（world-info 已确认 5.3.0），实体名可直接写中文。
+⚠️ 2026-09-17 补 5 条（做「青脑叁型」怪物时踩的，源码/实测双证）：
+11. 【AC 加值被吞】dnd5e 的 ac.calc 两个取值语义完全不同（源码 F:\\FVTT\\data\\systems\\dnd5e\\dnd5e.mjs L40278-40286 与 L40332-40335）：
+    case "flat":    ac.value = Number(ac.flat); return;   ← 注释原文「Flat AC (no additional bonuses)」= 完全不吃加值，直接 return
+    case "natural": ac.base = Number(ac.flat); break;     ← 「Natural AC (includes bonuses)」= 走完整计算
+    ac.value = Math.max(ac.min, ac.base + ac.shield + ac.bonus + ac.cover);
+    ⇒ 怪物/角色要有任何 AC 加值（如「有临时 HP 期间 AC+2」），calc 必须写 "natural"；写 "flat" 加值被静默吞掉。
+    ⇒ 实测：calc:"flat" + flat:15 + ac.bonus=2 → ac.value 仍 15；改 natural 后 → 17。
+12. 【AC 下限是真实字段】system.attributes.ac.min —— 它就是 ac.value = Math.max(ac.min, ...) 里的下限（同 L40335）。
+    要写「AC 不会降低至 X 以下」：AE change 用 key "system.attributes.ac.min" + mode 5 OVERRIDE value "15"，或直接写 actor 上。
+    ⚠️ 自省：我曾当面断言「AC 下限做不了自动化」——有这段源码就不该那么说。**先查源码，别凭印象否定**。
+13. 【NPC 攻击加值别写死】武器活动 attack.ability="str" + damage.parts[].bonus="@mod"，dnd5e 自动加熟练
+    （力17→+3，CR3 PB+2 ⇒ 命中+5、伤害 1d6+3）。写死数字 = 角色一升级就错。
+14. 【多重攻击不是 system.actions】是 feat 物品 + type:"utility" 活动（官方暮光审判官/铁卫都这么做），点了只提示，不会自动打两次。
+15. 【怪物免疫/语言的真实路径】system.traits.di.value / traits.ci.value / traits.languages.value —— **不是** attributes 下的 damage.immunities 那套旧路径（creature 主题骨架里那行是错的，已在主题顶部更正）。`,
     dae: `【DAE/AE 主动效果机制核心 · 出自用户资料库 data-dict §25/§26/§27】
+⚠️ 2026-09-17 实测：enableCondition / disableCondition 的表达式【必须带 @ 前缀】，否则字段不替换。
+  验证方法（用 DAE 自己的 API 一次问清，别猜）：
+    const ev = game.modules.get('dae').api.evalExpression();
+    ev('@attributes.hp.temp > 0', actor.getRollData())   → 返回 "20 > 0"   ✅ 字段被替换成数值
+    ev('attributes.hp.temp > 0', actor.getRollData())    → 原样返回该字符串 ❌ 字段没被替换 ⇒ 条件永远为真
+  ⇒ 写法一律用 @attributes.xxx / @abilities.xxx 这种带 @ 的形式（与 midi 的 OverTime 串里一致）。
+⚠️ 但仍有一条【未解】：把 actor 的 hp.temp 从 20 改成 0 后，带 @ 的 enableCondition 【没有重新评估】——
+  实测 effect.disabled 仍为 false、AC 加值仍生效。已排除：表达式写法（带 @ 已验证替换成功）、
+  效果未挂载（appliedEffects 里有）、DAE 未加载（13.0.25 active）。
+  推测条件只在效果创建/更新时评估一次，actor 字段变化不触发重评 —— 【此条为推测，未拿到 DAE 评估时机的源码证据】。
+  实务：需要「随字段实时开关」的效果（如「有临时 HP 期间 AC+2」），改用物品宏，或让 GM 手动禁用该效果；
+  【不要依赖 enableCondition 做实时开关】。已实测的失败案例：青脑叁型·安保模块的「防护插板」现在是无条件 AC+2。
 ⚠️ 2026-09-17 specialDuration 完整白名单（来源：DAE 仓库 src/module/Systems/DAEdnd5e.ts L650-700；回合类两项在 src/module/dae.ts L80-87）：
   回合类：turnStart ｜ turnEnd ｜ turnStartSource ｜ turnEndSource ｜ combatEnd ｜ joinCombat
     （后两项【仅当 times-up 模块 active 且版本 > 0.0.9 才注册】）
