@@ -819,9 +819,10 @@ Actor 顶层：
 - [ ] 所有 `effect.origin` 为 `""`
 - [ ] 所有 item/effect 的 `_stats.compendiumSource`、`_stats.duplicateSource` 为 `null`（无 `Scene.…Token.…` 残留）
 - [ ] 含宏的 item：`onUseMacroName` + `dae.macro` + `itemacro.macro` 三者齐备，宏体可过 `new Function()` 校验
-- [ ] **token 视野已配**：会看的怪 `sight.enabled:true`+`range`+`visionMode`，`detectionModes` 按感官列全（darkvision→basicSight、truesight→seeAll、blindsight→blindsight、tremorsense→feelTremor，外加 lightPerception）——只填 `senses.ranges` 不配 token 视野则 token 全瞎（见 §12.1）
-- [ ] **指示物命名**：`appendNumber` 默认 `false`（不加数字后缀）；普通/可成群小怪 `prependAdjective:true`（只加随机形容词前缀），具名/精英/Boss `prependAdjective:false`（见 §12.2）
-- [ ] **动画**（如需）：按招式类型挂 `flags.autoanimations`（见 §12.3 调色板）；传送类用 `menu:"preset"`+`presetType:"teleportation"`
+- [ ] **token 视野已配**：会看的怪 `sight.enabled:true`+`range`+**`visionMode:"basic"`（★别写 `darkvision`，会让屏幕变黑白）**，`detectionModes` 按感官列全（darkvision→basicSight、truesight→seeAll、blindsight→blindsight、tremorsense→feelTremor，外加 lightPerception）——只填 `senses.ranges` 不配 token 视野则 token 全瞎（见 §12.1）
+- [ ] **描述用了富文本 enricher**：名字用 `@UUID[…]{显示名}` 或 `&Reference[规则名]`；攻击/豁免/检定用 `[[/attack …]]` `[[/save …]]` `[[/check …]]` —— 写在 `system.description.value` 里，卡面上就是**可点击的按钮/链接**（见 §12.3）
+- [ ] **指示物命名**：`displayName:20`（拥有者悬停时显示，**必设**，否则默认 0 = 从不显示、玩家看不到名字）；`appendNumber` 默认 `false`（不加数字后缀）；普通/可成群小怪 `prependAdjective:true`（只加随机形容词前缀），具名/精英/Boss `prependAdjective:false`（见 §12.2）
+- [ ] **动画**（如需）：按招式类型挂 `flags.autoanimations`（见 §12.4 调色板）；传送类用 `menu:"preset"`+`presetType:"teleportation"`
 - [ ] **法术：官方只列、自创才写**：施法者怪物的官方法术（《5E万法大全》清单中有）**未写进 JSON**、仅列「官方法术清单」交 DM；JSON 内仅含**自创 / 魔改**法术的完整 spell item；施法者配置（spellcasting / spell.level / spells 法术位 + 施法 feat）齐备（见 §M8）
 - [ ] **没有任何本规范未出现过的字段/key**
 
@@ -1199,7 +1200,7 @@ effects[]：    该角色→"origin"✅ 其他角色→"otherOrigin"✅ 背景�
 
 **写法**（以黑暗视觉 60 为例）：
 ```json
-"sight": { "enabled": true, "range": 60, "angle": 360, "visionMode": "darkvision",
+"sight": { "enabled": true, "range": 60, "angle": 360, "visionMode": "basic",
            "color": null, "attenuation": 0.1, "brightness": 0, "saturation": 0, "contrast": 0 },
 "detectionModes": [
   { "id": "lightPerception", "range": 60, "enabled": true },
@@ -1217,7 +1218,14 @@ effects[]：    该角色→"origin"✅ 其他角色→"otherOrigin"✅ 背景�
 | 振动感知 | `tremorsense` | 感知震颤 | `feelTremor` |
 | （基础见光） | — | 感知光照 | `lightPerception` |
 
-规则：`sight.range` 取所有感官中最大距离；有黑暗视觉则 `visionMode:"darkvision"`，否则 `"basic"`。`detectionModes` 必含 `lightPerception`（见被照亮处）+ 对应各感官的 mode。例：黑暗视觉60+真视30 →
+规则：`sight.range` 取所有感官中最大距离。
+
+**★ `visionMode` 一律写 `"basic"`，不要写 `"darkvision"`**（2026-09-17 用户亲令修正）——
+darkvision 渲染模式会把**屏幕变成一片黑白**，玩家观感很差。D&D 的「黑暗视觉 60 尺」在 FVTT 里是由
+`senses.ranges.darkvision`（卡面数值）+ `detectionModes` 里的 `basicSight`（实际探测能力）二者表达的，
+**与渲染模式无关**。别用 visionMode 去表达感官。
+
+`detectionModes` 必含 `lightPerception`（见被照亮处）+ 对应各感官的 mode。例：黑暗视觉60+真视30 →
 ```json
 "detectionModes": [
   { "id": "lightPerception", "range": 60, "enabled": true },
@@ -1227,15 +1235,63 @@ effects[]：    该角色→"origin"✅ 其他角色→"otherOrigin"✅ 背景�
 ```
 （另有 `senseAll`/`senseInvisibility`/`seeInvisibility` 三种特殊 mode，普通怪不挂。）
 
-### 12.2 指示物命名（appendNumber / prependAdjective）
+### 12.2 指示物命名（displayName / appendNumber / prependAdjective）
 
-`prototypeToken` 顶层两布尔：
-- `appendNumber`：未关联时在名后追加递增数字（「哥布林 3」）。
-- `prependAdjective`：未关联时在名前加随机形容词（「愤怒的哥布林」）。
+`prototypeToken` 的三个命名字段：
 
-**规则**：`appendNumber` **默认 `false`**（不加数字后缀，除非 DM 特别想要编号）。`prependAdjective`：普通 / 杂兵 / 可成群的小怪设 **`true`**（只加随机形容词前缀，如「愤怒的哥布林」）；独特 / 具名 / 精英 / Boss 设 **`false`**。
+**① `displayName`（数字，名字显示模式）—— 一律设 `20`**
 
-### 12.3 动画（flags.autoanimations）
+| 值 | 常量名 | 含义 |
+|---|---|---|
+| 0 | `NONE` | 从不显示 |
+| 10 | `CONTROL` | 仅控制者可见 |
+| **20** | **`OWNER_HOVER`** | **拥有者悬停时显示 —— 本项目统一用这个** |
+| 30 | `HOVER` | 悬停时显示 |
+| 40 | `OWNER` | 仅拥有者可见 |
+| 50 | `ALWAYS` | 始终显示 |
+
+枚举来自 **`foundry.CONST.TOKEN_DISPLAY_MODES`**（2026-09-17 世界实读坐实）。
+⚠️ **v13 的 `CONFIG.Token.displayModes` 已不存在** —— 读它得 `undefined`、用它 localize 出 `n/a`，必须走 `foundry.CONST`。
+⚠️ 改 `prototypeToken` **不影响已放上地图的 token**（那已是独立文档，要单独改）。
+
+**② `appendNumber`（布尔）**：未关联时在名后追加递增数字（「哥布林 3」）。**默认 `false`**（不加数字后缀，除非 DM 特别想要编号）。
+
+**③ `prependAdjective`（布尔）**：未关联时在名前加随机形容词（「愤怒的哥布林」）。普通 / 杂兵 / 可成群的小怪设 **`true`**（只加随机形容词前缀）；独特 / 具名 / 精英 / Boss 设 **`false`**。
+
+### 12.3 描述富文本 enricher（★ 做怪物、做物品一律要用）
+
+`system.description.value` 支持**富文本 enricher** —— 写上这串代码，卡面上就渲染成**可点击的名字 / 掷骰按钮**。官方怪物与物品的描述**全部**是这么写的；不写就是死文字，玩家得自己去翻卡找按钮。
+
+**① 引用名字（点击在侧栏打开）**
+
+| 写法 | 效果 |
+|---|---|
+| `@UUID[Compendium.dnd5e.items.Item.xxxxx]{+1 长剑}` | 显示**自定义名字**，点击打开该文档（玩家需 Observe 以上权限） |
+| `&Reference[prone]` | dnd5e **规则引用**，自动识别名字、渲染成带 tooltip 的链接（状态 / 规则 / 技能都能引） |
+
+**② 掷骰按钮（点一下真的掷）** —— dnd5e 自己注册的（源码 `module/enrichers.mjs` L13-18）
+
+| 写法 | 效果 |
+|---|---|
+| `[[/attack +8]]` | 攻击检定 |
+| `[[/save dex 14]]` | 豁免（可加标签：`[[/save dex 14]]{敏捷豁免}`） |
+| `[[/check dex 12]]` | 属性检定 |
+| `[[/damage 2d6 fire]]` | 伤害掷骰 |
+| `[[/heal 1d8]]` | 治疗 |
+| `[[/item xxx]]` `[[/skill prc]]` `[[/tool thief]]` `[[/concentration]]` `[[/award 100 xp]]` | 物品 / 技能 / 工具 / 专注 / 经验 |
+
+核心 Foundry v13 通用：`[[/r 3d6]]`（`/roll` `/gmroll` `/blindroll` 同理）。
+另有 `[[lookup 类别 关键字]]`、`[[language ...]]`（同文件 L23-26）。
+
+**③ 最正规的可点按钮**（直接绑活动，dnd5e 文档注释 L126-156 的官方写法）：
+
+```html
+<a class="roll-action" data-type="attack" data-formula="+8" data-activity-uuid="…活动uuid…">+8 攻击</a>
+```
+
+⚠️ **写错不报错** —— 不匹配任何 enricher 正则的内容会**原样显示为纯文本**，所以别指望 FVTT 提示你写错了。
+
+### 12.4 动画（flags.autoanimations）
 
 动画挂在 item 顶层 `flags.autoanimations`；不挂则走 AA 全局自动匹配（泛用、常显简陋）。手挂可精确指定。**外壳**：
 ```json

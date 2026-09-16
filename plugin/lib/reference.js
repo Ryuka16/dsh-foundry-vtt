@@ -1077,6 +1077,28 @@ ActiveEffect 关键字段：
 14. 【多重攻击不是 system.actions】是 feat 物品 + type:"utility" 活动（官方暮光审判官/铁卫都这么做），点了只提示，不会自动打两次。
 15. 【怪物免疫/语言的真实路径】system.traits.di.value / traits.ci.value / traits.languages.value —— **不是** attributes 下的 damage.immunities 那套旧路径（creature 主题骨架里那行是错的，已在主题顶部更正）。`,
     dae: `【DAE/AE 主动效果机制核心 · 出自用户资料库 data-dict §25/§26/§27】
+⚠️ 2026-09-17 补【Effect Macro 模块】—— 这是「效果挂宏」的第三条路（与 DAE 的 macro.execute、midi 的物品宏都不同）：
+  模块 id = effectmacro（作者 Zhell；manifest 里的 github.com/krbz999/effectmacro **已 404**，真源码在 git.gay/Zhell/effectmacro，Forgejo 自建站）。
+  用法：宏**嵌在 ActiveEffect 里**（AE 配置界面 → 选触发类型 → Add Macro / Edit Macro），**不需要物品**。
+  身份：触发时以**持有该效果的 actor 的 owner** 身份执行；若该 actor 无 owner，则**以 GM 身份执行**。
+  范围：模块自动遍历**当前影响该 actor 的所有效果**（所以物品上 transfer:true 的常驻效果也算）。
+  一个效果**可以同时挂多种类型**的宏，不止一个。
+  11 种触发时机（原文）：
+    ① 效果被创建时  ② 效果被删除时  ③ 效果被切换时（开 / 关 / 两者）
+    ④ 持有该效果的角色**开始自己的回合**时  ⑤ 持有该效果的角色**结束自己的回合**时
+    ⑥ **任意**战斗者回合开始时  ⑦ **每轮**开始时  ⑧ **每轮**结束时
+    ⑨ 持有该效果的角色**在战斗中被标记为战败**时  ⑩ **战斗开始**时  ⑪ **战斗结束**时
+    另有静态 never 类型 = **永不自动触发**，只供其他脚本显式调用。
+  宏内预定义变量 8 个（无需声明）：effect / actor / character / token / scene / origin / speaker / item
+    · actor  = 持有该效果的 actor（**即使效果挂在物品上**）；无则 null
+    · character = 当前用户绑定的角色；无则 null
+    · token  = unlinked（合成）时取该 actor 在自己场景上的 token；否则取**当前查看场景**上属于该 actor 的第一个 token；无则 null
+    · scene  = token 所在场景；无 token 则用**当前激活场景**；无则 null
+    · origin = ActiveEffect.origin 指向的文档；无则 null
+    · item   = 效果挂在**物品**（而非 actor）上时是那个物品；否则 null
+  ⚠️ 已知坑（本机资料库记录）：effectmacro 的 onLongRest **不触发** → 改用 uses 的 recovery:"lr"。
+  文档：资料库 模块文档\\Effect Macro\\{README.md, Home.md}（已随插件 manuals 发布，foundry_knowledge{topic:"manuals"} 可读）
+  源码（本机已 clone 供查证）：code/triggers/combat.mjs 5105B ／ code/triggers/effect.mjs 5900B ／ code/triggers/systems/dnd5e.mjs 8584B
 ⚠️ ★★ 2026-09-17 【重大纠正，推翻了本节上一版的错误结论】—— 条件表达式的两个字段别用错：
   | 字段 | UI 名 | 语义 | 适用范围 |
   | enableCondition | 表达式，如果为假将从角色中移除效果 | 假 → 【删除】效果 | 【仅非转移效果】（物品使用后施加到目标身上的效应） |

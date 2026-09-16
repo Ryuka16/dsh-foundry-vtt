@@ -144,7 +144,28 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 - ★★ sound 的 7 个字段：enable / file / volume / delay / startTime / repeat / repeatDelay —— **只写 {enable:false} 等于根本没配**。只配 video 不配 sound = 半成品（实测事故：武器动画配对了但没声音，用户得手动提醒）。
 - 素材已装好三个包：psfx（音效，如 psfx.weapon-attacks.sword.v1、psfx.weapon-swooshes.necrotic=暗蚀）、blfx、jb2a（动画，如 jb2a.melee_attack.03.*）。sound.file 既可写数据库路径（psfx.xxx），也可写直接文件路径（modules/.../x.mp3）。
 - 最省事的办法：抄现成条目 —— execute_js 读 game.settings.get("autoanimations","aaAutorec-melee")（120 条）/ "aaAutorec-range"（159 条），全都带完整 sound，改个名和路径就能用。
-- 动画路径不许猜：用 execute_js 调 Sequencer.Database.entryExists("jb2a.xxx") 验证（**返回路径串 = 存在，返回 undefined = 不存在**），或用 foundry_file_system 浏览目录。路径猜错 = 卡面裂图 + 不播。`;
+- 动画路径不许猜：用 execute_js 调 Sequencer.Database.entryExists("jb2a.xxx") 验证（**返回路径串 = 存在，返回 undefined = 不存在**），或用 foundry_file_system 浏览目录。路径猜错 = 卡面裂图 + 不播。
+9. **建角色 / 怪物卡时，token 的显示名称一律设成「拥有者悬停时显示」**：
+- 字段 = prototypeToken.displayName，值是**数字**（枚举来自 foundry.CONST.TOKEN_DISPLAY_MODES；⚠️ v13 的 CONFIG.Token.displayModes **已不存在**，读它得 undefined、localize 出 n/a）：
+  · 0 = NONE 从不显示　· 10 = CONTROL 仅控制者可见　· **20 = OWNER_HOVER 拥有者悬停时**　· 30 = HOVER 悬停时　· 40 = OWNER 仅拥有者　· 50 = ALWAYS 始终显示
+- **默认给 20**：玩家不该一眼看到全场 token 的名字。NPC / 怪物 / 角色卡都按这个建 —— 建卡时设的是**原型**，以后放到地图上的 token 都自动继承。
+- foundry_create_creature **已自动写入 displayName:20**（无需你操心）；但**用 foundry_create_entity 手搓 Actor JSON 时必须自己写上 prototypeToken.displayName:20**，漏了就是 0 = 从不显示，玩家看不到名字。
+- 已有实体要补：foundry_update_entity{uuid, data:{prototypeToken:{displayName:20}}}。
+- ⚠️ 改 prototypeToken **不影响已放上地图的 token**（那是独立文档）—— 要改已放置的用 foundry_canvas_update{documentType:"tokens", data:{displayName:20}}。
+10. **给怪物 / 角色配 token 视野：visionMode 一律写 basic，别写 darkvision**：
+- 字段：prototypeToken.sight{enabled, range, angle, visionMode, ...} + prototypeToken.detectionModes[]。
+- ★ **visionMode 恒为 "basic"** —— 用 darkvision 渲染模式会让**屏幕变成一片黑白**（用户亲验，观感极差）。
+  D&D 的「黑暗视觉 60 尺」是由 system.attributes.senses.ranges.darkvision（卡面数值）+ detectionModes 里的 basicSight（实际探测）二者表达的，**与渲染模式无关**，别拿 visionMode 去表达感官。
+- detectionModes 映射：黑暗视觉→basicSight ｜ 真视→seeAll ｜ 盲视→blindsight ｜ 颤动感知→feelTremor；**必含 lightPerception**（看得见被照亮处）。sight.range 取所有感官里的最大距离。
+- ⚠️ 只填 system.attributes.senses.ranges.* 而不配 token 视野 = **token 全瞎**（玩家操控这只怪时眼前一片黑）。
+11. **物品 / 怪物的描述里必须用富文本 enricher，不要只写死文字**：
+- 写在 system.description.value 里，卡面会渲染成**可点击的名字与掷骰按钮**。官方怪物与物品的描述全是这么写的，不写就是死文字。
+- 引用名字：@UUID[Compendium.dnd5e.items.Item.xxxxx]{显示的名字}（点击在侧栏打开；玩家需 Observe 以上权限）；&Reference[prone]（dnd5e 规则引用，自动识别名字、带 tooltip）。
+- 掷骰按钮：[[/attack +8]] ｜ [[/save dex 14]] ｜ [[/check dex 12]] ｜ [[/damage 2d6 fire]] ｜ [[/heal 1d8]] ｜ [[/item xxx]] ｜ [[/skill prc]] ｜ [[/tool thief]] ｜ [[/concentration]] ｜ [[/award 100 xp]]
+  可加显示标签：[[/save dex 14]]{敏捷豁免}；核心通用掷骰：[[/r 3d6]]。
+- 最正规的「绑活动」按钮（dnd5e 官方写法，点了走该活动完整流程）：<a class="roll-action" data-type="attack" data-formula="+8" data-activity-uuid="活动uuid">+8 攻击</a>
+- ⚠️ **写错不会报错** —— 不匹配 enricher 正则的内容会原样显示成纯文本，FVTT 不会提示你写错了。
+- 完整语法表见 foundry_reference{topic:"item-fields"}，或 foundry_knowledge{topic:"local", file:"FVTT-monster-spec-v2_1.md"} 的 §12.3。`;
 import { summarizeDoc } from './summarize.js';
 import { registerReferenceTools } from './reference.js';
 import { registerKnowledgeTools, DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR } from './knowledge.js';
@@ -723,7 +744,7 @@ function buildNpcDocument(input) {
             },
         },
         items,
-        prototypeToken: { name: input.name, actorLink: false, disposition: -1 },
+        prototypeToken: { name: input.name, actorLink: false, disposition: -1, displayName: 20 },
     };
     if (input.folder)
         doc.folder = input.folder;

@@ -1293,6 +1293,20 @@ heavilyEncumbered exceedingCarryingCapacity
 
 - `appendNumber`(bool)：未关联 token 名后追加递增数字（「哥布林 3」）。
 - `prependAdjective`(bool)：未关联 token 名前加随机形容词（「愤怒的哥布林」）。
+- **`displayName`(number)：名字显示模式** —— 枚举在 **`foundry.CONST.TOKEN_DISPLAY_MODES`**（2026-09-17 世界实读坐实）：
+
+  | 值 | 常量名 | 含义 |
+  |---|---|---|
+  | 0 | `NONE` | 从不显示 |
+  | 10 | `CONTROL` | 仅控制者可见 |
+  | **20** | **`OWNER_HOVER`** | **拥有者悬停时显示 —— 本项目默认** |
+  | 30 | `HOVER` | 悬停时显示 |
+  | 40 | `OWNER` | 仅拥有者可见 |
+  | 50 | `ALWAYS` | 始终显示 |
+
+  ⚠️ **v13 的 `CONFIG.Token.displayModes` 已不存在** —— 读它得 `undefined`，用它 localize 会得到 `n/a`；**必须走 `foundry.CONST`**（实测：`CONFIG.Token.displayModes` → undefined，`foundry.CONST.TOKEN_DISPLAY_MODES` → 完整六项）。
+  ⚠️ 建卡设的是**原型**（`prototypeToken`），放到地图上的 token 会继承；**改 prototypeToken 不影响已放置的 token**（那已是独立文档，要单独改）。
+  实测样本：世界「特醇佳酿」场景内「西格蒙德」的 token `displayName = 50`（ALWAYS）。
 
 **规则**：`appendNumber` **默认 `false`**（不加数字后缀，除非 DM 特别想要编号）；`prependAdjective` 普通/杂兵/可成群小怪 → `true`（只加随机形容词前缀），独特/具名/精英/Boss → `false`。
 
