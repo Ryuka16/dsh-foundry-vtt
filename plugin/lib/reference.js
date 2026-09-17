@@ -522,6 +522,15 @@ attributes.ac.formula                  "12 + @abilities.int.mod"（配合 attrib
 
 ⚠️ 关于本模板里 "otherActivityId": ""（这是原样导出的值，别当成该照抄的习惯）：midi-qol 里 attack 的这个字段【默认就是空串 = 自动探测 auto】。只要本 item 上还有其它类型合格（含 utility）且 otherActivityCompatible 为真的活动，它就会被自动绑到这次攻击上——点一次攻击连带别人的豁免与伤害（实测翻车点，《挽歌》那次）。需要各活动独立时，显式写 "none"（不是 ""）。本插件的 create_item_minimal 建出来的活动已是 "none"，不必手改；只有手搓 JSON 时才要自己写。详见知识库 FVTT-monster-spec-v2_1.md 的勘误块。`,
     effect: `【物品 ActiveEffect 完整模板 · 实测成功（锯肉刀流血 OverTime）】
+⚠️ 2026-09-17 补【删效果的连带责任 —— 活动级引用不会自动清】
+现象（另一会话实测）：删掉 51 个物品级 AE 后，49 条物品的 save 活动 effects[]._id 还指着已删的 _id。
+根因：deleteEmbeddedDocuments 只删效果本身，活动里的引用是【纯字符串 id】，没有任何反向清理。
+后果：活动被使用时去 item.effects.get(该 id) 取效果 → 取不到 ⇒ 效果静默不施加（不报错，只是打上去没反应）。
+⇒ 规矩：删物品级 AE 之前，先找出哪些活动的 effects[]._id 指着它，一起清（或一并删活动）。
+⇒ 扫法（一次 execute_js 拿全，别一条条查）：遍历 game.items → 每个 item 走 it.toObject().system.activities
+   → 每个活动的 effects[] → 收集 {itemId, activityId, effectId} → 与待删 effect id 集合求交集。
+⇒ 本插件（v1.4.6 起）foundry_remove_effect 会在删除前做这个扫描，把「还有哪些活动指着它」一并回报；
+   foundry_cleanup_orphan_effects 可一次性列出所有已断链的引用（只列不删，除非传 confirm）。
 放进物品/特性顶层的 effects 数组（注意：不是 activity 的 effects！层级见 save-activity 铁律）。照抄勿精简——特别是 img（不是 icon！写 icon 会被 5.3.3 丢弃）。最简情况可用 foundry_add_effect{uuid, statusId:"poisoned"} 给 actor 挂现成状态。
 
 {
@@ -698,6 +707,14 @@ type:"spell"；伤害骰同样走 damage.base（见 weapon 铁律），范围法
 }
 要点：dc.calculation:"spellcasting" = 用施法者法术 DC；范围法术 activity type:"save"；升环加成 damage.base.scaling{mode:"whole",number:1} = 每环 +1d6。复杂法术建议再 foundry_get_entity(summary:true) 读一个现成法术核对。`,
     'status-list': `【常用状态效果 id 速查 · dnd5e 核心】
+⚠️ 2026-09-17 补【i18n 键名陷阱 —— 拿 icon 别拿 name】
+现象（另一会话实测）：CONFIG.statusEffects[] 里，slowed / turned / dazed 这几个的 name 返回的是
+   MonksLittleDetails.StatusSlowed 这种【未翻译的 i18n 键名】—— 直接照抄进效果名，就印到卡面上了。
+根因：第三方模块（这里是 monks-little-details）注册状态时用了自己的 i18n 命名空间，
+   而语言文件缺对应条目时，localize 会把原键名原样返回。
+⇒ 规矩：从 CONFIG.statusEffects 取数据时，【只拿 id 和 icon】，name 自己写中文。
+⇒ 想稳一点可以查：game.i18n.has(key) 为假，就是这个状态没翻译。
+⇒ 本插件的 foundry_list_status_effects 返回的是原始 name —— 用之前先扫一眼有没有「含点号且含大写字母」的串。
 foundry_add_effect{statusId}、effects.statuses 用这些 id（全量用 foundry_list_status_effects 查）：
 poisoned 中毒 · paralyzed 麻痹 · prone 倒地 · stunned 震慑 · frightened 恐慌 · charmed 魅惑 ·
 blinded 目盲 · deafened 耳聋 · invisible 隐形 · restrained 束缚 · grappled 擒抱 ·
@@ -1049,6 +1066,17 @@ ActiveEffect 关键字段：
 7. 教训即时沉淀：翻车 24h 内写进资料库对应篇。
 五大病根（反向警示）：臆造优先于查证 / 把资料当实测 / 未验证即交付 / 绕路不复盘 / 教训不闭环。`,
     pitfalls: `【高频坑速查 · 出自用户资料库血泪教训系列 + 本插件实测翻车记录】
+⚠️ 2026-09-17 补【compendium 包的 title 可能是空串 —— 别只按名字筛包】
+现象（另一会话实测）：用关键词在包名里找「斯坦哈德」→ 0 命中 → 误报「你世界没装这个包」。
+真相：那个包 id 是 sthdhh，title 是【空字符串】（第三方模组的 module.json 没写 title）。
+⇒ 规矩：找包要同时按 id 和 title 匹配，或直接用 foundry_list_packs 列全部（id + title + 类型 + 条目数）。
+⇒ 世界里实测有 325 个包，title 空的不止一个 —— 只按名字筛必漏。
+
+⚠️ 2026-09-17 补【读包标题要用 collection.title，不是 metadata.title】
+本插件第一版写 p.metadata?.title 取值，实测【325 个包全读成空串】（世界里的包明明都有名字）。
+正解：p.title（CompendiumCollection 上的 getter）优先，退到 p.metadata.title。
+⇒ 一般规律：CompendiumCollection 实例上的 getter（title / collection / index）比 metadata 里的字段可靠；
+   metadata 是从 module.json 抓的原始元数据，字段可能缺。
 1. effects 层级（多多剑翻车）：save/attack activity 的 effects 是空壳 {_id, onSave:false}，塞 name/statuses/duration 会被 5.3.3 清洗成空。挂状态必须写物品顶层 effects（ActiveEffect 结构）。activity.effects 里每个 effect 带 statuses 的写法是另一个模块语境（§十一），REST 通道写物品时按本插件 weapon/save-activity/effect 模板走。
 2. save.dc.calculation **别写 "flat"**（不在官方 8 项枚举里，见 roll-data 主题「DC 的坑」，2026-09-17 源码+实测双证）。
    一句话：非空 calculation ⇒ **formula 被跳过**、DC 取持用者属性 DC；空串 ⇒ 才用 formula。
@@ -1296,6 +1324,13 @@ flags.midi-qol.optional.<NAME>.*（mode 0 自定义），NAME=唯一串（建议
 规则：调用前检查 attributes.hp.value>0；同一效果可多条按 回合开始→回合结束→优先级（低先）执行；沿用原始施法环数缩放；依赖行动应目标自身，含 AoE 选「光环/光环-半径·无模板」。
 ⚠ 键名大小写源文档自相矛盾（ActivityOverTime vs ActivityOvertime vs overTime），用户世界 0 实例——精确键名落 JSON 前必须实测或找样本确认，勿按本节直接写死。绝大多数持续伤害需求用经典版 OverTime 即可，需要每轮召唤/每轮检定/AoE 才上行动版。`,
     'probe': `【F12 控制台探针 · midi-qol workflow 运行时快照 · hook 签名已对 v13 globals.ts 核实】
+⚠️ 2026-09-17 补【活动级 effects 的权威读法 —— 两个坑】
+写完 save 活动的 effects[]._id 后想确认「到底写进去没有」，有三条路，只有一条可信：
+   ❌ a._source.effects —— 不刷新（拿的是创建时的快照，改完还是旧值）
+   ❌ Array.from(a.effects).map(x => x._id) —— 返回 undefined（ActiveEffect 实例上的 _id 被故意隐藏）
+   ✅ it.toObject().system.activities[aid].effects —— 权威读法（toObject 拿原始数据）
+另一会话为此误判「一条都没写进去」，白试了 5 种写法，数据其实一直在。
+⇒ 探针里读活动效果一律用 toObject；同理读其他被隐藏的原始值（_id / _stats / 引用串）都走 toObject。
 ⚠️ 2026-09-16 补【item.use() 完整状态机】（midi v13 Workflow.ts）与每个状态对应的 hook：
   Start → AwaitItemCard ｜ 模板类：AwaitTemplate → TemplatePlaced
   → AoETargetConfirmation → ValidateRoll → PreambleComplete          ← hook targetingComplete（可 return false 取消）· 改 targets 在这
@@ -1864,6 +1899,65 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
     所以 +1 武器若写 attunement:"required"，未调谐时它的魔法加值效果【是不生效的】
   - 另：magicAvailable = (attuned || attunement !== "required") && properties.has("mgc")
     —— 决定伤害/攻击是否按魔法处理`,
+    'enrichers': `【描述富文本 enricher 全表 · 2026-09-17 补 · 侧边栏与角色卡的差异是本篇重点】
+【为什么要单独一篇】写物品/法术/怪物描述时，富文本能让卡面出现「可点的名字」和「可点的掷骰按钮」，官方全部物品描述都这么写。★写错不会报错 —— 不匹配 enricher 正则的内容原样显示成纯文本，FVTT 不提示你写错了。
+
+■ 三组来源
+1) dnd5e 自己注册（module/enrichers.mjs L11-58）
+   掷骰类（L13-18）：/attack  /check  /save  /damage  /heal  /item  /skill  /tool  /concentration  /award
+     格式 = 双方括号包住的 /type 配置，后接可选大括号 label。例：[[/save dex 14]]{敏捷豁免}、[[/damage 2d6 fire]]{火焰}
+   查询类（L23-26）：[[lookup 类别 关键字]] 与 [[language ...]]
+   引用类（L29-33）：&Reference[关键词] —— 自动识别规则名并带 tooltip，例 &Reference[prone]
+2) 核心 Foundry v13 提供
+   @UUID[Item.xxxxx]{显示名} —— 文档链接，点击在侧栏打开；玩家需该文档 Observe 以上权限
+   [[/r 3d6]]{标签}  [[/roll]]  [[/gmroll]]  [[/blindroll]]
+3) 绑活动的按钮（dnd5e 官方写法，点了走该活动完整流程）
+   一个 a 标签，class="roll-action"，属性 data-type / data-formula / data-activity-uuid
+   例：a class="roll-action" data-type="attack" data-formula="+8" data-activity-uuid="活动uuid"  → 显示成 +8 攻击
+   （enrichers.mjs 文档注释 L126-156 有官方示例）
+
+■ ★★ [[lookup @name]]{回退词} —— 最容易踩的一个
+作用：把当前上下文的名字取出来嵌进描述（物品描述里取物品名、效果描述里取效果名）。
+⚠️ 陷阱（另一会话 2026-09-17 实测）：不写 {回退词} 时，如果 enricher 拿不到 rollData，卡面上会直接显示一个灰色的 @name。
+   典型场景：物品躺在侧边栏（compendium / 世界物品目录）被预览时没有 actor 上下文，取不到 @name。
+   ⇒ 规矩：永远写成 [[lookup @name]]{你的回退词}，让取不到时有东西可显示。
+
+■ ★★ 侧边栏 vs 挂到角色卡上 —— 同一段描述，两处渲染结果可能不同
+   · 挂在 actor 身上的物品：有完整 rollData（actor 的属性/等级/职业都在），@abilities.* / @mod / @prof 之类能取到值
+   · 只躺在世界物品目录或 compendium 里：没有 actor，一切依赖 actor 的引用取不到值
+   ⇒ 写描述时：机制数值优先写死数字，或写 @ 引用同时给回退文案；别假定它一定挂在角色身上。
+   ⇒ 想验证渲染结果，用 F12 跑 TextEditor.enrichHTML(描述文本, {rollData: 假数据或真 actor})，两种上下文各跑一次对比。
+
+■ 写错的后果（是静默，不是报错）
+   · 不匹配任何 enricher 正则 → 原样显示成纯文本（玩家看到一串双方括号字样）
+   · activity uuid 写错 → 按钮点不动
+   · @UUID 指向不存在的文档 → 显示成不可点的样式
+`,
+    'bulk': `【批量操作 · 2026-09-17 由另一会话实测挖出 · 三条约束不遵守会静默失败】
+【为什么要单独一篇】批量建/改/删时，relay 与模块端都有硬限制，但都不报错。另一会话建 1039 + 493 条时全靠手搓循环，撞出下面三条。
+
+■ ★ 约束一：逐条 it.update() 会把 relay 拖死
+   表现：连续快速逐条调用更新 → relay 报 HTTP 408。
+   ⇒ 批量改多条时，用一次 execute_js 在【世界内】循环改（世界内 update 是本地调用、不走 HTTP），别在外部循环发 N 次 HTTP。
+
+■ ★★ 约束二：Item.create 一次 400 条会【静默返回 0】
+   表现：世界一条都没写、零报错，而且【后面几批跟着失败】（像被拖垮了）。
+   ⇒ 分批：30 条一批，批与批之间 sleep 90 毫秒。
+   ⇒ 这是世界内文档创建的经验阈值，不是官方文档规定值（来自实测）。
+
+■ ★★ 约束三：超时 ≠ 没执行
+   表现：报 HTTP 408 的那次调用其实【已经完整落库了】。
+   ⇒ 收到超时后【先重新读一次看数据在不在】（用 foundry_diff 看 matchedCount、foundry_search 看结果数），
+     不要直接改参数重跑 —— 那会造出重复文档。
+   ⇒ 本插件（v1.4.6 起）已把这条写进超时报错文案里。
+
+■ 推荐姿势
+   1. 先用 foundry_create_item_minimal 建【一条】验证结构对（它会真回读校验，problems 非空就是没写对）
+   2. 结构确认后，把批量数据交给一次 execute_js 在世界内循环：每 30 条 await 一个 90 毫秒的 setTimeout，
+      全部包在 try/catch 里逐个记录失败项（一个抛错会带走整批）
+   3. 用 foundry_search 或 foundry_list_packs 回读数量核对
+   ⚠️ execute_js 受 relay 的 forbidden-patterns 预检（本插件已在提交前本地拦住并给出行号），脚本里别出现 localStorage / eval / Proxy 等词。
+`,
     'cpr': `【CPR（Cauldron of Plentiful Resources）· 模块 id chris-premades · 原名 Chris's Premades】
 ⚠️ 2026-09-17 实机验证通过（CPR 1.5.15 / foundry 13.351 / dnd5e 5.3.3），四条实测结论：
 

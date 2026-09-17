@@ -499,5 +499,195 @@ export function registerExtraTools(h, reg) {
             hint,
         };
     }));
+    // ===== 批量创建（内建分批与间隔，避开「一次几百条静默写 0 条」）=====
+    reg(h.makeTool('foundry_create_batch', '批量创建实体。★内建分批与间隔，避开三条实测硬约束：①逐条 HTTP 创建会拖垮 relay（408）②世界内一次创建几百条会静默返回 0（一条不写还不报错）③超时其实已落库、别急着重跑。默认每批 30 条、批间隔 90ms。优先走世界内循环（一次 HTTP 调用搞定，实测 relay 的 /create 不接受数组），世界未开 execute-js 时自动退回逐条 HTTP。', {
+        entityType: {
+            type: 'string',
+            enum: ['Item', 'Actor', 'JournalEntry', 'RollTable', 'Macro', 'Playlist', 'Cards', 'Scene'],
+            description: '文档类型',
+        },
+        documents: { type: 'array', description: '要创建的文档数组（每项是完整文档对象，不用带 _id）' },
+        folder: { type: 'string', description: '可选：统一归档文件夹 id（纯 16 位 ID 或 Folder.xxx 均可，自动剥前缀）' },
+        batchSize: { type: 'number', description: '每批条数（默认 30，上限 100）' },
+        delayMs: { type: 'number', description: '批间隔毫秒（默认 90）' },
+    }, ['entityType', 'documents'], async (args) => {
+        const et = String(args.entityType);
+        const docs = (Array.isArray(args.documents) ? args.documents : []).filter(d => !!d && typeof d === 'object');
+        if (!docs.length)
+            return { error: 'documents 为空，没有东西可建' };
+        const bs = Math.min(Math.max(Number(args.batchSize) || 30, 1), 100);
+        const dm = Math.min(Math.max(Number(args.delayMs) || 90, 0), 5000);
+        const fol = typeof args.folder === 'string' && args.folder.trim() ? args.folder.trim().replace(/^Folder\./, '') : '';
+        const script = [
+            'const ET = ' + JSON.stringify(et) + ';',
+            'const DOCS = ' + JSON.stringify(docs) + ';',
+            'const BS = ' + bs + ', DM = ' + dm + ', FOL = ' + JSON.stringify(fol) + ';',
+            'const cls = CONFIG[ET]?.documentClass ?? CONFIG.Item.documentClass;',
+            'const created = [], failed = [], batches = [];',
+            'for (let i = 0; i < DOCS.length; i += BS) {',
+            '  const slice = DOCS.slice(i, i + BS).map(d => (FOL ? Object.assign({}, d, { folder: FOL }) : d));',
+            '  try {',
+            '    const res = await cls.createDocuments(slice);',
+            '    for (const d of res) created.push({ id: d.id, name: d.name });',
+            '    batches.push({ from: i, count: slice.length, ok: true });',
+            '  } catch (e) {',
+            '    for (const s of slice) failed.push({ name: s.name ?? "", error: String(e) });',
+            '    batches.push({ from: i, count: slice.length, ok: false, error: String(e) });',
+            '  }',
+            '  if (i + BS < DOCS.length) await new Promise(r => setTimeout(r, DM));',
+            '}',
+            'return { requested: DOCS.length, createdCount: created.length, failedCount: failed.length, created: created.slice(0, 60), failed: failed.slice(0, 20), batches };',
+        ].join('\n');
+        let executeJsDisabled = false;
+        try {
+            const env = h.asObject(await h.callRelay('POST', '/execute-js', { body: { script } }));
+            const raw = (env.result && typeof env.result === 'object')
+                ? env.result
+                : env;
+            if (typeof raw.createdCount === 'number') {
+                const req = typeof raw.requested === 'number' ? raw.requested : docs.length;
+                return {
+                    mode: 'execute-js',
+                    entityType: et,
+                    requested: req,
+                    createdCount: raw.createdCount,
+                    failedCount: raw.failedCount ?? 0,
+                    batches: raw.batches ?? [],
+                    created: raw.created ?? [],
+                    failed: raw.failed ?? [],
+                    hint: '世界内循环完成（每批 ' + bs + ' 条 / 间隔 ' + dm + 'ms）。用 foundry_search 回读核对数量。',
+                };
+            }
+        }
+        catch (e) {
+            const msg = String(e);
+            if (!/execute-js is disabled/i.test(msg)) {
+                return {
+                    error: true,
+                    mode: 'execute-js',
+                    message: msg,
+                    hint: '⚠️ 超时或报错【不代表没执行】—— 先用 foundry_search 回读看数据在不在，不要直接改参数重跑（会造出重复文档）。',
+                };
+            }
+            executeJsDisabled = true;
+        }
+        const created2 = [];
+        const failed2 = [];
+        const batches2 = [];
+        for (let i = 0; i < docs.length; i += bs) {
+            const slice = docs.slice(i, i + bs);
+            for (const d of slice) {
+                const bodyBase = { entityType: et, data: d };
+                if (fol)
+                    bodyBase.folder = fol;
+                try {
+                    const r = h.asObject(await h.callRelay('POST', '/create', { body: bodyBase }));
+                    const ent = (r.entity && typeof r.entity === 'object') ? r.entity : r;
+                    created2.push({ id: ent._id ?? r.uuid ?? '', name: ent.name ?? d.name ?? '' });
+                }
+                catch (e) {
+                    failed2.push({ name: d.name ?? '', error: String(e) });
+                }
+            }
+            batches2.push({ from: i, count: slice.length });
+            if (i + bs < docs.length)
+                await new Promise(r => setTimeout(r, dm));
+        }
+        return {
+            mode: executeJsDisabled ? 'http-fallback' : 'http-partial',
+            entityType: et,
+            requested: docs.length,
+            createdCount: created2.length,
+            failedCount: failed2.length,
+            created: created2.slice(0, 60),
+            failed: failed2.slice(0, 20),
+            batches: batches2,
+            hint: '世界内路线不可用，已退回逐条 HTTP（同样分批 ' + bs + ' 条 / 间隔 ' + dm + 'ms）。中途若超时，先回读核对再决定要不要续跑。',
+        };
+    }));
+    // ===== 包列表（同时按 id 与 title 匹配）=====
+    reg(h.makeTool('foundry_list_packs', '列出世界里的全部 compendium 包（id + 标题 + 类型 + 条目数）。★实测：世界里 325 个包里【有多个包标题是空字符串】（第三方模组没写 title），只按包名关键词筛会漏 → 会误报「你世界没装这个包」。本工具同时按 id 与标题匹配，并回报空标题包的数量。需要世界开启 execute-js。', {
+        keyword: { type: 'string', description: '可选：关键词，同时匹配包 id 与标题（不区分大小写）。不传 = 列全部' },
+        type: { type: 'string', description: '可选：按包类型过滤（Actor / Item / JournalEntry / RollTable / Scene / Macro / Cards / Playlist / Adventure）' },
+        limit: { type: 'number', description: '最多返回多少条（默认 40，上限 300）' },
+    }, [], async (args) => {
+        const kw = typeof args.keyword === 'string' ? args.keyword.trim().toLowerCase() : '';
+        const ty = typeof args.type === 'string' ? args.type.trim() : '';
+        const lim = Math.min(Math.max(Number(args.limit) || 40, 1), 300);
+        const script = [
+            'const out = [];',
+            'for (const p of game.packs) {',
+            '  let size = null;',
+            '  try { size = p.index?.size ?? null; } catch (e) {}',
+            '  out.push({ id: p.collection ?? p.metadata?.id ?? "", title: p.title ?? p.metadata?.title ?? "", type: p.metadata?.type ?? "", system: p.metadata?.system ?? "", packageName: p.metadata?.packageName ?? "", size });',
+            '}',
+            'return { total: out.length, packs: out };',
+        ].join('\n');
+        const env = h.asObject(await h.callRelay('POST', '/execute-js', { body: { script } }));
+        const raw = (env.result && typeof env.result === 'object') ? env.result : env;
+        const all = Array.isArray(raw.packs) ? raw.packs : [];
+        let list = all;
+        if (kw)
+            list = list.filter(p => String(p.id ?? '').toLowerCase().includes(kw) || String(p.title ?? '').toLowerCase().includes(kw));
+        if (ty)
+            list = list.filter(p => String(p.type ?? '') === ty);
+        const emptyTitle = all.filter(p => !String(p.title ?? '').trim()).length;
+        return {
+            totalPacks: all.length,
+            matched: list.length,
+            returned: Math.min(list.length, lim),
+            emptyTitleCount: emptyTitle,
+            packs: list.slice(0, lim),
+            hint: '⚠️ 本世界有 ' + emptyTitle + ' 个包的标题是空串（按名字筛会漏，建议按 id 找）。包内条目用 foundry_search 搜。',
+        };
+    }));
+    // ===== 断链效果引用扫描（删 AE 不会自动清活动级引用）=====
+    reg(h.makeTool('foundry_cleanup_orphan_effects', '扫描「断链的活动级效果引用」：物品上某个活动的 effects[]._id 指向的效果已经不存在。★根因：删效果只删效果本身，活动里存的是纯字符串 id，不会自动清理 → 活动被使用时取不到效果，静默不施加（不报错，只是打上去没反应）。实测另一会话删 51 个 AE 后有 49 条物品的活动还指着已删 id。默认只列不删。需要世界开启 execute-js。', {
+        uuid: { type: 'string', description: '可选：只扫这个物品或角色（内嵌物品也可）。不传 = 扫描世界全部物品与角色身上的物品' },
+        confirm: { type: 'boolean', description: 'true 才真删断链引用；默认 false = 只列出' },
+    }, [], async (args) => {
+        const only = typeof args.uuid === 'string' ? args.uuid.trim() : '';
+        const doDel = args.confirm === true;
+        const script = [
+            'const ONLY = ' + JSON.stringify(only) + ';',
+            'const DEL = ' + (doDel ? 'true' : 'false') + ';',
+            'const targets = [];',
+            'if (ONLY) {',
+            '  const d = await fromUuid(ONLY);',
+            '  if (!d) return { error: "找不到 " + ONLY };',
+            '  if (d.documentName === "Actor") { for (const i of d.items) targets.push(i); } else { targets.push(d); }',
+            '} else {',
+            '  for (const it of game.items) targets.push(it);',
+            '  for (const a of game.actors) for (const i of a.items) targets.push(i);',
+            '}',
+            'const out = [];',
+            'for (const it of targets) {',
+            '  const obj = it.toObject();',
+            '  const acts = obj.system?.activities ?? {};',
+            '  for (const [aid, act] of Object.entries(acts)) {',
+            '    const effs = Array.isArray(act.effects) ? act.effects : [];',
+            '    for (const e of effs) {',
+            '      const id = e?._id;',
+            '      if (!id) continue;',
+            '      if (!it.effects.get(id)) out.push({ itemUuid: it.uuid, itemName: it.name, activityId: aid, activityName: act.name ?? "", effectId: id });',
+            '    }',
+            '  }',
+            '}',
+            'return { scanned: targets.length, total: out.length, orphans: out.slice(0, 200) };',
+        ].join('\n');
+        const env = h.asObject(await h.callRelay('POST', '/execute-js', { body: { script } }));
+        const raw = (env.result && typeof env.result === 'object') ? env.result : env;
+        if (raw.error)
+            return { error: true, message: raw.error };
+        return {
+            scanned: raw.scanned ?? 0,
+            orphanCount: raw.total ?? 0,
+            orphans: raw.orphans ?? [],
+            confirm: doDel,
+            hint: (raw.total ?? 0) === 0
+                ? '没有断链引用，干净。'
+                : '这些活动的 effects[]._id 已指向不存在的效果 —— 活动被使用时取不到效果会静默不施加。修法：用 foundry_patch_item 的 activityPatch 把该活动的 effects 改成正确 id，或 removeActivities 删掉该活动。',
+        };
+    }));
 }
 //# sourceMappingURL=tools-extra.js.map

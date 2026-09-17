@@ -969,25 +969,63 @@ export function apply(ctx: any): void {
         rec
       const matched: Record<string, unknown> = {}
       const mismatched: Array<Record<string, unknown>> = []
+      // 2026-09-17 补：把「类型」一起报出来 —— 另一会话反馈「diff 只说未落库，我不知道为什么」，
+      // 它为此自己去读 defineSchema 才发现 ignoreTraits 是 SetField<StringField>（要数组，它写了布尔对象）。
+      const shapeOf = (v: unknown): string => {
+        if (v === undefined) return 'undefined'
+        if (v === null) return 'null'
+        if (Array.isArray(v)) return 'Array'
+        if (v instanceof Set) return 'Set'
+        if (typeof v === 'object') return 'object'
+        return typeof v
+      }
+      // dnd5e 里这些字段是 SetField，值必须给数组（写成对象会被清洗）
+      const SET_LIKE = /(ignoreTraits|statuses|properties|traits\.|tags|creatureTypes|sizes|categories|riders)/i
+      const typeHint = (path: string, want: unknown, got: unknown): string | null => {
+        const w = shapeOf(want)
+        const g = shapeOf(got)
+        if (g === 'undefined' && w === 'object' && SET_LIKE.test(path)) {
+          return '★该字段很可能是 SetField（要【数组】不是对象）—— 例如 ignoreTraits 要写 ["idi"] 而不是 { idi: true }'
+        }
+        if (g === 'undefined' && w === 'boolean') {
+          return '你传的是布尔值：多数 schema 字段不收 boolean，请改传数组 / 字符串 / 对象'
+        }
+        if (g !== 'undefined' && w !== g) {
+          return '类型不符：你写的是 ' + w + '，读回是 ' + g + '（dnd5e 把值规范化了）'
+        }
+        return null
+      }
       for (const [path, want] of Object.entries(expected)) {
         const got = readPathLoose(doc, path)
         if (eqLoose(got, want)) matched[path] = got
         else if (got === undefined) {
-          // 2026-09-17 补：区分「键名写错（父级都不存在）」与「父级在、字段被清洗」——
-          // 《鞘中惊雷》反馈 #2：以前只回「未落库（读回 undefined）」，调用方分不清是写法错还是系统不吃这个键。
+          // 《鞘中惊雷》反馈 #2：区分「键名写错（父级都不存在）」与「父级在、字段被清洗」。
           const parent = path.includes('.') ? path.slice(0, path.lastIndexOf('.')) : ''
           const pv = parent ? readPathLoose(doc, parent) : doc
+          const th = typeHint(path, want, got)
           mismatched.push({
             path,
             want,
             got,
+            wantShape: shapeOf(want),
+            gotShape: shapeOf(got),
             reason: pv === undefined
               ? '父级路径 ' + (parent || '(根)') + ' 在该文档上不存在 —— 键名写错了（这一层 dnd5e 的 schema 里没有）'
               : '父级 ' + parent + ' 存在，但该字段被 dnd5e 清洗（schema 不接受这个键，或类型不符）',
             parentExists: pv !== undefined,
+            ...(th ? { typeHint: th } : {}),
           })
         } else {
-          mismatched.push({ path, want, got, reason: '值不同（被 dnd5e 改写或规范化）' })
+          const th = typeHint(path, want, got)
+          mismatched.push({
+            path,
+            want,
+            got,
+            wantShape: shapeOf(want),
+            gotShape: shapeOf(got),
+            reason: '值不同（被 dnd5e 改写或规范化）',
+            ...(th ? { typeHint: th } : {}),
+          })
         }
       }
       const total = Object.keys(expected).length
