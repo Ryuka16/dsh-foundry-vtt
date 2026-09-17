@@ -374,11 +374,30 @@ export function registerExtraTools(h, reg) {
         const limit = Math.min(200, Math.max(1, Number(args.limit ?? 30) || 30));
         const kind = typeof args.kind === 'string' ? args.kind : 'all';
         const words = kw.split(/\s+/).filter(Boolean);
+        // ⚠️ 库里既没有 D&D 状态名，也没有 thrust / slash / punch 这类动作词 ——
+        // 搜不到时按同义词表换词重搜（原先只回一句「换个更粗的词根」，调用方不知道换哪个，
+        // 实测有人试到 spear 才出结果）。见《鞘中惊雷》反馈 #9。
+        const SYNONYMS = {
+            thrust: ['stab', 'pierce', 'spear', 'lunge', 'jab'],
+            stab: ['pierce', 'spear', 'dagger'],
+            slash: ['sword', 'cleave', 'cut'],
+            cleave: ['axe', 'slash'],
+            punch: ['fist', 'unarmed', 'knuckle'],
+            kick: ['fist', 'unarmed'],
+            shoot: ['arrow', 'bolt', 'gun'],
+            hit: ['impact', 'punch'],
+            boom: ['explosion', 'fireball', 'burst'],
+            heal: ['healing', 'life', 'cure'],
+            poison: ['poison', 'toxic', 'venom'],
+        };
         // kind 过滤必须在扫描【时】就放宽：searchFor("sword") 实测 292 条、("fire") 388 条，
         // 若只扫前 limit*3 条，这 15~90 条可能清一色是 video —— 要音效的人会拿到空结果，
         // 明明库里有却搜不到（这是「数据库不全」错觉的来源）。所以按类型搜时扫到 500 条再筛。
         const scan = kind === 'all' ? limit * 3 : 500;
-        const script = 'const words = ' + JSON.stringify(words) + ';\n' +
+        // ★ usable / suggestedPath（《鞘中惊雷》反馈 #8）：searchFor 给回来的**未必是叶子路径** ——
+        // 它可能是前缀节点（如 jb2a.melee_attack.04.katana.01，实际要用 .01.0）。
+        // 判据 = getEntry 拿到的东西有没有 file；没有就自动试补 ".0" 并给 suggestedPath。
+        const buildScript = (ws) => 'const words = ' + JSON.stringify(ws) + ';\n' +
             'const scan = ' + scan + ';\n' +
             'const seen = {};\n' +
             'const out = [];\n' +
@@ -388,22 +407,30 @@ export function registerExtraTools(h, reg) {
             '  for (const p of hits) {\n' +
             '    if (seen[p]) continue;\n' +
             '    seen[p] = 1;\n' +
-            '    let f = ""; let mod = "";\n' +
-            '    try { const ent = Sequencer.Database.getEntry(p); f = (ent && ent.file) || ""; mod = (ent && ent.moduleName) || ""; } catch (err2) {}\n' +
-            '    out.push({ dbPath: p, file: f, module: mod });\n' +
+            '    let f = ""; let mod = ""; let ok = false;\n' +
+            '    try { const ent = Sequencer.Database.getEntry(p); f = (ent && ent.file) || ""; mod = (ent && ent.moduleName) || ""; ok = !!f; } catch (err2) {}\n' +
+            '    let alt = null;\n' +
+            '    if (!ok) {\n' +
+            '      try { const e2 = Sequencer.Database.getEntry(p + ".0"); if (e2 && e2.file) { alt = p + ".0"; f = e2.file; ok = true; } } catch (err3) {}\n' +
+            '    }\n' +
+            '    out.push({ dbPath: p, file: f, module: mod, usable: ok, suggestedPath: alt });\n' +
             '    if (out.length >= scan) break;\n' +
             '  }\n' +
             '  if (out.length >= scan) break;\n' +
             '}\n' +
             'return { total: out.length, entries: out };\n';
-        let raw;
-        try {
-            // ⚠️ /execute-js 的返回是包一层的：{ success: true, result: <脚本的返回值> }
-            // （实测踩过：直接读 raw.entries 永远是 undefined，页面看着「检索到 0 条」）
-            const env = h.asObject(await h.callRelay('POST', '/execute-js', { body: { script } }));
-            raw = env.result && typeof env.result === 'object' && !Array.isArray(env.result)
+        // ⚠️ /execute-js 的返回是包一层的：{ success: true, result: <脚本的返回值> }
+        // （实测踩过：直接读 raw.entries 永远是 undefined，页面看着「检索到 0 条」）
+        const runSearch = async (ws) => {
+            const env = h.asObject(await h.callRelay('POST', '/execute-js', { body: { script: buildScript(ws) } }));
+            const inner = env.result && typeof env.result === 'object' && !Array.isArray(env.result)
                 ? env.result
                 : env;
+            return Array.isArray(inner.entries) ? inner.entries : [];
+        };
+        let entries;
+        try {
+            entries = await runSearch(words);
         }
         catch (e) {
             const msg = e instanceof Error ? e.message : String(e);
@@ -416,7 +443,25 @@ export function registerExtraTools(h, reg) {
                     : '调用 relay 失败，先 foundry_list_worlds 确认世界在线。',
             };
         }
-        const entries = Array.isArray(raw.entries) ? raw.entries : [];
+        // 0 结果 → 自动按同义词重搜一次
+        let usedKeywords = words;
+        let synonymOf = '';
+        if (!entries.length) {
+            const alt = Array.from(new Set(words.flatMap((w) => SYNONYMS[w.toLowerCase()] ?? [])));
+            if (alt.length) {
+                try {
+                    const altEntries = await runSearch(alt);
+                    if (altEntries.length) {
+                        entries = altEntries;
+                        synonymOf = words.join(' ');
+                        usedKeywords = alt;
+                    }
+                }
+                catch (e) {
+                    /* 同义词重搜失败就照原样返回空结果，不掩盖原始错误 */
+                }
+            }
+        }
         const isSound = (f) => /\.(mp3|ogg|wav|m4a|flac|aac)$/i.test(f);
         const picked = entries
             .filter((e) => {
@@ -429,17 +474,29 @@ export function registerExtraTools(h, reg) {
         })
             .slice(0, limit);
         const videoCount = entries.filter((e) => !isSound(String(e.file ?? ''))).length;
+        const unverified = picked.filter((e) => e.usable === false).length;
+        let hint = picked.length
+            ? '把 dbPath 或 file 照抄进 flags.autoanimations 的 video.customPath / sound.file（sound 还要补齐 enable/file/volume/delay/startTime/repeat/repeatDelay 七个字段，见 foundry_reference{topic:"fx-anim"}）。'
+            : '这个关键词没搜到（或都被 kind 过滤掉了）。换个更粗的词根重试，例如 longsword→sword、warhammer→hammer；音效试 psfx，动画试 jb2a。';
+        if (picked.length && unverified) {
+            hint +=
+                ' ⚠️ 有 ' + unverified + ' 条 usable:false —— 那些 dbPath 只是**前缀节点**（不可直接播放），请改用同项的 suggestedPath（已自动补 .0 探到可用路径）或 file。';
+        }
+        if (synonymOf) {
+            hint +=
+                ' ⚠️ 原关键词（' + synonymOf + '）在库里 0 命中，这是用同义词（' + usedKeywords.join(' / ') + '）重搜的结果。';
+        }
         return {
             keyword: kw,
+            ...(synonymOf ? { synonymOf, usedKeywords } : {}),
             kind,
             totalScanned: entries.length,
             videoCount,
             soundCount: entries.length - videoCount,
             returned: picked.length,
+            unverifiedCount: unverified,
             entries: picked,
-            hint: picked.length
-                ? '把 dbPath 或 file 照抄进 flags.autoanimations 的 video.customPath / sound.file（sound 还要补齐 enable/file/volume/delay/startTime/repeat/repeatDelay 七个字段，见 foundry_reference{topic:"fx-anim"}）。'
-                : '这个关键词没搜到（或都被 kind 过滤掉了）。换个更粗的词根重试，例如 longsword→sword、warhammer→hammer；音效试 psfx，动画试 jb2a。',
+            hint,
         };
     }));
 }

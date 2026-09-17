@@ -178,7 +178,7 @@ function dmgParts(d: Record<string, unknown>): unknown[] {
  *   即 attack 仍会走 midi 的 auto 探测。要显式串接就把元素里的 `linkedTo`
  *   填目标活动的 `name`（或它的 id），本函数会把 otherActivityId 指过去。
  */
-function appendExtraActivities(acts: Record<string, unknown>, specs: unknown, notes: string[], itemHasUses = false): string[] {
+function appendExtraActivities(acts: Record<string, unknown>, specs: unknown, notes: string[], itemHasUses = false, expectFields: Array<{ path: string; want: unknown }> = []): string[] {
   const made: string[] = []
   if (!Array.isArray(specs) || !specs.length) return made
   const KINDS = ['attack', 'save', 'heal', 'utility', 'summon', 'check', 'damage', 'transform']
@@ -208,6 +208,14 @@ function appendExtraActivities(acts: Record<string, unknown>, specs: unknown, no
     const sd = (s.damage ?? {}) as Record<string, unknown>
     const svx = (s.save ?? {}) as Record<string, unknown>
     const hx = (s.healing ?? {}) as Record<string, unknown>
+    // 逐活动射程与目标（2026-09-17 补齐：原先只有 rangeUnits，range.value 与 target 全无入口）
+    const exUnits = typeof s.rangeUnits === 'string' && s.rangeUnits.trim() ? s.rangeUnits.trim() : 'self'
+    const exRangeVal = s.rangeValue === undefined || s.rangeValue === null ? '' : String(s.rangeValue)
+    const exTargetRaw = (s.target ?? {}) as Record<string, unknown>
+    const exTmpl = (exTargetRaw.template ?? {}) as Record<string, unknown>
+    const exAff = (exTargetRaw.affects ?? {}) as Record<string, unknown>
+    // 这个活动扣不扣物品次数（2026-09-17：原先是「物品有 uses 就无脑全挂」，且 consumes 没进 schema）
+    const consumesThis = itemHasUses || s.consumes === true
     const common: Record<string, unknown> = {
       name: actName,
       activation: { type: aType, value: null, override: false },
@@ -215,7 +223,7 @@ function appendExtraActivities(acts: Record<string, unknown>, specs: unknown, no
       // 限次形同虚设（第三方实测报告 #5）。物品有 uses 时（或 AI 显式传 consumes:true）
       // 必须挂 itemUses，卡面才会在每次使用时扣 1。
       consumption: {
-        targets: (itemHasUses || s.consumes === true)
+        targets: consumesThis
           ? [{ type: 'itemUses', value: '1', target: '', scaling: { mode: '', formula: '' } }]
           : [],
         scaling: { allowed: false, max: '' },
@@ -223,15 +231,16 @@ function appendExtraActivities(acts: Record<string, unknown>, specs: unknown, no
       },
       duration: { concentration: s.concentration === true, value: '', units: 'inst', special: '', override: false },
       effects: [],
-      // ⚠️ 逐活动 range 只有 units、**没有 value**（入参表里也没有 rangeValue，只有 rangeUnits），
-      //    所以「额外活动」的精确射程填不了。2026-09-14 第三方复核后判定 **不必补**，理由：
-      //      真正需要精确射程的是「远程武器的额外攻击活动」，这种组合很少见；
-      //      其余额外活动（锥形豁免 / 召唤 / 读条文案）的射程由模板或物品主活动决定；
-      //      而**物品主活动**那条路径 rangeValue 是通的（在 buildUpdateData 里，实测过）。
-      //    真撞上了用一行补回来，本团「圣火」那个 60 尺就是这么补的：
-      //      foundry_patch_item{ activityPatch: { <活动id>: { range: { value: "60", units: "ft" } } } }
-      range: { override: false, units: typeof s.rangeUnits === 'string' && s.rangeUnits.trim() ? s.rangeUnits.trim() : 'self' },
-      target: { template: { count: '', contiguous: false, type: '', size: '', width: '', height: '', units: 'ft', stationary: false }, affects: { count: '', type: '', choice: false, special: '' }, prompt: false, override: false },
+      // 逐活动 range：units + value 都可填（2026-09-17 补 value —— 原先只有 units，
+      // 导致「穿刺（30 尺线形）」这类需要精确射程的额外活动填不了，只能事后 patch）
+      range: { override: false, units: exUnits, value: exRangeVal },
+      // 逐活动 target：传入的字段覆盖默认空值（template 做线形/锥形/球形，affects 做目标类型）
+      target: {
+        template: { count: '', contiguous: false, type: '', size: '', width: '', height: '', units: 'ft', stationary: false, ...exTmpl },
+        affects: { count: '', type: '', choice: false, special: '', ...exAff },
+        prompt: false,
+        override: false,
+      },
       uses: { spent: 0, max: '', recovery: [] },
       sort: 0,
       img: null,
@@ -241,6 +250,24 @@ function appendExtraActivities(acts: Record<string, unknown>, specs: unknown, no
       ...otherIdPatch(kind),
       // 逐活动 midiProperties（activities[] 每项可传一个对象，只写显式键）
       ...mpPatch(s.midiProperties),
+    }
+    // ★ 把「显式传进来的键」逐条纳入落库校验（2026-09-17 修）。
+    //   原先 midiProperties / target / range.value 全都不在 expectFields 里 ——
+    //   传了 ignoreTraits 被 dnd5e 清洗掉，工具照样回 verified:true，是假的安心。
+    const actPath = 'system.activities.' + id + '.'
+    // 点名消耗（原先静默给每个额外活动挂 itemUses，调用方不知道）
+    if (consumesThis) {
+      const ctag = 'itemUses 消耗'
+      if (!notes.some((x) => x.includes(ctag))) {
+        notes.push('⚠️ 额外活动已挂 itemUses 消耗（每次使用扣 1 次物品次数）—— 不该扣的活动请传 consumes:false')
+      }
+    }
+    if (exRangeVal !== '') expectFields.push({ path: actPath + 'range.value', want: exRangeVal })
+    for (const tk of Object.keys(exTmpl)) expectFields.push({ path: actPath + 'target.template.' + tk, want: exTmpl[tk] })
+    for (const ak of Object.keys(exAff)) expectFields.push({ path: actPath + 'target.affects.' + ak, want: exAff[ak] })
+    const mpIn = (s.midiProperties ?? {}) as Record<string, unknown>
+    if (mpIn && typeof mpIn === 'object' && !Array.isArray(mpIn)) {
+      for (const mk of Object.keys(mpIn)) expectFields.push({ path: actPath + 'midiProperties.' + mk, want: mpIn[mk] })
     }
     if (typeof s.linkedTo === 'string' && s.linkedTo.trim()) {
       const target = idByName.get(s.linkedTo.trim().toLowerCase())
@@ -924,10 +951,19 @@ function buildNonWeapon(a: Args, itemType: string): Built {
   const checkActKeys: string[] = []
   if (hasHealAct) checkActKeys.push('dnd5eactivity000')
   if (wantsUtility) checkActKeys.push(hasHealAct ? 'dnd5eactivity100' : 'dnd5eactivity000')
+  if (itemType === 'spell') checkActKeys.push('dnd5eactivity000')
   for (const k of checkActKeys) {
     if (itemHasUses) expectFields.push({ path: 'system.activities.' + k + '.consumption.targets[0].type', want: 'itemUses' })
     if (actRange.value !== '' || actRange.units !== 'self') {
       expectFields.push({ path: 'system.activities.' + k + '.range.units', want: actRange.units })
+    }
+    // ★ 主活动 midiProperties 逐键落库校验（2026-09-17 补：原先透传了却完全不核，
+    //   传了 ignoreTraits 被 dnd5e 清洗掉照样回 verified:true）
+    const mpTop = (a.midiProperties ?? {}) as Record<string, unknown>
+    if (mpTop && typeof mpTop === 'object' && !Array.isArray(mpTop)) {
+      for (const mk of Object.keys(mpTop)) {
+        expectFields.push({ path: 'system.activities.' + k + '.midiProperties.' + mk, want: mpTop[mk] })
+      }
     }
   }
 
@@ -1186,8 +1222,23 @@ function buildUpdateData(a: Args, attackKey: string, itemType: string): Built {
     ...mpPatch(a.midiProperties),
   }
   if (attackKey) {
+    // ⚠️ 2026-09-17 实测否决了「指定主活动键名」这条路（原计划用 mainActivityId）：
+    //   · `-=<旧键>` 在这个更新路径上不生效（旧活动键始终还在）
+    //   · 传非 16 位键名（strike001）会被 dnd5e 规范化成随机 16 位 id
+    //   · 传 16 位键名（abcdef0123456789 / dnd5eactivity001）键名保留，但值是增量对象、
+    //     缺 type 等必填 ⇒ 落库后活动类型无效
+    //   四组对照实验见 docs/工具反馈-鞘中惊雷.md 第 5 条。
+    //   ⇒ 所以主活动只能沿用 Foundry 生成的随机键；要引用它请「先建 → 读键 → 再 update」。
+    //     预览里的 mainActivityNote 会说明这一点。
     activities[attackKey] = attackUpdate
-    notes.push(`攻击字段 merge 进 dnd5e 默认攻击活动（${attackKey}）`)
+    notes.push('攻击字段 merge 进 dnd5e 默认攻击活动（' + attackKey + '）')
+    // 主活动 midiProperties 落库校验（2026-09-17 补：原先 12 处透传零覆盖）
+    const mpMain = (a.midiProperties ?? {}) as Record<string, unknown>
+    if (mpMain && typeof mpMain === 'object' && !Array.isArray(mpMain)) {
+      for (const mk of Object.keys(mpMain)) {
+        expectFields.push({ path: 'system.activities.' + attackKey + '.midiProperties.' + mk, want: mpMain[mk] })
+      }
+    }
   } else {
     activities.dnd5eactivity000 = { ...attackUpdate, type: 'attack', name }
     notes.push('无默认攻击活动，新建 dnd5eactivity000')
@@ -1342,14 +1393,17 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
             transform: { type: 'object', description: '【transform】变身目标（把自己变成另一个 Actor）：{uuid（**必填**，指向 Actor，如 "Actor.xxxx"）, cr（公式字符串）, name, types:["beast"], sizes:["med"], movement:["walk"], levelMin, levelMax, mode:"cr", preset, customize}。levelMin/levelMax 不传 = 任何等级都能用（dnd5e 的 availableProfiles 过滤是 (min ?? -Infinity) <= 等级 <= (max ?? Infinity)）' },
             transformSettings: { type: 'object', description: '【transform】可选，变身时保留/合并哪些东西：{effects,keep,merge,other,spellLists,tempFormula,minimumAC,preset,transformTokens}。**不传 = dnd5e 用默认**（各集合的默认项由 CONFIG.DND5E.transformation 决定，卡面上也能改）' },
             linkedTo: { type: 'string', description: '【主活动用】填**被引用子活动**的 name（或 id），本活动的 otherActivityId 会指向它。方向 = 主 → 子：只有 attack/check/save/utility 能当主；子活动需类型合格（damage/heal/save/check/utility）且 midiProperties.otherActivityCompatible=true 才会被自动探测到。不填则写 none（不绑定）。' },
-            rangeUnits: { type: 'string', description: '该活动的射程单位（默认 self）' },
+            rangeUnits: { type: 'string', description: '该活动的射程单位（默认 self）。⚠️ 只给 units 的话 value 是空的 —— 要精确射程请同时给 rangeValue' },
+            rangeValue: { type: ['string', 'number'], description: '【该活动】射程数值（如 30 / 60 / 150）。落 activities.<id>.range.value。「穿刺·30 尺线形」这类额外活动必填' },
+            target: { type: 'object', description: '【该活动】目标与模板。{template:{type:"line"|"cone"|"sphere"|"cube"|"circle"|"cylinder"|"radius"|"square"|"wall", size, width, height, units:"ft", count, contiguous, stationary}, affects:{type:"creature"|"enemy"|"ally"|"self"|"object"|"space"|"creatureOrObject"|"any"|"willing", count, choice, special}}。⚠️ 9 种 template.type 各自读不同尺寸字段（line 读 size+width、cone 只读 size、sphere 读 size…），完整对照表见 foundry_reference{topic:"item-fields"}' },
+            consumes: { type: 'boolean', description: '【该活动】是否消耗物品次数。不传 = 跟物品走（物品有 uses.max 就自动挂 itemUses 每次扣 1；没有就不消耗）。显式传 false = 这个活动不扣次数（多活动里只有部分该扣时用，如「蓄力斩扣次数、追刃不扣」）' },
             concentration: { type: 'boolean', description: '是否需要专注' },
-            midiProperties: { type: 'object', description: '【该活动】midi-qol 活动级设置（29 键，**只写你要改的**；不写就整个键不传，走 dnd5e/midi 自己的默认值）。最常用三个：automationOnly:true（不进「选择活动」弹窗、不能手动掷，只能被自动化/otherActivityId 调用 —— 「攻击 + 追击」这类同物品多活动时，隐藏追击活动的标准姿势）；triggeredActivityId:"<另一活动的 id 或 identifier>"（这次结算完之后**另开一个独立 workflow** 触发它 —— 与 otherActivityId 的「同一次使用连带结算」是两套机制）；identifier（活动别名，只能英文数字破折号下划线，可被 otherActivityId / triggeredActivityId 按名字引用）。完整 29 键语义见 foundry_reference{topic:"midi-properties"}。' },
+            midiProperties: { type: 'object', description: '【该活动】midi-qol 活动级设置（29 键，**只写你要改的**；不写就整个键不传，走 dnd5e/midi 自己的默认值）。最常用三个：automationOnly:true（不进「选择活动」弹窗、不能手动掷，只能被自动化/otherActivityId 调用 —— 「攻击 + 追击」这类同物品多活动时，隐藏追击活动的标准姿势）；triggeredActivityId:"<另一活动的 id 或 identifier>"（这次结算完之后**另开一个独立 workflow** 触发它 —— 与 otherActivityId 的「同一次使用连带结算」是两套机制）；identifier（活动别名，只能英文数字破折号下划线，可被 otherActivityId / triggeredActivityId 按名字引用）。⚠️ triggeredActivityTargets 七值：self（自己）/ hitTargets（命中的目标，最常用）/ missedTargets（没打中的）/ failedSaves（豁免失败的）/ saveTargets（被要求豁免的）/ targets（最初选中的）/ retarget（重新选目标）。完整 29 键语义见 foundry_reference{topic:"midi-properties"}。' },
           },
           required: ['kind'],
         },
       },
-      midiProperties: { type: 'object', description: '【主活动】主活动的 midi-qol 设置（只写要改的键）。⚠️ 只作用于**主活动**；activities[] 数组里的额外活动用它们自己那份。常用配方：主活动 {triggeredActivityId:"dnd5eactivity200"} + 那个追击活动 {automationOnly:true} = 「命中后追加一发」。完整 29 键见 foundry_reference{topic:"midi-properties"}。' },
+      midiProperties: { type: 'object', description: '【主活动】主活动的 midi-qol 设置（只写要改的键）。⚠️ 只作用于**主活动**；activities[] 数组里的额外活动用它们自己那份。常用配方：主活动 {triggeredActivityId:"dnd5eactivity200"} + 那个追击活动 {automationOnly:true} = 「命中后追加一发」。⚠️ triggeredActivityTargets 七值：self（自己）/ hitTargets（命中的目标，最常用）/ missedTargets（没打中的）/ failedSaves（豁免失败的）/ saveTargets（被要求豁免的）/ targets（最初选中的）/ retarget（重新选目标）。⭐ 主活动的**键名无法预先指定**（Foundry 随机生成；实测传自定义键名会被规范化或落成无效活动）—— 要引用主活动请「先建 → foundry_inspect 读键 → 再 update」。完整 29 键见 foundry_reference{topic:"midi-properties"}。' },
       summon: {
         type: 'object', description: '【spell】召唤活动参数（结构照抄官方 Conjure Animals）。给了它就自动生成 summon 活动：profiles 里的 CR/数量/生物类型',
         properties: {
@@ -1475,6 +1529,9 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
           },
           notes: pvNotes,
           warnings: pvWarn,
+          mainActivityNote: itemType === 'weapon'
+            ? 'card.activities 里列出的键 = 预览态键名。⚠️ 主攻击活动的**真实键名由 Foundry 创建时随机生成**（预览里的 dnd5eactivity000 只是占位）—— **无法预先指定**（实测：传自定义键名会被规范化或落成无效活动）。要让 triggeredActivityId / otherActivityId 指向主活动，只能「先建 → 用 foundry_inspect 读键 → 再 update」；额外活动的键是可预测的（dnd5eactivity200 / 300 …），可以直接引用。'
+            : 'card.activities 里列出的键就是最终键名（主活动固定 dnd5eactivity000；与 heal 并存时 utility 用 dnd5eactivity100）。',
           hint: '这是**预览**，世界里什么都没变。把 card / notes 的内容讲给用户听 —— 尤其 description（描述文案）与 damage / save 数值、warnings 里的提醒。用户说「可以」→ 带 confirmToken 原样调第二次建下去；**用户说「不用看 / 直接建」→ 立刻带 confirmToken 建，不要再问**；用户说「改一下」→ 改参数重新出预览。',
         }
       }
@@ -1647,7 +1704,7 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
       macroCommand: { type: 'string', description: '宏代码（函数体，可直接用 token/game/MidiQOL/args 等；⚠️ 勿用 JSON.stringify(token)）' },
       macroScope: { type: 'string', description: "'global'（默认）或 'actor'" },
       onUseMacroName: { type: 'string', description: '高级用法：直接覆盖 flags["midi-qol"].onUseMacroName 原串（传了就忽略 macroPass）' },
-      flags: { type: 'object', description: '要合并的任意 flags（深合并），如 {"autoanimations": {...}}——AA 动画就挂在这；CPR 用 {"chris-premades": {...}}（先查 foundry_reference{topic:"cpr"}）' },
+      flags: { type: 'object', description: '要合并的任意 flags —— **深合并**：只覆盖你给的那几个叶子键，同层其他键保持原值（例：给 {"autoanimations":{"sound":{"volume":0.5}}} 只改音量，不会把同层的 video / dbSection / menu 冲掉；**不需要先读全量再整体重写**）。AA 动画挂 {"autoanimations": {...}}；CPR 用 {"chris-premades": {...}}（先查 foundry_reference{topic:"cpr"}）' },
       unsetFlags: { type: 'array', items: { type: 'string' }, description: '要删除的 flags 点号路径，如 ["midi-qol.onUseMacroName","dae.macro"]' },
     },
     ['uuid'],

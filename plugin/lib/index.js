@@ -935,8 +935,24 @@ export function apply(ctx) {
             const got = readPathLoose(doc, path);
             if (eqLoose(got, want))
                 matched[path] = got;
-            else
-                mismatched.push({ path, want, got, reason: got === undefined ? '未落库（读回 undefined）' : '值不同（被 dnd5e 改写或清洗）' });
+            else if (got === undefined) {
+                // 2026-09-17 补：区分「键名写错（父级都不存在）」与「父级在、字段被清洗」——
+                // 《鞘中惊雷》反馈 #2：以前只回「未落库（读回 undefined）」，调用方分不清是写法错还是系统不吃这个键。
+                const parent = path.includes('.') ? path.slice(0, path.lastIndexOf('.')) : '';
+                const pv = parent ? readPathLoose(doc, parent) : doc;
+                mismatched.push({
+                    path,
+                    want,
+                    got,
+                    reason: pv === undefined
+                        ? '父级路径 ' + (parent || '(根)') + ' 在该文档上不存在 —— 键名写错了（这一层 dnd5e 的 schema 里没有）'
+                        : '父级 ' + parent + ' 存在，但该字段被 dnd5e 清洗（schema 不接受这个键，或类型不符）',
+                    parentExists: pv !== undefined,
+                });
+            }
+            else {
+                mismatched.push({ path, want, got, reason: '值不同（被 dnd5e 改写或规范化）' });
+            }
         }
         const total = Object.keys(expected).length;
         return {
@@ -950,6 +966,70 @@ export function apply(ctx) {
                 ? '全部字段与期望一致。'
                 : '看 mismatched 的 want/got：未落库多为键名不被 dnd5e 接受，值不同多为系统规范化或清洗。',
         };
+    }));
+    // 2.6 foundry_inspect —— 一次读回指定字段（+ 可选 labels）。
+    // 存在理由（《鞘中惊雷》反馈 #6/#7）：没有「一次读回指定字段」的入口 ——
+    // foundry_get_entity 的 summary 会把活动细节精简掉，要看精确字段只能 execute_js 手写路径逐个取；
+    // 而 dnd5e **运行时算出来的** labels（伤害/豁免的最终显示值）根本没有任何 get 工具能拿到。
+    REG(makeTool('foundry_inspect', '一次读回一个实体的**指定字段值**（只读，不比对）。用途：写完之后想确认某几个字段到底变成了什么，又不想拉整份文档。paths 用点号路径 + [n] 下标（语法同 foundry_diff），例：["system.damage.base.denomination","system.activities.dnd5eactivity100.save.dc.formula","flags.autoanimations.primary.video.customPath"]。labels=true 会额外取 dnd5e **运行时算出来的** labels —— 这是「写进去的」与「算出来的」的唯一对照口径（写进去的 1d8 也可能被算成 2d10，只有 labels 看得见），需要世界开着 execute-js。没找到的路径会进 missing，不会静默消失。', {
+        uuid: { type: 'string', description: '实体 uuid（支持内嵌物品 Actor.<actorId>.Item.<itemId>）' },
+        paths: { type: 'array', items: { type: 'string' }, description: '要读的点号路径数组，如 ["system.rarity","system.activities.dnd5eactivity000.type"]' },
+        labels: { type: 'boolean', description: 'true 则额外读取该物品的运行时 labels（dnd5e prepareData 算出的最终显示值，含 damages/saves/toHit），需世界开启 execute-js' },
+    }, [], async (args) => {
+        const uuid = String(args.uuid ?? '').trim();
+        if (!uuid)
+            return { error: 'uuid 必填' };
+        const paths = Array.isArray(args.paths)
+            ? args.paths.filter((p) => typeof p === 'string' && p.trim()).map((p) => String(p).trim())
+            : [];
+        const wantLabels = args.labels === true;
+        if (!paths.length && !wantLabels)
+            return { error: '至少要给 paths（要读哪些字段）或 labels:true' };
+        const raw = await callRelay('GET', '/get', { query: { ...targetingQuery(args), uuid } });
+        const rec = raw;
+        const doc = (rec && typeof rec.entity === 'object' && rec.entity) ||
+            (rec && typeof rec.data === 'object' && rec.data) ||
+            rec;
+        const values = {};
+        const missing = [];
+        for (const p of paths) {
+            const v = readPathLoose(doc, p);
+            if (v === undefined)
+                missing.push(p);
+            else
+                values[p] = v;
+        }
+        const out = {
+            uuid,
+            name: doc?.name,
+            type: doc?.type,
+            values,
+            missing,
+        };
+        if (wantLabels) {
+            try {
+                const script = 'const it = await fromUuid(' + JSON.stringify(uuid) + ');\n' +
+                    'if (!it) return { found: false };\n' +
+                    'let lb = null;\n' +
+                    'try { lb = JSON.parse(JSON.stringify(it.labels ?? null)) } catch (e) { lb = { unserializable: true } }\n' +
+                    'return { found: true, labels: lb };';
+                const env = await callRelay('POST', '/execute-js', { body: { script } });
+                const inner = (env?.result ?? env);
+                out.labels = inner?.labels ?? null;
+                if (inner?.found === false)
+                    out.labelsNote = 'fromUuid 没解析到这个 uuid（可能是不在世界里的 compendium 实体）';
+            }
+            catch (e) {
+                out.labelsNote =
+                    'labels 读取失败：' +
+                        (e instanceof Error ? e.message : String(e)) +
+                        '（世界可能没开 execute-js，或该实体不支持 labels）';
+            }
+        }
+        if (missing.length) {
+            out.hint = 'missing 里的路径在当前文档上不存在 —— 键名可能写错，也可能被 dnd5e 清洗（对照 foundry_reference 的模板）';
+        }
+        return out;
     }));
     // 3. foundry_get_entity —— 按 uuid 或当前选中 token/actor 读完整文档。
     REG(makeTool('foundry_get_entity', '按 uuid 读取一个 Foundry 实体；或 selected=true 读取当前选中的 token/actor（actor=true 则取该 token 的 Actor 文档）。返回完整文档含 system 数据与内嵌 items。**uuid 支持内嵌物品形式 Actor.<actorId>.Item.<itemId>，可直接读 actor 身上的某个物品。** ⚠️省 token 铁律：只是看数值/伤害结构/活动/效果时用 summary:true（返回精简摘要，省 90%+ token）；需要完整原始 JSON（含描述全文/富文本/全部 flags）才不传 summary。', {
@@ -971,7 +1051,7 @@ export function apply(ctx) {
         return args.summary === true ? summarizeDoc(raw) : raw;
     }));
     // 4. foundry_create_entity —— 用 raw Foundry 文档创建实体，返回新 uuid 与文档。
-    REG(makeTool('foundry_create_entity', '用原始 Foundry 文档创建一个实体（entityType: Actor|Item|Scene|JournalEntry|RollTable|Cards|Macro|Playlist），data 为该类型文档（name/type/system/items 等）。返回新实体 uuid 与文档。**建结构先查内置参考库 foundry_reference（weapon/save-activity/effect/creature/feat/spell 模板），别再 search+get_entity 拉样本怪照抄。** 警告：dnd5e 5.3.3 会丢弃旧版字段——武器伤害骰必须放 item.system.damage.base{number,denomination,bonus,types}，activities 的 damage.parts 必须留空数组并设 includeBase:true；在 parts[].formula 写骰子会被系统清洗成空，导致怪物没有伤害。文档内所有 _id 必须恰好 16 位字母数字（超长会自动规范化并附 note）。', {
+    REG(makeTool('foundry_create_entity', '用原始 Foundry 文档创建一个实体（entityType: Actor|Item|Scene|JournalEntry|RollTable|Cards|Macro|Playlist），data 为该类型文档（name/type/system/items 等）。返回新实体 uuid 与文档。**建结构先查内置参考库 foundry_reference（weapon/save-activity/effect/creature/feat/spell 模板），别再 search+get_entity 拉样本怪照抄。** 警告：dnd5e 5.3.3 会丢弃旧版字段——武器伤害骰必须放 item.system.damage.base{number,denomination,bonus,types}，activities 的 damage.parts 必须留空数组并设 includeBase:true；在 parts[].formula 写骰子会被系统清洗成空，导致怪物没有伤害。文档内所有 _id 必须恰好 16 位字母数字（超长会自动规范化并附 note）。⚠️ 建 Macro 被拦时会报「Allow Macro Creation/Editing」——去 **Foundry 设置 → 模块设置 → Foundry REST API** 打开对应开关（设置键 foundry-rest-api.allowMacroWrite），不用去扫 game.settings 全表。', {
         entityType: { type: 'string', enum: ['Actor', 'Item', 'Scene', 'JournalEntry', 'RollTable', 'Cards', 'Macro', 'Playlist'], description: '文档类' },
         data: { type: 'object', description: '原始 Foundry 文档' },
         folder: { type: 'string', description: '归档到的文件夹 id（传纯 16 位 ID 或 Folder.xxx 均可，自动剥前缀）' },
