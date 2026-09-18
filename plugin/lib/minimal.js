@@ -13,6 +13,20 @@
 //   feat       → system.type{value:"feat",subtype:""}（特性，可挂自动化）
 import { randomBytes, createHash } from 'node:crypto';
 const ID16 = () => randomBytes(8).toString('hex');
+// 纯对象的深合并（数组与非对象一律直接覆盖）。
+// 用途：activityPatch 改活动字段时，必须 merge 进原活动而不是整体替换 ——
+// 整体替换会把没提到的字段（activation / consumption / midiProperties 等）全部抹掉。
+function deepMergePlain(base, patch) {
+    if (patch === null || typeof patch !== 'object' || Array.isArray(patch))
+        return patch;
+    if (base === null || typeof base !== 'object' || Array.isArray(base))
+        return patch;
+    const out = { ...base };
+    for (const [k, v] of Object.entries(patch)) {
+        out[k] = deepMergePlain(base[k], v);
+    }
+    return out;
+}
 /** heal 活动的 types 是【闭集三键】（dnd5e 源码 config.mjs L2340 DND5E.healingTypes）：
  *   healing（治疗）/ temphp（临时生命）/ maximum（提升最大生命）。
  *  ⚠️ 填伤害类型（如 necrotic）不行 —— midi 的 getDamageType（utils.ts L29-41）会把它落进
@@ -1656,12 +1670,12 @@ export function registerMinimalTools(h, reg) {
         '  ① `flags["midi-qol"].onUseMacroName = "[<macroPass>]ItemMacro"`\n' +
         '  ② `flags.itemacro.macro = {name,type:"script",scope,command}`\n' +
         '  ③ `flags.dae.macro = {name,type:"script",scope,command}`\n' +
-        '**删活动**用 removeActivities（内部走 dnd5e 的 `-=` 合并写法，实测生效）。\n' +
+        '**删活动**用 removeActivities（内部走「读取 → 过滤 → 整段替换」，**不用** dnd5e 的 `-=` 写法 —— 实测 `-=<键名>` 会触发 `FeatData.preUpdateActivities` 拿键名当 id 去 `this.activities.get(id)`，拿到 undefined 后访问 `.cachedSpell` 抛 TypeError，活动删不掉还报错）。\n' +
         '支持**内嵌物品 uuid**（`Actor.<actorId>.Item.<itemId>`）—— 改角色身上那件时用它；改世界模板对已 give 出去的副本**没有影响**（give 是复制一份）。\n' +
         '写完会**回读校验**，返回 verified + problems（不是硬编码 true）。', {
         uuid: { type: 'string', description: '物品 uuid（Item.xxx 或内嵌 Actor.<actorId>.Item.<itemId>）' },
-        removeActivities: { type: 'array', items: { type: 'string' }, description: '要删除的活动 id 数组，如 ["dnd5eactivity001","dnd5eactivity002"]' },
-        activityPatch: { type: 'object', description: '按活动 id 合并字段，如 {"dnd5eactivity000": {"otherActivityId": "dnd5eactivity100"}}' },
+        removeActivities: { type: 'array', items: { type: 'string' }, description: '要删除的活动键名数组（键名 = 活动 _id；传 _id 也认）。⚠️ 键名是随机的（如 "4pdDwJpntYBAM0BQ"）不是 dnd5eactivity000 —— 不知道就先 foundry_inspect 读 system.activities 的键，或用预览返回的 plannedActivityIds' },
+        activityPatch: { type: 'object', description: '按活动键名**深合并**字段，如 {"dnd5eactivity000": {"otherActivityId": "dnd5eactivity100"}}。同一物品可同时给 removeActivities 与 activityPatch，内部一起处理（读一次、改完整段写回）' },
         macroPass: { type: 'string', description: "物品宏触发时机（给了它才挂宏）。常用：postActiveEffects / preItemRoll / postAttackRoll / preDamageRoll / postDamageRoll / preCheckHits / isDamaged / isHealed。⚠️ 别自己拼 '[pass]ItemMacro' 串——本工具按物品级写法组装，AE 级逗号式在 midi 13.0.55 实测不触发" },
         macroName: { type: 'string', description: '宏名（不传 = 物品名 + "·宏"）' },
         macroCommand: { type: 'string', description: '宏代码（函数体，可直接用 token/game/MidiQOL/args 等；⚠️ 勿用 JSON.stringify(token)）' },
@@ -1676,24 +1690,54 @@ export function registerMinimalTools(h, reg) {
         const fullUuid = uuid.startsWith('Actor.') ? uuid : uuid.startsWith('Item.') ? uuid : 'Item.' + uuid;
         const notes = [];
         const sysPatch = {};
-        if (Array.isArray(args.removeActivities) && args.removeActivities.length) {
-            const acts = {};
-            for (const id of args.removeActivities) {
-                if (typeof id === 'string' && id.trim())
-                    acts['-=' + id.trim()] = null;
+        // ── 活动增删改：统一走「读取 → 内存改 → 整段替换」──
+        // 为什么不用 dnd5e 的 `-=` 写法：实测 `-=<键名>` 会触发 dnd5e 的 FeatData.preUpdateActivities，
+        // 它拿「键名」当 id 去 this.activities.get(id)，拿到 undefined 后访问 .cachedSpell 抛 TypeError
+        // —— 活动删不掉还报错。整段替换的代价是多一次 GET /get，换来的是不碰那条崩溃路径。
+        const rmList = Array.isArray(args.removeActivities)
+            ? args.removeActivities.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim())
+            : [];
+        const patchObj = (args.activityPatch && typeof args.activityPatch === 'object' && !Array.isArray(args.activityPatch))
+            ? args.activityPatch
+            : null;
+        if (rmList.length || patchObj) {
+            const rawCur = (await h.callRelay('GET', '/get', { query: { ...h.targetingQuery(args), uuid: fullUuid } }));
+            const cur = unwrapEntity(rawCur);
+            const curActs = { ...((cur?.system?.activities) ?? {}) };
+            let dirty = false;
+            if (rmList.length) {
+                const removed = [];
+                for (const [k, v] of Object.entries(curActs)) {
+                    const vid = String((v?._id) ?? '');
+                    if (rmList.includes(k) || (vid && rmList.includes(vid))) {
+                        delete curActs[k];
+                        removed.push(k);
+                    }
+                }
+                if (removed.length) {
+                    dirty = true;
+                    notes.push('删除活动 ' + removed.join(', '));
+                }
+                else
+                    notes.push('⚠️ 要删的活动一个都没找到：' + rmList.join(', ') + ' —— 先 foundry_inspect 读 system.activities 的键名（键名 = 活动 _id）');
             }
-            if (Object.keys(acts).length) {
-                sysPatch.activities = acts;
-                notes.push('删除活动 ' + args.removeActivities.join(', '));
+            if (patchObj) {
+                const patched = [];
+                for (const [id, val] of Object.entries(patchObj)) {
+                    if (!curActs[id]) {
+                        notes.push('⚠️ activityPatch 的 ' + id + ' 不在该物品上，已跳过');
+                        continue;
+                    }
+                    curActs[id] = deepMergePlain(curActs[id], val);
+                    patched.push(id);
+                }
+                if (patched.length) {
+                    dirty = true;
+                    notes.push('活动字段 merge：' + patched.join(', '));
+                }
             }
-        }
-        if (args.activityPatch && typeof args.activityPatch === 'object') {
-            const prev = (sysPatch.activities ?? {});
-            for (const [id, val] of Object.entries(args.activityPatch)) {
-                prev[id] = val;
-            }
-            sysPatch.activities = prev;
-            notes.push('活动字段 merge：' + Object.keys(args.activityPatch).join(', '));
+            if (dirty)
+                sysPatch.activities = curActs;
         }
         // ── 物品宏三件套 ──
         const flagPatch = {};

@@ -18,6 +18,21 @@ const REFERENCE = {
 - ⚠️ 活动【没有 identifier 字段】（那是物品的）—— 别想用 identifier 挂活动宏。
 - 不依赖 id 的挂法：全局宏名 [postActiveEffects]Macro.我的宏 + 宏体自判 workflow.activity.type / name（最稳）。
 - 「先建壳再 PUT update」不破坏这个契约，只要 update 时保留 _id（activities 是 Map，用原 key 就不会换 id）。
+⚠️ 2026-09-17 补三条【活动容器】硬约束（第三方会话实测，dnd5e 5.3.3 复现）：
+① 【activities 是 Collection，不是普通对象】Object.keys(item.system.activities) 恒返回【空数组】——
+   它是 ActivityCollection（Map 类），不是 plain object。唯一可信读法：item.toObject().system.activities。
+   同理 a.effects 也是 Collection，且 _id 被故意隐藏 —— Array.from(a.effects).map(x => x._id) 全是 undefined。
+   ⇒ 要读【活动级】effects 用 item.toObject().system.activities[活动键名].effects（权威读法）。
+② 【深拷贝活动必须换 _id，否则被吃掉】ActivityCollection 按 _id 建索引（activities-field.mjs L97-102
+   this.set(entry._id, entry)）⇒ 多个活动带同一个 _id 时，后者覆盖前者，最后只剩一个。
+   实测：把「虹光爆裂」拆成五种元素、深拷贝 5 份带原 _id → 落库只剩最后一个，另外 4 个无声消失（零报错）。
+   ⇒ 复制活动时必须给每份【重新生成 16 位 _id】；若活动间有 otherActivityId / triggeredActivityId 互引，
+      引用也要一并改到新 id（本插件 normalizeDocIds 会同步改写引用，手搓 JSON 要自己保证）。
+③ 【删活动别用 dnd5e 的「减号等号」写法】把它写成「'减号等号' + 键名」置 null 会触发
+   dnd5e 的 FeatData.preUpdateActivities —— 它拿「键名」当 id 去 this.activities.get(id)，
+   拿到 undefined 后访问 .cachedSpell → TypeError，活动删不掉还报错。
+   ⇒ 正解：读当前 activities → 过滤掉要删的键 → 整段写回 system.activities。
+      本插件 foundry_patch_item 的 removeActivities / activityPatch 已按此实现（src/minimal.ts）。
 
 【use.consumed 的正确读法】
 - 读：workflow.chatCard.getFlag("midi-qol", "use.consumed")（或 message.getFlag("midi-qol","use.consumed")）。
