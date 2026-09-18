@@ -1097,6 +1097,19 @@ ActiveEffect 关键字段：
 五大病根（反向警示）：臆造优先于查证 / 把资料当实测 / 未验证即交付 / 绕路不复盘 / 教训不闭环。`,
 
   pitfalls: `【高频坑速查 · 出自用户资料库血泪教训系列 + 本插件实测翻车记录】
+⚠️ 2026-09-18 补【子路径写数组元素 = 整个元素被替换，不是深合并】（实测，含页内对照定责）
+现象（另一会话实测）：写 system.activities.<key>.damage.parts.0.number = 3，工具回 verified:true，
+但读回发现 parts[0] 变成 {number:3, types:[], custom:{enabled:false}, scaling:{number:1}} ——
+原来的 types:["slashing"] 被清空、denomination 与 bonus 直接消失、scaling/custom 被重置。
+★ 关键对照（2026-09-18 本机实测，用来区分责任层）：页内直接 item.update({"system.activities.<key>.damage.parts.0.number": 9})
+  结果【一模一样】—— 同样替换整个元素、types 一样被清空。
+⇒ 结论：这是 Foundry 的 expandObject 机制（把 parts.0.number 展开成稀疏数组 parts:[{number:9}]，
+   ArrayField 拿这个新对象【替换】旧元素，不做深合并）—— 【不是 relay / 本插件的 bug，工具层修不了】。
+⇒ 规矩：改数组里的某个元素，必须给【完整数组】或【完整元素对象】：
+   ✅ 对：{"system":{"activities":{"<key>":{"damage":{"parts":[{number:3,denomination:6,bonus:"",types:["slashing"],scaling:{mode:"",number:null,formula:""}}]}}}}}
+   ❌ 错：{"system":{"activities":{"<key>":{"damage":{"parts":{"0":{"number":3}}}}}}}   ← 除 number 外其余全丢
+⇒ 自检：写完用 foundry_inspect 读【整个数组】（不是只读那个子路径），或 foundry_diff 一次核多项。
+   ⚠️ 工具返回的 verified 只代表「这次 update 调用成功了」，不代表数组元素里其他字段还在。
 ⚠️ 2026-09-17 补【compendium 包的 title 可能是空串 —— 别只按名字筛包】
 现象（另一会话实测）：用关键词在包名里找「斯坦哈德」→ 0 命中 → 误报「你世界没装这个包」。
 真相：那个包 id 是 sthdhh，title 是【空字符串】（第三方模组的 module.json 没写 title）。

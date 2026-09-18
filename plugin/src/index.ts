@@ -334,6 +334,30 @@ function jsonRender(_args: unknown, value: unknown): Array<{ type: 'text'; text:
  * activityType…），导致该工具 30/30 次返回失败。
  * 放在 makeTool 出口统一处理 → 91 个工具全部受益，不必逐个手改。
  */
+/**
+ * 扫描 data 里的「数组索引写法」——形如 {"parts":{"0":{...}}} 或 {"effects":{"1":{...}}}。
+ * 为什么需要：Foundry 的 expandObject 会把 parts.0.number 展开成【稀疏数组】parts:[{number:9}]，
+ * 然后 ArrayField 拿这个新对象【替换】整个旧元素 —— 是替换不是深合并。
+ * 2026-09-18 实测（含页内 item.update 对照，确认是 Foundry 机制而非 relay 的问题）：
+ *   写 system.activities.<key>.damage.parts.0.number = 3 →
+ *   原来同元素的 types:["slashing"] 变 []、denomination 与 bonus 直接消失、scaling/custom 被重置。
+ *   页内直接 item.update 同样写法结果一模一样 ⇒ 工具层改不了，只能提前警告调用方。
+ * 被用于 foundry_update_entity 的返回体（indexPathWarning 字段）。
+ */
+function scanIndexPaths(v: unknown, prefix = '', out: string[] = []): string[] {
+  if (v === null || v === undefined) return out
+  if (Array.isArray(v)) {
+    v.forEach((item, i) => scanIndexPaths(item, prefix ? prefix + '.' + i : String(i), out))
+    return out
+  }
+  if (typeof v !== 'object') return out
+  for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+    const path = prefix ? prefix + '.' + k : k
+    if (/^\d+$/.test(k)) out.push(path)
+    scanIndexPaths(val, path, out)
+  }
+  return out
+}
 function pruneUndefined<T>(v: T): T {
   if (Array.isArray(v)) return v.map((x) => pruneUndefined(x)) as unknown as T
   // ⚠️ Set / Map / Date 必须先于普通对象分支处理：它们 typeof 也是 'object'，
@@ -1178,22 +1202,33 @@ export function apply(ctx: any): void {
       if (args.selected) q.selected = args.selected
       if (args.actor) q.actor = args.actor
       const wantFull = args.detail === 'full'
+      const idxPaths = scanIndexPaths(args.data)
+      const idxWarn = idxPaths.length
+        ? '⚠️ data 里用了【数组索引写法】：' + idxPaths.join(' / ') + ' —— Foundry 的 expandObject 会把它展开成稀疏数组并【替换整个元素】（不是深合并）。2026-09-18 实测：写 parts.0.number 会把同元素的 types 清空、denomination 与 bonus 直接丢掉（页内直接 item.update 同样行为，确认是 Foundry 机制、工具层改不了）。改数组元素请一次给【完整数组】或【完整元素对象】，或先 foundry_inspect 读回整个数组再整段写回。'
+        : ''
       try {
         const { doc: data } = normalizeDocIds(args.data)
         const raw = await callRelay('PUT', '/update', { query: q, body: { data } })
         if (wantFull) return raw
-        return {
+        const okPayload: Record<string, unknown> = {
           mutation: 'update',
           uuid: args.uuid ?? '(selected)',
           verified: true,
           changed: args.data,
           note: '写入已确认。需要读回新值时用 foundry_get_entity(summary:true)。',
         }
+        if (idxWarn) {
+          okPayload.indexPathWarning = idxWarn
+          okPayload.indexPaths = idxPaths
+        }
+        return okPayload
       } catch (e) {
         if (args.uuid && e instanceof HttpError) {
           const rawErr = JSON.stringify(e.raw ?? e.message)
           if (/does not exist|failed to update entity/i.test(rawErr)) {
-            return { mutation: 'update', uuid: args.uuid, verified: true, changed: args.data, note: '模块回读确认失败但写入已执行（假阴性）——判定已生效。' }
+            const ff: Record<string, unknown> = { mutation: 'update', uuid: args.uuid, verified: true, changed: args.data, note: '模块回读确认失败但写入已执行（假阴性）——判定已生效。' }
+            if (idxWarn) ff.indexPathWarning = idxWarn
+            return ff
           }
           try {
             const fresh = await callRelay('GET', '/get', { query: { uuid: args.uuid } })
