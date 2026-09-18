@@ -1703,6 +1703,20 @@ enchant/cast 属边缘（不常用），forward/order 不用碰（前者能用 o
 flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts L314）。
 ⚠️ 实操建议：写 AE 时【显式给 stackable】—— 挂了 statuses 的中毒类其实安全（statuses 已存在会被忽略），
    但【没有 statuses 的纯 OverTime 效果会叠】，建议 "noneName"（刷新而非叠层）或 "count"（要叠层）。
+
+★★ 2026-09-18 世界内实测：stackable="count" 的层数【记在哪】（此前只能靠名字后缀 (1)(2)(3) 猜，是降级做法）：
+  做法：对同一个 actor 连做两次 createEmbeddedDocuments('ActiveEffect', [同名 AE，flags.dae.stackable='count'])。
+  实测结果：
+    · 效果【只有 1 条】（不是 2 条文档）—— 同名同 origin 被合并
+    · name 自动变成 "同心护佑 (2)"（追加 (n) 后缀）
+    · ★★ 层数 = flags.dae.stacks（数字，这里是 2）—— 【这才是权威读法，不要靠名字后缀反推】
+    · changes 仍然只有 1 条（DAE 不复制 change），但计算时按 stacks 重复应用：
+      该 AE 给 system.attributes.ac.bonus +1，两次施加后 actor.system.attributes.ac.bonus === "1 + 1"
+  ⇒ 读层数：effect.flags.dae.stacks（缺省 = 1 层）
+  ⇒ countDeleteDecrement 的逐层递减行为【未实测】，本主题不给结论。
+  ⇒ 现成样本：lib/samples/07-DAE与特殊时长/fvtt-Item-叠层护符-stacking-ward-EXAMPLE01.json（含完整 _EXAMPLE_NOTE）。
+
+── 以下是 daelink 主题本体（「命中 → 豁免失败 → 中毒」那条链）──
 链路：midi-qol 的 WorkflowState_ApplyDynamicEffects（Workflow.ts L2820-2998）负责把**物品级 AE 复制到豁免失败的目标**上。
      dnd5e 核心**不**做这件事（核心只在 summon 等少数场景用 applicableEffects）。
      触发时机：伤害 / 豁免结算**之后**（WaitForSaves → ApplyDynamicEffects 状态机顺序）。
@@ -1733,9 +1747,15 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
 - 两处都能挂 flags.autoanimations，【活动级优先】。读取点 aa-dnd5e.js 监听 dnd5e.rollAttackV2 / rollDamageV2 / postUseActivity，
   把 activity 对象传进 getRequiredData({item, actor, activity, ...})。
 - findAnimation.js L19-20：item 与 activity 各读各的 flags。
-- 优先级（findAnimation.js L60-75）：① itemFlags.isCustomized → 用 itemFlags ② activityFlags?.isCustomized → 用 activityFlags（L67-68）
-  ③ 否则 itemFlags.isCustomized → itemFlags ④ 否则名字匹配：overrideNames（= activity.name，L72 / aa-dnd5e.js L102）→ itemName → extraNames。
-  ⇒ 活动级设了 isCustomized:true 就压过物品级。
+- 优先级（findAnimation.js L60-75；2026-09-18 按实跑改写，消除旧文自相矛盾的读法）：
+  【一句话：活动级 isCustomized:true 压过物品级；两级都没有才走名字匹配】
+  ① 先看活动：activityFlags?.isCustomized 为真 → 用活动自己的配置（L67-68）
+  ② 活动没有 → 再看物品：itemFlags.isCustomized 为真 → 用物品的配置
+  ③ 两者都没有 → 名字匹配：overrideNames（= activity.name，L72 / aa-dnd5e.js L102）→ itemName → extraNames
+  ★ 实跑证据（2026-09-18）：同一物品两个活动，写了活动级 isCustomized:true 的那个按自己的配置播、
+    没写的那个不播 —— 证明【活动级优先，且物品级 flags 不会兜住活动级】。
+  ⚠️ 旧版本这一段把 ①② 的编号写成了「先 itemFlags 再 activityFlags」的阅读顺序，
+     于是同一段里「①用 itemFlags」与结论「活动级压过物品级」看着互相矛盾。以本条为准。
 - 判定依据 = isCustomized 标记 + 名字匹配（rinseName 去空格小写）；【不是】活动 id，也【不是】activity.type（type 只用于跳过逻辑，aa-dnd5e.js L94-98）。
 - ★ 只写一份物品级 flags ⇒ 两个活动都播同一个动画。要区分必须【每个活动各写一份】。
 - 活动级最小结构（照抄）：version 5 / isEnabled true / isCustomized true / fromAmmo false / animType "melee" / animation "slash" /
@@ -1771,16 +1791,20 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
     播放参数（缩放/锚点/延迟）不因路径方式不同，它们由 options 控制。
   · 另：static/templatefx 需要 getTruePath（L124），melee/range 可 returnable（L125）。
 
-▸ AA primary.options 完整键表（DataSanitizer.js setPrimaryOptions L141-185）：
-  melee 15 键：contrast 0 / delay 0 / elevation 1000 / isAbsolute false / isWait false / opacity 1 /
-    playbackRate 1 / repeat 1 / repeatDelay 1 / saturation 0 / size 1 / tint false / tintColor "#FFFFFF" / zIndex 1
+▸ AA primary.options 键表 —— ★【以世界实测为准】（2026-09-18 读 game.settings.get('autoanimations','aaAutorec-melee') 第 1 条校准）：
+  melee 【实测 13 键】：contrast 0 / delay 0 / elevation 1000 / isWait false / opacity 1 / playbackRate 1 /
+    repeat 1 / repeatDelay 250 / saturate 0 / size 1 / tint false / tintColor "#FFFFFF" / zIndex 1
   range 额外 6 键：animationSource false / fakeLocation（handler 提供）/ isReturning false / onlyX false /
     randomOffset false / reverse false
-  ⚠️ sound 的 repeatDelay 默认 250（L68），与动画的 repeatDelay 1 不同 —— 别抄混。
+  ★ AA 条目【顶层 12 键】（别塞进 primary）：id / label / levels3d / macro / meleeSwitch / menu /
+    primary / secondary / soundOnly / source / target / metaData
+  ⚠️ 三个曾经写错、已按实测更正的键（旧文来自源码转述，与世界实际条目不符）：
+    · 是 saturate（不是 saturation）
+    · repeatDelay 实测 250（旧文写 1）—— sound.repeatDelay 也是 250
+    · 【没有 isAbsolute 这个键】（旧文写了，真实条目里不存在）—— elevation 1000 就是绝对高度（0=地面，1000=屏幕上方）
   ⚠️ repeat 在 range 会被 handler.systemData.overrideRepeat 覆盖（L170）。
   · isWait 语义（L102-104）：false 时音效延迟叠加 delay；true 时音效等动画播完。
-  · ★ elevation 默认 1000 是 Sequencer 的【绝对高度】（0=地面，1000=屏幕上方），不是「相对 token 抬高 1000」；
-    isAbsolute（L148）切换：false = 相对目标高度叠加。此前记录含糊，以本条为准。
+  · 最省事：别自己拼 options —— 抄 aaAutorec-melee（120 条）/ aaAutorec-range（159 条）里同名武器的整条。
 
 ▸ Sequencer 在物品宏里（此前只有概念，未实测）：
   · 【不用写 flags.sequencer】—— 它是 Sequencer 自己的特效宿主/数据库配置，与「宏里 new Sequence() 播放」无关，
@@ -1816,7 +1840,7 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
       "primary": {
         "video": { "dbSection": "melee", "menuType": "weapon", "animation": "sword", "variant": "fire", "color": "red", "enableCustom": false, "customPath": "" },
         "sound": { "enable": true, "file": "psfx.weapon-attacks.sword.v1", "volume": 0.75, "delay": 0, "startTime": 250, "repeat": 1, "repeatDelay": 250 },
-        "options": { "delay": 0, "elevation": 1000, "isWait": false, "opacity": 1, "repeat": 1, "repeatDelay": 500, "size": 1, "zIndex": 1 }
+        "options": { "delay": 0, "elevation": 1000, "isWait": false, "opacity": 1, "repeat": 1, "repeatDelay": 250, "size": 1, "zIndex": 1 }
       },
       "secondary": { "enable": false },
       "soundOnly": { "sound": { "enable": false } },

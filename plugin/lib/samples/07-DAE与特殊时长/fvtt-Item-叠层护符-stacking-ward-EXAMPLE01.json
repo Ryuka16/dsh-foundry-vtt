@@ -1,0 +1,132 @@
+{
+  "_id": "EXAMPLE01stacking",
+  "name": "叠层护符 Stacking Ward",
+  "type": "equipment",
+  "img": "icons/equipment/neck/amulet-carved-stone-green.webp",
+  "system": {
+    "description": {
+      "value": "<p>一块刻着同心圆的青石护符。每次被同一道祝福触碰，圆心就多刻一圈——护佑会真正叠加，而不是互相覆盖。</p>"
+    },
+    "source": {
+      "rules": "2024"
+    },
+    "identified": true,
+    "unidentified": {
+      "description": "<p>一块刻着同心圆的青石护符。</p>"
+    },
+    "type": {
+      "value": "trinket",
+      "baseItem": ""
+    },
+    "rarity": "uncommon",
+    "attunement": "",
+    "attuned": false,
+    "equipped": false,
+    "identified_": true,
+    "weight": {
+      "value": 0.1,
+      "units": "lb"
+    },
+    "price": {
+      "value": 350,
+      "denomination": "gp"
+    },
+    "quantity": 1,
+    "properties": [],
+    "uses": {
+      "spent": 0,
+      "max": "",
+      "recovery": []
+    },
+    "activities": {}
+  },
+  "effects": [
+    {
+      "_id": "stackWard0000001",
+      "name": "同心护佑",
+      "img": "icons/magic/control/silhouette-aura-energy.webp",
+      "origin": null,
+      "type": "base",
+      "system": {},
+      "changes": [
+        {
+          "key": "system.attributes.ac.bonus",
+          "mode": 2,
+          "value": "1",
+          "priority": 20
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "description": "<p>每被施加一次，层数 +1（名称出现 (n) 后缀），AC 加值按层数重复计算。</p>",
+      "tint": "#ffffff",
+      "transfer": false,
+      "statuses": [],
+      "sort": 0,
+      "flags": {
+        "core": {
+          "overlay": false
+        },
+        "dae": {
+          "enableCondition": "",
+          "disableCondition": "",
+          "disableIncapacitated": false,
+          "selfTarget": false,
+          "selfTargetAlways": false,
+          "dontApply": false,
+          "stackable": "count",
+          "showIcon": false,
+          "durationExpression": "",
+          "macroRepeat": "none",
+          "specialDuration": []
+        }
+      }
+    }
+  ],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "dnd5e",
+    "systemVersion": "5.3.3",
+    "createdTime": 0,
+    "modifiedTime": 0,
+    "lastModifiedBy": null
+  },
+  "_EXAMPLE_NOTE": {
+    "why": "样本库缺一条带 flags.dae.stackable=count 的实测样本 —— 另一个会话的 AI 想验证「DAE 的 count 叠层把层数记在哪」，世界里的物品一件都没有，只能靠名字后缀 (1)(2)(3) 猜。",
+    "verified_by": "2026-09-18 世界内实测（worldId=123 木桩 actor 上跑 createEmbeddedDocuments 两次）",
+    "measured": {
+      "两次施加后的效果条数": 1,
+      "name": "同心护佑 (2)",
+      "flags.dae.stacks": 2,
+      "changes 条数": 1,
+      "actor.system.attributes.ac.bonus": "1 + 1"
+    },
+    "conclusions": [
+      "层数记在 flags.dae.stacks（数字），不需要靠名字后缀反推",
+      "同名同 origin 的效果【只留一条】，不新增文档 —— 名字自动追加 (n)",
+      "changes 保持原来的条数，DAE 在计算时按 stacks 重复应用（AC 加值表现为 '1 + 1'）",
+      "stackable 六种取值：缺省/空串=不去重；multi；none（同 origin 替换）；noneName（同 origin+同名，最常用）；noneNameOnly（同名即替换）；count / countDeleteDecrement（叠层，本条）"
+    ],
+    "unverified": [
+      "countDeleteDecrement 的逐层递减行为未实测（本样本只验证了 count）",
+      "本 JSON 是【结构样本】，不是从世界导出的原文 —— 世界内不存在这件物品"
+    ]
+  }
+}

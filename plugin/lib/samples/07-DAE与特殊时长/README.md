@@ -16,5 +16,10 @@
 - `吸收元素-turnEndSource.json` — 来源回合结束移除（turnEndSource）+ 空 changes 壳
 - `驱散不死生物-isDamaged.json` — 受伤即灭（isDamaged）
 - 其他变体：turnEnd（普通回合结束）、turnStartSource、isSaveSuccess.dex（豁免成功即灭，见 04-灼烧）、None（禁用特殊时长）
+- `叠层护符-stacking-ward-EXAMPLE01.json` — ★ **flags.dae.stackable: "count" 的叠层样本**（2026-09-18 世界内实测）：
+  两次施加只留【一条】效果、名字自动加 ` (n)` 后缀、**层数记在 `flags.dae.stacks`**、
+  changes 不复制但计算时按层数重复应用（AC 加值表现为 `"1 + 1"`）。
+  ⚠️ 想做「可叠加层数的 buff」照这条抄，**不要**靠名字后缀反推层数。
+  ⚠️ 本件是**结构样本**（世界内不存在这件物品），文件尾的 `_EXAMPLE_NOTE` 记了完整实测值与未验证项。
 
 **注意**：这些值 AI 凭空写不出来（无 UI 可点），必须照样本抄。DAE 的 UI 好配，但 AI 写的是 JSON——这分类是给 AI 照抄用的。

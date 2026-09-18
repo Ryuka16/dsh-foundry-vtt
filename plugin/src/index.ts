@@ -1152,7 +1152,25 @@ export function apply(ctx: any): void {
       if (args.selected) q.selected = args.selected
       if (args.actor) q.actor = args.actor
       const raw = await callRelay('GET', '/get', { query: q })
-      return args.summary === true ? summarizeDoc(raw) : raw
+      if (args.summary === true) {
+        const sum = summarizeDoc(raw) as Record<string, unknown>
+        // ★ 补 flags scope 列表（2026-09-18 加，响应《钟摆》反馈）：
+        //    ITEM_TREE 故意不列 flags 的内容（宏体可能几十 KB），但调用方需要先知道
+        //    「这件东西挂了哪些模块的 flags」才能决定去读哪个 scope —— 否则只能逐个 scope 试。
+        const rawRec = (raw && typeof raw === 'object') ? (raw as Record<string, unknown>) : {}
+        const inner = (rawRec.entity && typeof rawRec.entity === 'object')
+          ? (rawRec.entity as Record<string, unknown>)
+          : rawRec
+        const fl = (inner.flags && typeof inner.flags === 'object' && !Array.isArray(inner.flags))
+          ? (inner.flags as Record<string, unknown>)
+          : null
+        if (fl) {
+          const scopes = Object.keys(fl)
+          if (scopes.length) sum.flagScopes = scopes
+        }
+        return sum
+      }
+      return raw
     },
   ))
 

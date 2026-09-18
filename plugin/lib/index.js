@@ -1118,7 +1118,26 @@ export function apply(ctx) {
         if (args.actor)
             q.actor = args.actor;
         const raw = await callRelay('GET', '/get', { query: q });
-        return args.summary === true ? summarizeDoc(raw) : raw;
+        if (args.summary === true) {
+            const sum = summarizeDoc(raw);
+            // ★ 补 flags scope 列表（2026-09-18 加，响应《钟摆》反馈）：
+            //    ITEM_TREE 故意不列 flags 的内容（宏体可能几十 KB），但调用方需要先知道
+            //    「这件东西挂了哪些模块的 flags」才能决定去读哪个 scope —— 否则只能逐个 scope 试。
+            const rawRec = (raw && typeof raw === 'object') ? raw : {};
+            const inner = (rawRec.entity && typeof rawRec.entity === 'object')
+                ? rawRec.entity
+                : rawRec;
+            const fl = (inner.flags && typeof inner.flags === 'object' && !Array.isArray(inner.flags))
+                ? inner.flags
+                : null;
+            if (fl) {
+                const scopes = Object.keys(fl);
+                if (scopes.length)
+                    sum.flagScopes = scopes;
+            }
+            return sum;
+        }
+        return raw;
     }));
     // 4. foundry_create_entity —— 用 raw Foundry 文档创建实体，返回新 uuid 与文档。
     REG(makeTool('foundry_create_entity', '用原始 Foundry 文档创建一个实体（entityType: Actor|Item|Scene|JournalEntry|RollTable|Cards|Macro|Playlist），data 为该类型文档（name/type/system/items 等）。返回新实体 uuid 与文档。**建结构先查内置参考库 foundry_reference（weapon/save-activity/effect/creature/feat/spell 模板），别再 search+get_entity 拉样本怪照抄。** 警告：dnd5e 5.3.3 会丢弃旧版字段——武器伤害骰必须放 item.system.damage.base{number,denomination,bonus,types}，activities 的 damage.parts 必须留空数组并设 includeBase:true；在 parts[].formula 写骰子会被系统清洗成空，导致怪物没有伤害。文档内所有 _id 必须恰好 16 位字母数字（超长会自动规范化并附 note）。⚠️ 建 Macro 被拦时会报「Allow Macro Creation/Editing」——去 **Foundry 设置 → 模块设置 → Foundry REST API** 打开对应开关（设置键 foundry-rest-api.allowMacroWrite），不用去扫 game.settings 全表。', {

@@ -858,11 +858,20 @@ function buildNonWeapon(a: Args, itemType: string): Built {
   }
 
   // ── identifier（spell / class / subclass / race / background / feat 等都有）──
+  // ⚠️ 2026-09-18 补 weapon：实测 weapon 类型也有 system.identifier 字段，且 dnd5e 会用【物品标题】
+  //    自动 slug 出一个（中文标题「钟摆」被剃成空 → 落成 "-the-pendulum"）。
+  //    ⇒ 不显式写就会得到一个连字符开头的垃圾 id，且工具不报错。
   if (typeof a.identifier === 'string' && a.identifier.trim()
-    && ['spell', 'class', 'subclass', 'race', 'background', 'feat'].includes(itemType)) {
+    && ['spell', 'class', 'subclass', 'race', 'background', 'feat', 'weapon'].includes(itemType)) {
     sys.identifier = a.identifier.trim()
     expectFields.push({ path: 'system.identifier', want: a.identifier.trim() })
     notes.push('identifier: ' + a.identifier.trim())
+    // ⚠️ 实测教训（2026-09-18）：不显式写 identifier 时，dnd5e 会拿【物品标题】自动 slug 一个
+    //     —— 中文标题「钟摆」被剃成空，落成 "-the-pendulum"（一个连字符开头的垃圾 id），且不报错。
+    //     这里只做提示，不替用户改值（改值属于越权）。
+    if (/[^\x00-\x7F]/.test(a.identifier.trim())) {
+      notes.push('⚠️ identifier 含非 ASCII 字符（' + a.identifier.trim() + '）—— dnd5e 的 slug 规则会把它剃掉。identifier 必须是纯英文数字与短横线，请改一个（如 pendulum）。')
+    }
   }
 
   // ── subclass 的 classIdentifier（实测键名就叫这个，指向所属职业的 identifier）──
@@ -1182,6 +1191,23 @@ function buildUpdateData(a: Args, attackKey: string, itemType: string): Built {
     notes.push(`武器类别 ${wt}${baseItemName ? '（baseItem: ' + baseItemName + '）' : ''}`)
   }
 
+  // ── identifier（★ weapon 分支原先漏了，2026-09-18 补）──
+  // 为什么必须补：dnd5e 在【不写 identifier】时会拿物品标题自动 slug 一个 ——
+  //   实测「钟摆」被剃成空 → 落成 "-the-pendulum"（一个连字符开头的垃圾 id）；
+  //        「ZzIdentifier验证刀」→ "zzidentifier"。
+  //   ⇒ 表现是「我传的 identifier 没生效」，实际是「落了一个你不认识的值」，而且不报错。
+  //   （根因曾误判为类型门控：identifier 的代码原只在 buildNonWeapon 里，
+  //     weapon 走的是本函数自己的分支 —— 两处都要有。）
+  if (typeof a.identifier === 'string' && a.identifier.trim()) {
+    const idVal = a.identifier.trim()
+    sys.identifier = idVal
+    expectFields.push({ path: 'system.identifier', want: idVal })
+    notes.push('identifier: ' + idVal)
+    if (/[^\x00-\x7F]/.test(idVal)) {
+      notes.push('⚠️ identifier 含非 ASCII 字符（' + idVal + '）—— dnd5e 的 slug 规则会把它剃掉，请改成纯英文数字与短横线。')
+    }
+  }
+
   // ── 稀有度（⚠️ weapon 分支也必须处理！）──
   // 实锤（子代理重跑 30 件，3/3 复现）：rarity 原来只加在 buildNonWeapon 里，
   // 武器传 rarity 会被**静默丢弃**——不落库、不报错、verify 还回 verified:true。
@@ -1376,7 +1402,7 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
       spellActivity: { type: 'string', enum: ['attack', 'save', 'heal', 'utility', 'summon'], description: '【spell】法术活动类型。不传则自动推断：给了 summon 参数→summon；有 healing→heal；有 damage 且有 save→save；有 damage→attack；都没有→utility' },
       spellMethod: { type: 'string', description: '【spell】施展方式（默认 "spell"）' },
       prepared: { type: 'number', description: '【spell】准备状态：0=未准备、1=已准备（默认）、2=始终准备' },
-      identifier: { type: 'string', description: '【spell/class/subclass/race/background/feat】系统标识符，只能英文数字破折号下划线，如 "fireball"' },
+      identifier: { type: 'string', description: '系统标识符（spell / class / subclass / race / background / feat / **weapon** 都有），只能英文数字破折号下划线，如 "fireball"。⚠️ **不传的后果**：dnd5e 会拿【物品标题】自动 slug 一个 —— 中文标题会被剃成空（「钟摆」→ "-the-pendulum"），你不认识那个值，而且工具不报错。所以：【要英文物品名就给一个显式 identifier；中文名的物品就接受自动值，别指望它等于你想要的英文】。传了非 ASCII 字符时本工具会在 notes 里警告' },
       classIdentifier: { type: 'string', description: '【subclass】所属职业的 identifier，如 "fighter"' },
       raceSubtype: { type: 'string', description: '【race】亚种标识，如 "elf"、"dwarf"' },
       movement: { type: 'object', description: '【race】移速，如 {walk:30,fly:60}——**实测 race 的移速在 system.movement 下，不走 5.3.x 的 attributes 路径**' },
@@ -1492,7 +1518,8 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
       durationSeconds: { type: 'number', description: '效果时长（秒）。**不传 = 永久**（推荐）：持续伤害类由 OverTime 的 saveCount 决定何时结束，填 60 之类的秒数会让效果中途自己消失' },
       folder: { type: 'string', description: '归档文件夹 uuid（可选，纯 16 位 ID 或 Folder.xxx 均可，自动剥前缀）' },
       preview: { type: 'boolean', description: '试写模式。**现在这已是默认行为** —— 不带有效 confirmToken 时，本工具一律只返回预览、不落库（传不传 preview 都一样）。' },
-      confirmToken: { type: 'string', description: '**落库凭证**：上一步预览返回的那个 confirmToken。带上它才会真的创建（不带＝只出预览）；参数与预览时不一致就带不动，会重新回到预览。用户说「直接建」时就用它。' },
+      confirmToken: { type: 'string', description: '**落库凭证**：上一步预览返回的那个 confirmToken。带上它才会真的创建（不带＝只出预览）；参数与预览时不一致就带不动，会重新回到预览。用户说「直接建」时就用它。**⚠️ 只改了一句描述文案也要重跑整轮预览**（凭证是全部参数的 sha256）——如果嫌麻烦可以传 skipPreview:true 跳过门槛（见下）' },
+      skipPreview: { type: 'boolean', description: '**跳过预览门槛，直接落库**（2026-09-18 加）。只在「参数已基本定稿、只改了个别文字」时用 —— 传 true 就不再要求 confirmToken。不传 = 维持安全的两步走（默认）。⚠️ 传了它等于调用方自己承担「没给用户过目」的责任，用户说过「不用看/直接建」时才用' },
     },
     ['name'],
     async (args: Args) => {
@@ -1506,7 +1533,11 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
       const argRec = args as Record<string, unknown>
       const givenToken = typeof argRec.confirmToken === 'string' ? argRec.confirmToken : ''
       const expectedToken = confirmTokenFor(argRec)
-      if (argRec.preview === true || givenToken === '' || givenToken !== expectedToken) {
+      // ⚠️ skipPreview=true 时【完全跳过预览门槛】（2026-09-18 加，响应《钟摆》反馈）：
+      //    原设计下「只改一句描述文案」也要重跑整轮预览拿新 token（两次预览各回吐 ~2KB）。
+      //    skipPreview 是调用方显式承担责任的开关 —— 不传就还是安全的两步走。
+      const skipPreview = argRec.skipPreview === true
+      if (!skipPreview && (argRec.preview === true || givenToken === '' || givenToken !== expectedToken)) {
         const { data: pvData, notes: pvNotes } = buildUpdateData(args, 'dnd5eactivity000', itemType)
         const pvAsRec = pvData as Record<string, unknown>
         const pvMem = (pvAsRec.system ?? {}) as Record<string, unknown>
@@ -1536,7 +1567,11 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
             systemType: (pvMem.type ?? null) as unknown,
             damage: (pvMem.damage ?? null) as unknown,
             rarity: pvMem.rarity ?? null,
-            activities: Object.keys((pvMem.activities ?? {}) as Record<string, unknown>),
+            activities: Object.keys((pvMem.activities ?? {}) as Record<string, unknown>).map((k) =>
+              (itemType === 'weapon' && k === 'dnd5eactivity000')
+                ? k + '（占位·真键由 Foundry 随机生成，落库后不可用；真键用 foundry_inspect 读）'
+                : k
+            ),
             effects: pvEffects.map((e) => ({ name: e.name ?? null, transfer: e.transfer ?? null, statuses: e.statuses ?? null, img: e.img ?? null, changes: e.changes ?? null })),
             description: String(((pvMem.description as Record<string, unknown>) ?? {}).value ?? ''),
           },
@@ -1711,13 +1746,14 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
     {
       uuid: { type: 'string', description: '物品 uuid（Item.xxx 或内嵌 Actor.<actorId>.Item.<itemId>）' },
       removeActivities: { type: 'array', items: { type: 'string' }, description: '要删除的活动键名数组（键名 = 活动 _id；传 _id 也认）。⚠️ 键名是随机的（如 "4pdDwJpntYBAM0BQ"）不是 dnd5eactivity000 —— 不知道就先 foundry_inspect 读 system.activities 的键，或用预览返回的 plannedActivityIds' },
-      activityPatch: { type: 'object', description: '按活动键名**深合并**字段，如 {"dnd5eactivity000": {"otherActivityId": "dnd5eactivity100"}}。同一物品可同时给 removeActivities 与 activityPatch，内部一起处理（读一次、改完整段写回）' },
+      activityPatch: { type: 'object', description: '按活动键名**深合并**字段，如 {"dnd5eactivity000": {"otherActivityId": "dnd5eactivity100"}}。★ **可以改活动类型**：传 {"<键>":{"type":"utility"}} 即把 attack 活动改成 utility —— 实测 dnd5e 会按新 type **重新实例化**：旧类型字段（attack/damage）被清掉、新类型字段（roll 等）自动补上，不需要删了重建。同一物品可同时给 removeActivities 与 activityPatch，内部一起处理（读一次、改完整段写回）' },
       macroPass: { type: 'string', description: "物品宏触发时机（给了它才挂宏）。常用：postActiveEffects / preItemRoll / postAttackRoll / preDamageRoll / postDamageRoll / preCheckHits / isDamaged / isHealed。⚠️ 别自己拼 '[pass]ItemMacro' 串——本工具按物品级写法组装，AE 级逗号式在 midi 13.0.55 实测不触发" },
       macroName: { type: 'string', description: '宏名（不传 = 物品名 + "·宏"）' },
       macroCommand: { type: 'string', description: '宏代码（函数体，可直接用 token/game/MidiQOL/args 等；⚠️ 勿用 JSON.stringify(token)）' },
       macroScope: { type: 'string', description: "'global'（默认）或 'actor'" },
       onUseMacroName: { type: 'string', description: '高级用法：直接覆盖 flags["midi-qol"].onUseMacroName 原串（传了就忽略 macroPass）' },
       flags: { type: 'object', description: '要合并的任意 flags —— **深合并**：只覆盖你给的那几个叶子键，同层其他键保持原值（例：给 {"autoanimations":{"sound":{"volume":0.5}}} 只改音量，不会把同层的 video / dbSection / menu 冲掉；**不需要先读全量再整体重写**）。AA 动画挂 {"autoanimations": {...}}；CPR 用 {"chris-premades": {...}}（先查 foundry_reference{topic:"cpr"}）' },
+      systemPatch: { type: 'object', description: '**深合并**进 system 的任意字段（不碰 activities / flags），如 {"rarity":"legendary","price":{"value":500,"denomination":"gp"},"uses":{"max":"3"}}。**一次调用就能同时改 system + activities + flags + 挂宏** —— 不用再拆成 patch_item + update_entity 两次 HTTP。⚠️ 数组字段是【整段替换】不是逐元素合并（与 Foundry 的 ArrayField 语义一致）' },
       unsetFlags: { type: 'array', items: { type: 'string' }, description: '要删除的 flags 点号路径，如 ["midi-qol.onUseMacroName","dae.macro"]' },
     },
     ['uuid'],
@@ -1765,6 +1801,18 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
         }
 
         if (dirty) sysPatch.activities = curActs
+      }
+
+      // ── systemPatch：深合并进 system（不碰 activities —— 那是上面那块的地盘）──
+      if (args.systemPatch && typeof args.systemPatch === 'object' && !Array.isArray(args.systemPatch)) {
+        const sp = args.systemPatch as Record<string, unknown>
+        for (const [k, v] of Object.entries(sp)) {
+          const prev = sysPatch[k]
+          sysPatch[k] = (prev && typeof prev === 'object' && !Array.isArray(prev) && v && typeof v === 'object' && !Array.isArray(v))
+            ? deepMergePlain(prev, v)
+            : v
+        }
+        notes.push('system merge：' + Object.keys(sp).join(', '))
       }
 
       // ── 物品宏三件套 ──
@@ -1847,9 +1895,25 @@ export function registerMinimalTools(h: MinimalHelpers, reg: Reg): void {
             problems.push(`flags["midi-qol"].onUseMacroName = ${JSON.stringify(midi.onUseMacroName)}，期望 ${JSON.stringify(wantOnUse)}`)
           }
           const ia = (itemacro.macro ?? {}) as Record<string, unknown>
-          if (!ia.command) problems.push('flags.itemacro.macro.command 未落库 → ItemMacro 取不到宏体')
+          const iaCmd = typeof ia.command === 'string' ? ia.command : ''
+          if (!iaCmd) problems.push('flags.itemacro.macro.command 未落库 → ItemMacro 取不到宏体')
           const dm = (dae.macro ?? {}) as Record<string, unknown>
-          if (!dm.command) problems.push('flags.dae.macro.command 未落库')
+          const dmCmd = typeof dm.command === 'string' ? dm.command : ''
+          if (!dmCmd) problems.push('flags.dae.macro.command 未落库')
+          // ★ 宏体【内容】校验（2026-09-18 加）：原来只判非空，实测宏被截断时会静默通过 ——
+          //    调用方得自己写 execute_js 读 String(fn) 才知道有没有断。这里比对长度与结尾。
+          // ⚠️ 不能用上面 flagPatch 块里的 cmd —— 那是另一个作用域（首次编译就把这条抓出来了）。
+          const wantCmd = typeof args.macroCommand === 'string' ? args.macroCommand : ''
+          if (wantCmd.trim()) {
+            const tailOf = (s: string) => s.trim().slice(-40)
+            const wantTail = tailOf(wantCmd)
+            if (iaCmd && tailOf(iaCmd) !== wantTail) {
+              problems.push('flags.itemacro.macro.command 与传入的宏体【不一致或疑似被截断】：传入 ' + wantCmd.length + ' 字符 / 落库 ' + iaCmd.length + ' 字符')
+            }
+            if (dmCmd && tailOf(dmCmd) !== wantTail) {
+              problems.push('flags.dae.macro.command 与传入的宏体【不一致或疑似被截断】：传入 ' + wantCmd.length + ' 字符 / 落库 ' + dmCmd.length + ' 字符')
+            }
+          }
         }
         for (const path of (Array.isArray(args.unsetFlags) ? (args.unsetFlags as string[]) : [])) {
           let cur: unknown = gFlags
