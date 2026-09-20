@@ -482,6 +482,12 @@ export function registerExtraTools(h: ExtraHelpers, reg: Reg): void {
     '**尤其注意 `Proxy` 与 `import(` 是子串匹配** —— 任何含 "Proxy" 的单词（如 ProxyToken、proxyConfig）、任何 `import(` 写法（含 `importScripts(` 之外的正则/字符串）都会中招。躲坑写法：不要在注释里解释这些词，用「该 API」之类替代。\n' +
     '**可用性取决于世界设置**：REST API 模块设置里若没开，会返回 400 "execute-js is disabled in REST API module settings. A GM must enable it to allow JavaScript execution."；开着则正常返回结果（实测有的世界是开着的）。所以：**可以直接试一次**，别因为描述里写着「默认禁用」就放弃——但报上面那条 400 就说明该世界没开，改用专用工具。\n' +
     '优先用专用工具（foundry_update_entity 支持内嵌物品 uuid Actor.<actorId>.Item.<itemId>，可直接改 actor 身上物品的 system/effects；改物品自动化特性通常不需要 execute_js）。真正的用途是**查专用工具拿不到的运行时值**：如 save.dc 算出来的 dc.value（普通 GET /get 看不到）、token texture 是否有效、某个 flag 的真实解析结果。写脚本前先想清楚后果。\n' +
+    '⚠️ **返回形状（必读，实测踩过）**：/execute-js 的返回**包了一层** —— 成功时 {success:true, result:<脚本的返回值>}；**失败时 {error:true, message:"..."} 根本没有 result 字段**。\n' +
+    '  · 先判 error 再取 result；result 可能是字符串（脚本里 JSON.stringify 过）⇒ 拿到后判类型再 parse。\n' +
+    '  · 反例（实测）：JSON.parse(raw.result) 在失败时抛 SyntaxError: "undefined" is not valid JSON，**把真正的报错盖掉**。\n' +
+    '  · 推荐：脚本末尾统一 return JSON.stringify({...})。\n' +
+    '★ **黑名单的替代写法（被拦了照这个改）**：eval( / Function( → 动态执行，世界内无替代品，改设计；atob( / btoa( → **世界内既无 Buffer 也无 atob，base64 方案整体放弃**（世界内【宏面板】不受此限，是另一回事）；crypto. → 连 crypto.randomUUID 也禁 ⇒ 用 foundry.utils.randomID()；globalThis → 用 game / window / canvas；game.settings.set → 脚本内只读设置。\n' +
+    '⚠️ **超时 ≠ 没执行**（实测两次 408 的调用都完整落库了）—— 先用 foundry_search / foundry_get_entity 回读看数据在不在，别直接改参数重跑（会造重复）。批量时逐条 await item.update() 会拖死 relay ⇒ 分批喂给世界内循环。\n' +
     '**报错排查**：若返回 `Error executing script: <某处的> is not a function` 之类 —— 多半是假设了字段类型（实测踩过 `(p.types || []).join is not a function`，因为 types 是对象不是数组）。先在脚本里 `return { 探到的值: typeof 某字段, 样例: 某字段 }` 探一次真实形状，再写正式逻辑；不要在类型不明时直接 .join()/.map()。',
     { script: { type: 'string', description: '要执行的 JavaScript 代码（会先过 24 条 forbidden-patterns 预检，命中则不提交并回报行号）' } },
     [],

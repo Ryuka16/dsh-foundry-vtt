@@ -2010,6 +2010,65 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
    3. 用 foundry_search 或 foundry_list_packs 回读数量核对
    ⚠️ execute_js 受 relay 的 forbidden-patterns 预检（本插件已在提交前本地拦住并给出行号），脚本里别出现 localStorage / eval / Proxy 等词。
 `,
+    'verify': `【验证：数据看起来对 ≠ 系统真的认 · 测试卡法（2026-09-19 收入，来源：实战避坑手册）】
+为什么需要它：foundry_diff / foundry_inspect 只能证明【字段值写进去了】，证明不了【dnd5e 内部真的把它们绑起来了】。
+  实证：给角色挂 class + subclass，两件物品的 identifier 都对，diff 全绿 —— 但世界里根本没有 identifier=artificer 的主职，
+  于是 subclass 挂不上去，功能是坏的而验证是假的。diff 验字段，测试卡验【关系】。
+做法（临时角色当试验台，验完必须删）：
+  1) execute_js 建一张临时 character，名字统一加 ZZ_TEST 前缀（便于一次找全、清理可核验）
+     const a = await Actor.create({ name: "ZZ_TEST_类验证", type: "character" });
+  2) 把要验的东西挂上去（class / subclass / feat / 装备 / 法术），**走真实路径**（createEmbeddedDocuments 或 actor.update），
+     不要只往字段里塞值 —— 假验证就是这么来的
+  3) 断言【派生值】而不是源字段 —— 读系统算出来的，才知道它认不认：
+     const cls = a.items.find(i => i.type === "class");
+     return JSON.stringify({
+       clsIdent: cls?.system?.identifier,
+       sub: cls?.subclass?.system?.identifier ?? null,   // 挂上了才有
+       subLinked: cls?.subclass?.uuid ?? null,
+       hpMax: a.system.attributes.hp.max                  // 派生值，能验证 class 是否真被吃进
+     });
+  4) 批量时循环建卡、每张只验一件事，结果 push 进数组一次返回（别一张卡验十件事，失败时定位不了）
+  5) **收尾必须清干净**（写进同一个脚本的最后）：
+     const ids = game.actors.filter(x => x.name.startsWith("ZZ_TEST")).map(x => x.id);
+     await Actor.deleteDocuments(ids);
+     再核验 game.actors.filter(x => x.name.startsWith("ZZ_TEST")).length === 0
+适用：批量导入 class / subclass / feat / 法术（identifier 依赖强）；验证附魔是否真生效；验证 summon 的 profile 是否匹配；
+  验证 AE 条件表达式有没有被求值（改 actor 字段看效果 disabled 变不变）。
+不适用：纯字段写入（foundry_diff 就够，不必建卡 —— 别为了验证造垃圾数据）。
+`,
+    'exec-js': `【execute_js 专项 · 返回形状 / 黑名单替代写法 / 报错对照（2026-09-19 收入）】
+■ 返回形状（★最容易吃暗亏的一条）
+  · 成功：{success:true, result:<脚本返回值>} —— 包了一层。
+  · 失败：{error:true, message:"..."} —— **没有 result 字段**。
+  ⇒ 先判 error 再取 result；result 可能是字符串（脚本里 JSON.stringify 过），拿到后判类型再 parse。
+  ⇒ 实测反例：JSON.parse(raw.result) 在失败时抛 SyntaxError: "undefined" is not valid JSON，**把真正的报错盖掉**。
+  ⇒ 推荐：脚本末尾统一 return JSON.stringify({...})，调用方先 error 后 result。
+■ 24 条黑名单的替代写法（被拦了照这个改，别自己发明）
+  localStorage / sessionStorage / document.cookie → 世界内没有，别想持久化
+  eval( / Function( / Function.constructor → 动态执行，世界内无替代品 ⇒ 改设计
+  atob( / btoa( → 世界内既无 Buffer 也无 atob ⇒ base64 方案整体放弃
+       ⚠️ 分清场景：世界内【宏面板】里 atob 可用（不受 relay 限制）；走 execute_js 时会被拦。
+  crypto. → 连 crypto.randomUUID 也禁 ⇒ 用 foundry.utils.randomID()
+  globalThis → 用 game / window / canvas
+  game.settings.set → 脚本内只读设置；要写就用专用工具
+  Proxy / import( → 子串匹配（含 ProxyToken 这类词、注释与字符串里）⇒ 换词
+  Intl. / postMessage( / XMLHttpRequest / importScripts( / new Worker( / new SharedWorker( / __proto__ /
+  apiKey / privateKey / password / Reflect. → 换写法或去掉
+■ 报错对照
+  "Script contains forbidden patterns" → 命中黑名单（本地预检已给行号，按行改）
+  "... is not a function" → 假设了字段类型（实测 (p.types || []).join 失败，因 types 是对象不是数组）
+       ⇒ 先 return { t: typeof x, sample: x } 探真实形状，再写正式逻辑
+  "Unexpected token 'return'" → **问题几乎不在 return**（return 本身合法，脚本按函数体执行），
+       是它【上一行】没写完（缺右括号 / 悬空操作数 / 引号未闭合）
+  "execute-js is disabled in REST API module settings" → 该世界没开，改用专用工具
+  "Buffer is not defined" → 世界内没有 Node 的 Buffer
+■ 408 / 超时
+  **超时 ≠ 没执行**（实测两次报 408 的调用其实都完整落库了）
+  ⇒ 先用 foundry_search / foundry_get_entity 回读看数据在不在，**别直接改参数重跑**（会造重复文档）。
+■ 批量
+  execute_js 里逐条 await item.update() 会把 relay 拖死（408）⇒ 分批（另见 bulk 主题）。
+  一次 create 几百条会静默返回 0（世界内 Item.create 的已知行为）⇒ 分批 + 每批回报数量。
+`,
     'cpr': `【CPR（Cauldron of Plentiful Resources）· 模块 id chris-premades · 原名 Chris's Premades】
 ⚠️ 2026-09-17 实机验证通过（CPR 1.5.15 / foundry 13.351 / dnd5e 5.3.3），四条实测结论：
 
