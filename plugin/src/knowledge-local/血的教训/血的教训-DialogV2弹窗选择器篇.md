@@ -107,4 +107,4 @@ const { mode, ids } = picked;
 
 - 同族坑（FVTT 剥内联事件的其他位置）：`血的教训-远程盲调UI篇.md` §2.6 / §3-10（ChatMessage HTML 内容内联 onclick 被清洗 → 用 `[data-act]` 事件委托）。
 - 速查表同步警示：`FVTT-data-dict-v9_1.md`「对话框（v13）」条目下方。
-- 修复后产物：`<工作目录>\FVTT房规\fvtt-Macro-角色休息.js`（v3，宏名「角色休息」，radio 长短休 + checkbox 角色列表 + 按钮 callback 读 DOM）。
+- 修复后产物：`C:\Users\龙华\Desktop\智能体\FVTT房规\fvtt-Macro-角色休息.js`（v3，宏名「角色休息」，radio 长短休 + checkbox 角色列表 + 按钮 callback 读 DOM）。

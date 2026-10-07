@@ -48,8 +48,8 @@ tarot.js 函数索引（v1.3.9 行号）：
 
 ### 2.1 用户环境
 - FVTT v13.351 + dnd5e 5.3.3；服务器 146.56.232.12:30000；部署=复制粘贴整个文件夹；浏览器需 Ctrl+F5 强刷（module.json version 变更会触发新 URL）。
-- 世界有 socketlib 频道 `module.your-dm-toolkit`、midi-qol、Tidy5E（非标准卡）等大量模块。
-- **本机 FVTT 源码黄金来源**：`<FVTT安装目录>\resources\app\`（public/css/foundry2.css、client/ 等），查 API 先 grep 这里。
+- 世界有 socketlib 频道 `module.longhua-dm-toolkit`、midi-qol、Tidy5E（非标准卡）等大量模块。
+- **本机 FVTT 源码黄金来源**：`F:\BaiduSyncdisk\FVTT\Foundry Virtual Tabletop\resources\app\`（public/css/foundry2.css、client/ 等），查 API 先 grep 这里。
 
 ### 2.2 ★核心坑：用户浏览器「点击命中检测不跟随 transform」（现象级坐实）
 证据链（用户实测原话）：

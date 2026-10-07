@@ -1,8 +1,8 @@
-# your-world-sync · 审查记录 · 整体盲审收口（v1.3.0）
+# lh-world-sync · 审查记录 · 整体盲审收口（v1.3.0）
 
-> 本篇记录「七轮盲审所报问题全部修完」的这一轮。轮次 1~5 见 `your-world-sync-审查记录.md`，
-> 轮次 6（整体盲审，三路视角）见 `your-world-sync-审查记录-轮次6-整体盲审.md`，
-> 批次 2（v1.2.9）见 `your-world-sync-审查记录-批次2-v1.2.9.md`。
+> 本篇记录「七轮盲审所报问题全部修完」的这一轮。轮次 1~5 见 `lh-world-sync-审查记录.md`，
+> 轮次 6（整体盲审，三路视角）见 `lh-world-sync-审查记录-轮次6-整体盲审.md`，
+> 批次 2（v1.2.9）见 `lh-world-sync-审查记录-批次2-v1.2.9.md`。
 
 ---
 
@@ -67,7 +67,7 @@
   C3/C1/B1/B2 文案与结构、玩家端 `_readonlyApi`、玩家隐藏开关、setTheme 选择器等）
 - 版本五处同步：`module.json` / JS 头注释 / `MODULE_VERSION` / CSS 头 / README appVersion ×2 → 全部 1.3.0
 - 中文直引号扫描 12 处，全部为模板串/HTML 属性内的合法引号
-- 包：`01_跑团工具\Foundry模块\your-world-sync.zip` = **85462 字节 / 5 条目**
+- 包：`01_跑团工具\Foundry模块\lh-world-sync.zip` = **85462 字节 / 5 条目**
   （module.json 979 / README.md 37330 / LICENSE 1059 / scripts\world-sync.js 185740 / styles\world-sync.css 13129）；
   旧包备份 `.v129.bak`（80703）
 
@@ -77,7 +77,7 @@
 
 - commit **1db97c3**「v1.3.0：第七轮整体盲审剩余 13 项一次收口」（4 files, +197/−62）
 - push main（74863f1..1db97c3）→ tag v1.3.0
-- Release：https://github.com/Ryuka16/your-world-sync/releases/tag/v1.3.0
+- Release：https://github.com/Ryuka16/lh-world-sync/releases/tag/v1.3.0
 
 ---
 
@@ -88,7 +88,7 @@
 
 1. `window.lhWorldSync.applySnapshot` 的 `precomputed` 参数只判 `Array.isArray`（有 assertGM 兜底）。
 2. 旧合并账本的读失败提示只写 console（该文件只读不写，影响面小）。
-3. 自指键（`your-world-sync.*`）在 `parseSnapshot` 里是整份拒收而非跳过（有意偏硬）。
+3. 自指键（`lh-world-sync.*`）在 `parseSnapshot` 里是整份拒收而非跳过（有意偏硬）。
 
 ### 只能真机验证、本地无法覆盖的（部署后建议实测）
 

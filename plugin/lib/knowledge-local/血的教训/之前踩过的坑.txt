@@ -5,13 +5,13 @@
 判断口诀：这个操作改的是“我自己”还是“别人/场景”？后者一律走 GM。
 二、你现在已经搭好的基础设施（以后直接复用，不用重造）
 
-your-dm-toolkit的 module.json 里 —— 开通了 这个 socket 频道，是一切委托的前提。"socket": truemodule.your-dm-toolkit
-world-scripter 里两段常驻脚本：传送门专用的 ，和通用的 YGM。以后新物品直接用 YGM，不用再写 socket。PortalDevice
+longhua-dm-toolkit的 module.json 里 —— 开通了 这个 socket 频道，是一切委托的前提。"socket": truemodule.longhua-dm-toolkit
+world-scripter 里两段常驻脚本：传送门专用的 ，和通用的 LHGM。以后新物品直接用 LHGM，不用再写 socket。PortalDevice
 
 三、以后写物品/特性的标准做法
 
 优先让系统自己做：活动的 、伤害、豁免，交给 midi/dnd5e——midi 把效果应用到敌人时会自动走 GM，你不用管。手写宏只补系统做不了的（强制位移、特殊清理、连招逻辑）。effects
-宏里凡是“对敌/对场景”的操作，别直接写 ，改成收集 ops 交给 YGM。模板：target.actor.createEmbeddedDocuments(...)
+宏里凡是“对敌/对场景”的操作，别直接写 ，改成收集 ops 交给 LHGM。模板：target.actor.createEmbeddedDocuments(...)
 
 JS// —— 对敌/对场景：收集后交给 GM ——
 const ops = [];
@@ -19,17 +19,17 @@ ops.push({ tokenId: tgt.id, addStatuses: ["prone"] });               // 加状�
 ops.push({ tokenId: tgt.id, move: { x, y, animate: true } });        // x,y 是左上角坐标
 ops.push({ tokenId: tgt.id, deleteFlag: { scope: "world", key: "xxx" } }); // 删带某 flag 的效果
 ops.push({ tokenId: tgt.id, createEffects: [ /* AE 数据 */ ] });
-if (ops.length) await globalThis.YGM?.request({ sceneId: canvas.scene.id, ops });
+if (ops.length) await globalThis.LHGM?.request({ sceneId: canvas.scene.id, ops });
 
 // —— 对己：直接本地做 ——
 await token.document.update({ x, y }, { animate: true });
 await actor.applyTempHP(10);
 
-YGM 不够用时，就往它的 里加一种新 op 类型（一处加、所有物品共享），别在每个物品里各写一套 socket。apply
+LHGM 不够用时，就往它的 里加一种新 op 类型（一处加、所有物品共享），别在每个物品里各写一套 socket。apply
 
 四、反复踩的坑（写之前对照一遍）
 
-socket 频道：，且该模块 manifest 必须 。借没开 socket 的模块（如 world-scripter）发消息 → 石沉大海。用你自己的 。game.socket.emit/on("module.<模块>")"socket": trueyour-dm-toolkit
+socket 频道：，且该模块 manifest 必须 。借没开 socket 的模块（如 world-scripter）发消息 → 石沉大海。用你自己的 。game.socket.emit/on("module.<模块>")"socket": truelonghua-dm-toolkit
 监听注册时机：放进 （world-scripter 在 init 期求值时 / 还没就绪，顶层注册会丢）。Hooks.once("ready", ...)game.socketgame.users
 主 GM 判定：，多 GM 时只让一个动手，避免重复执行。game.users.activeGM
 移动写法：;别用已弃用的 。tokenDoc.update({x,y}, {animate:false/true})MidiQOL.moveToken(tk, pos, 布尔)
@@ -79,14 +79,14 @@ autoanimations 的 JB2A 键名是模块专属、还分版本：不能手写猜�
 
 系统能办的（活动 、伤害、豁免）就交系统，midi 应用效果到敌人会自动走 GM。effects
 save 施加状态： + 该 effect 带 。activity.effects:[{_id, onSave:false}]statuses
-同一 socket 频道可挂多个监听，各按 门控，互不干扰（传送门和 YGM 就是共用一个频道）。action
+同一 socket 频道可挂多个监听，各按 门控，互不干扰（传送门和 LHGM 就是共用一个频道）。action
 ═══════════════════════════════════════════════
 十二、权限转交 / 临时操控类（附身符这串硬骨头的总结）
 
 凡是"让玩家临时操控一个原本不属于他的 token"（附身、魅惑、临时召唤同盟、夺取载具）都会连环踩到下面这几个，每一个都让人以为是别的问题，实则独立。出之前逐条对。
 
 1. socket 频道名：world.* 不会被广播，必死。
-   game.socket.emit/on 只转发 module.<id> 和 system.<id> 两种命名空间。写 "world.possessionCharm" 这种自定义 world.* 名 → Foundry 服务器静默丢弃，PL emit 的请求 GM 永远收不到。现象极具迷惑性："GM 自己用能成（走本地直调没过 socket），PL 用没反应"。一律用 your-dm-toolkit 那条已开 socket:true 的合法频道，靠 action 字段区分动作。
+   game.socket.emit/on 只转发 module.<id> 和 system.<id> 两种命名空间。写 "world.possessionCharm" 这种自定义 world.* 名 → Foundry 服务器静默丢弃，PL emit 的请求 GM 永远收不到。现象极具迷惑性："GM 自己用能成（走本地直调没过 socket），PL 用没反应"。一律用 longhua-dm-toolkit 那条已开 socket:true 的合法频道，靠 action 字段区分动作。
 
 2. effectmacro 的 onCreate/onDelete 在【effect 拥有者那一端】跑，不是 GM 端。
    把收尾 effect 挂在玩家自己的角色上（如附身的"出窍"），它的 onDelete 就在玩家客户端执行。这时候在 onDelete 里写 if(!game.user.isGM) return; → 整段收尾在玩家端被自己挡掉，啥也没干（GM 端压根没跑这个 effect 的 onDelete）。又是"DM 测正常、PL 翻车"。

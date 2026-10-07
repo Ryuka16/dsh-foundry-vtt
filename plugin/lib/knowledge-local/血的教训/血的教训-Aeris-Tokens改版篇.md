@@ -53,7 +53,7 @@
 ## 2. 正解存档（照抄这些，别再发明）
 
 ### 2.1 构建链（每次都要用，缺一步就崩）
-- 源码：`<跑团工具>\Foundry模块\第三方源码\aeris-tokens`（`git clone --depth 1 https://gitlab.com/robxnlifts/aeris-tokens.git`）
+- 源码：`C:\Users\龙华\Desktop\智能体\01_跑团工具\Foundry模块\第三方源码\aeris-tokens`（`git clone --depth 1 https://gitlab.com/robxnlifts/aeris-tokens.git`）
 - **装依赖必须**：`npm install --no-save --no-audit --no-fund --ignore-scripts`
   - 根因：`fvtt-types`（`github:League-of-Foundry-Developers/foundry-vtt-types#main`）带来 `electron`，
     其 postinstall 下载二进制时报 `RequestError: read ECONNRESET` + Windows `EPERM rmdir`
@@ -170,13 +170,13 @@
 
 ## 5. 给下一个接活的智能体
 
-- 产物在 `<跑团工具>\Foundry模块\`：`aeris-tokens-中文增强-v13.0.19-LH.10.zip`（100,257 字节 / 28 条目）是最终版；
+- 产物在 `C:\Users\龙华\Desktop\智能体\01_跑团工具\Foundry模块\`：`aeris-tokens-中文增强-v13.0.19-LH.10.zip`（100,257 字节 / 28 条目）是最终版；
   LH.1~LH.9 与 `aeris-tokens-v13.0.19-原版(官方zip).zip` 同目录保留作二分基线。**已知好用基线 = LH.6**（两条线但那版用户确认没报错）。
-- 源码在 `<跑团工具>\Foundry模块\第三方源码\aeris-tokens`（分支 lh-cn，基线 v13 提交，LH.1~LH.10 全部**未提交**，改动集中在 30 个文件 + 新增 `src/token/movementHistoryRuler.ts`）。
+- 源码在 `C:\Users\龙华\Desktop\智能体\01_跑团工具\Foundry模块\第三方源码\aeris-tokens`（分支 lh-cn，基线 v13 提交，LH.1~LH.10 全部**未提交**，改动集中在 30 个文件 + 新增 `src/token/movementHistoryRuler.ts`）。
 - 还没修的上游问题（用户已知情，要修就**一个一个单独出**）：Esc/右键取消拖拽后该 token 拖不动（`_onDragLeftCancel` 只认 `event.button === 2` + 缺 return，刷新可解）、纹理缓慢泄漏（刷新可解）、画布外松手不落库、多选 token 不走跳跃特效（上游只处理 `controlled.length===1`）、socket 8 个 handler 无鉴权。
 - 用户环境：FVTT 13.351 / dnd5e 5.3.3 / 服务器 `http://146.56.232.12:30000` / 世界 id `chushi`「初始世界（数据）」；依赖 aeris-core v13.0.23 / socketlib v1.1.3 / lib-wrapper 1.13.4.0 / color-picker 1.7；`moduleFunctionalityScopeInCombat` 与 `OutOfCombat` 均 `Tactics`、`enableCombatMovementHistory` = true、场景网格 100px 方形。
 - 升级三步（每次交付都要说）：删服务器 `Data\modules\aeris-tokens` 整个文件夹 → 解压新 zip 进同名文件夹（防双层）→ **重进世界**（模块清单在「加载世界」那一刻读入，只按 F5 不够）。
-- 本机 Foundry 源码：`<FVTT安装目录>\resources\app\`（`data\modules` 只有 README，无法真机验证，所有结论靠代码级核对 + 编译 + 用户实测）。
+- 本机 Foundry 源码：`F:\BaiduSyncdisk\FVTT\Foundry Virtual Tabletop\resources\app\`（`data\modules` 只有 README，无法真机验证，所有结论靠代码级核对 + 编译 + 用户实测）。
 
 ---
 
@@ -653,4 +653,3 @@ usedTiles = cap && dragKeyNow && cap.dragKey === dragKeyNow
   **都还没有第二份证据** —— 本文档只记录到「已交付」为止。
 - **锁死 autoPath 可能改变折返的表现（两个方向都可能）**：autoPath 开时 `_path` 是整条替换、
   关时是逐格拼接，而**蓝线画的正是 `_path`** ⇒ 下一个探针要一起看这个变量。
-

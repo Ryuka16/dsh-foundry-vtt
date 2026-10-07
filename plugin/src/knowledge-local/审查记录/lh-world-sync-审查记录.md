@@ -1,4 +1,4 @@
-# your-world-sync · 审查记录（错误与解决办法）
+# lh-world-sync · 审查记录（错误与解决办法）
 
 > **本文件的用途**：每做完一轮代码审查，在这里追加一节，写清「发现了什么错 → 怎么修的 → 怎么验证的」。
 > 目的不是自我批评，是让同一个坑**第二次出现时能被立刻认出来**。
@@ -7,7 +7,7 @@
 > 1. 只记**真问题**（能指到代码行、能说出触发条件的）；指不出来源的猜测不进来，或明确标注「未验证」。
 > 2. 每条必须有三样：**位置**（函数名 + 版本时的行号，行号会随版本漂移所以函数名更重要）、**触发条件**（什么操作会踩到）、**修法与验证**。
 > 3. 修完了就更新状态（`已修 vX.Y.Z` / `只修一半` / `未修·原因`），不要删旧记录。
-> 4. 版本与文件：`<工作目录>\Git源码\your-world-sync\`（`scripts/world-sync.js` 主文件）。
+> 4. 版本与文件：`C:\Users\龙华\Desktop\智能体\Git源码\lh-world-sync\`（`scripts/world-sync.js` 主文件）。
 >
 > **配套文件**：审阅清单在 `01_跑团工具\FVTT技术资料\搓怪物做效果做mod任何时候，看到了一定要看仔细看\血的教训-代码审阅自检清单篇.md`（14 项）。
 
@@ -17,7 +17,7 @@
 
 | 环节 | 做法 | 为什么这样 |
 |---|---|---|
-| 独立盲审 | 起一个**看不到作者任何判断**的 subagent，只给它代码路径 + 14 项清单 + FVTT 源码路径（`<FVTT安装目录>\resources\app\`），要求输出「问题清单 / 14 项逐项结论 / 未验证部分」，并**禁止改文件** | 作者自审会顺着自己的思路读，看不见自己的盲区；换一双眼睛十行内就能指出来 |
+| 独立盲审 | 起一个**看不到作者任何判断**的 subagent，只给它代码路径 + 14 项清单 + FVTT 源码路径（`F:\BaiduSyncdisk\FVTT\Foundry Virtual Tabletop\resources\app\`），要求输出「问题清单 / 14 项逐项结论 / 未验证部分」，并**禁止改文件** | 作者自审会顺着自己的思路读，看不见自己的盲区；换一双眼睛十行内就能指出来 |
 | 改动专审 | 再起一个 subagent 专审「上一轮这 N 处改动**本身**」：修好没修好、有没有引入新 bug、改动之间有没有冲突 | 修补丁比找 bug 更容易翻车，必须单独验 |
 | 作者自查 | 我按同一份 14 项清单逐项过一遍，与盲审结果交叉 | 两边都命中的才是高置信真问题 |
 | 修法与验证 | 每条修完，先写**测试断言**（`vm.createContext` 加载真实脚本 + 打桩）再改代码；跑全量回归 | 「声称修了但没生效」在本项目出现过 6 次，只靠读代码确认不了 |
@@ -42,7 +42,7 @@
 | 5 | 一般 | 回档路径**没有上锁** | `rollbackApplyLog` | 两个 GM/两个标签页同时回档 → 互相覆盖 | v1.2.1：回档也走 `acquireLock` + `try/finally` 释放 |
 | 6 | 一般 | 锁的「自己人」判定用 `l.userId !== game.user.id` | `acquireLock` | **同一个 GM 开两个标签页 → 双双放行**，锁形同虚设 | v1.2.2：改 sessionStorage 里的 `myOwner()`（每标签页一个随机 ID） |
 | 7 | 一般 | 回滚失败被 `catch (e2) { console.error }` 吞掉，外层仍提示「恢复失败，**已自动回滚**」 | `applySnapshot` / `proceedApplySnap` | 回滚也失败时，界面在**说假话**，用户以为世界已还原 | v1.2.2：记 `e.__rollbackFailed`，按三态给话（未开始 / 已回滚 / 回滚也失败·请勿刷新） |
-| 8 | 一般 | 判「这个 key 在本世界存不存在」用的是**导出时的过滤结果** | `applySnapshot` 写入循环 | 外来快照含 `your-world-sync.*` 或 user 级键时，会 `createDocuments` **造出同 key 的第二份 Setting 文档** | v1.2.2：改用 `currentMap.get(key)?.doc ?? getSettingDoc(key)` 单一路径；v1.2.4：统一「同 key 取第一份」对齐官方 `getSetting(key,user=null)=find(...)` |
+| 8 | 一般 | 判「这个 key 在本世界存不存在」用的是**导出时的过滤结果** | `applySnapshot` 写入循环 | 外来快照含 `lh-world-sync.*` 或 user 级键时，会 `createDocuments` **造出同 key 的第二份 Setting 文档** | v1.2.2：改用 `currentMap.get(key)?.doc ?? getSettingDoc(key)` 单一路径；v1.2.4：统一「同 key 取第一份」对齐官方 `getSetting(key,user=null)=find(...)` |
 | 9 | 一般 | 面板可重复打开（无单例）+ `refreshStatus` 用 `$(".wsync-app.wsync-panel").first()` 定位 | `openSyncPanel` / `refreshStatus` | 连点两次开两个面板；关窗后元素因 `slideUp` 滞留约 200ms → 刷新状态**写错窗口** | v1.2.2：`openPanelDlg` 单例 + `refreshStatus` 改用传入的 `dlg.element` |
 | 10 | 一般 | 回档把「本来就不存在（无需处理）」计入「**已回档 N 项**」并宣称「已全部还原」 | `rollbackApplyLog` / `doRollback` | 虚报战果，用户以为回了很多其实什么都没动 | v1.2.2：拆 `restored` / `untouched`，报告分开讲 |
 | 11-19 | 建议 | 死字段 `sourceWorldId`（只写不读）／快照无条目上限／通知未转义／死变量 `style="--dot"`／`nth-of-type` 配色耦合／`applyLogFile` 中文名被压成 `____` 撞名／恢复模组列表可能把本模块自己关掉／README 四处过强断言／按钮文案与行为不符 | 各处 | — | 分别修于 v1.2.2 / v1.2.5（见对应轮次） |
@@ -200,4 +200,4 @@
 - **蓝白主题对比度（5.7）与 5.8 那 10 条建议** —— 留待下一轮集中处理。本轮刻意把改动压在 7 处以内（教训：v1.2.4 一次改 19 处，把新引入的 bug 与旧问题混在一起，排查成本翻倍）。
 - 「本机未安装的模组」在面板里仍可勾选（只是标灰），偏好里可能存着它们的名字 —— 语义无害（diff 会过滤），暂不改。
 - `getSettingDoc` 只认 `user === null`（user 级设置同集合存在复本，边界极低）。
-- 自指键（`your-world-sync.*`）**整份拒收**偏硬，但出于安全保留。
+- 自指键（`lh-world-sync.*`）**整份拒收**偏硬，但出于安全保留。

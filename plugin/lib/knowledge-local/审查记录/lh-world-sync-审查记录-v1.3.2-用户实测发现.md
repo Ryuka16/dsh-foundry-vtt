@@ -1,4 +1,4 @@
-# your-world-sync 审查记录 · v1.3.2（**本轮由用户实测发现，不是盲审提出**）
+# lh-world-sync 审查记录 · v1.3.2（**本轮由用户实测发现，不是盲审提出**）
 
 > 存放约定：本文件属技术资料，**不进模块 Git 仓库**（用户明确要求技术资料不上传 GitHub）。
 > 记录规则：只记能指到代码行的真问题；每条含「位置 / 触发条件 / 现象 / 修法 / 验证」；修完更新状态，不删旧记录。
@@ -20,7 +20,7 @@
 
 ### 第一层：Foundry 到底删不删模块留下的设置？
 
-用 node 从本机安装目录提取 `<FVTT安装目录>\resources\app\dist\packages\package.mjs` 中 `Package.uninstall(id)` 的完整函数体：
+用 node 从本机安装目录提取 `F:\BaiduSyncdisk\FVTT\Foundry Virtual Tabletop\resources\app\dist\packages\package.mjs` 中 `Package.uninstall(id)` 的完整函数体：
 
 ```js
 static async uninstall(e){
@@ -92,7 +92,7 @@ function nsIsUnavailable(ns) {
 
 | 项 | 数值 |
 |---|---|
-| 服务器主快照 `/modules/your-world-sync/storage/world-snapshot-master.json` | **1322 项** / 129 命名空间 / 9,268,088 字节 |
+| 服务器主快照 `/modules/lh-world-sync/storage/world-snapshot-master.json` | **1322 项** / 129 命名空间 / 9,268,088 字节 |
 | 快照元信息 | `appVersion: "1.3.1"`，`sourceWorld: "初始世界（数据）"`，`savedAt: 2026-09-10T08:49:18.062Z` |
 | 同一世界当前按模块判据**应进快照** | **2467 项** / 129 命名空间 |
 | 差额 | **1145 项**，但**命名空间数完全一致（129 = 129）** |
@@ -109,8 +109,8 @@ function nsIsUnavailable(ns) {
 
 ## 4. 本版交付
 
-- 提交 `1c27e57`「v1.3.2：把「本机没装这个模组」说准，world 不再被误判成模组」（4 files, +48/−18）→ push main → tag v1.3.2 → Release **https://github.com/Ryuka16/your-world-sync/releases/tag/v1.3.2**（Latest，非草稿非预发布，2026-09-10T09:05:51Z）
-- 包：`<跑团工具>\Foundry模块\your-world-sync.zip` = **95178 字节 / 5 条目**（module.json 979 / README.md 42834 / LICENSE 1059 / `scripts\world-sync.js` 206287 / `styles\world-sync.css` 13129）；旧包备份 `your-world-sync.zip.v131.bak`（93622）
+- 提交 `1c27e57`「v1.3.2：把「本机没装这个模组」说准，world 不再被误判成模组」（4 files, +48/−18）→ push main → tag v1.3.2 → Release **https://github.com/Ryuka16/lh-world-sync/releases/tag/v1.3.2**（Latest，非草稿非预发布，2026-09-10T09:05:51Z）
+- 包：`C:\Users\龙华\Desktop\智能体\01_跑团工具\Foundry模块\lh-world-sync.zip` = **95178 字节 / 5 条目**（module.json 979 / README.md 42834 / LICENSE 1059 / `scripts\world-sync.js` 206287 / `styles\world-sync.css` 13129）；旧包备份 `lh-world-sync.zip.v131.bak`（93622）
 - 线上核验：manifest HTTP 200 `version=1.3.2` `systems=0`；download HTTP 200 Content-Length 95178（与本地一致）
 
 ---

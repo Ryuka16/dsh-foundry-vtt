@@ -9,8 +9,8 @@
 > **模块与环境背景（新 AI 接手必读）：**
 > - 模块位置：`01_跑团工具\Foundry模块\lh-video-lab\`，文件 = `module.json` / `scripts/video-lab.js`（约 1360 行）/ `styles/video-lab.css`（约 876 行）/ `lang/cn.json` / `README.md`。
 > - 用户环境：**FVTT v13.351 + dnd5e 5.3.3**，服务器 146.56.232.12:30000，用户用「复制粘贴整个文件夹」方式部署到 `Data/modules/`。
-> - 用户用的是 **Tidy5E 非标准卡**；世界里有 socketlib 频道 `module.your-dm-toolkit`、midi-qol、Plutonium 等大量模块。
-> - **本机 FVTT 源码（grep 全局 CSS 的唯一权威来源）**：`<FVTT安装目录>\resources\app\`，其中全局样式在 `public\css\foundry2.css`（14265 行）。
+> - 用户用的是 **Tidy5E 非标准卡**；世界里有 socketlib 频道 `module.longhua-dm-toolkit`、midi-qol、Plutonium 等大量模块。
+> - **本机 FVTT 源码（grep 全局 CSS 的唯一权威来源）**：`F:\BaiduSyncdisk\FVTT\Foundry Virtual Tabletop\resources\app\`，其中全局样式在 `public\css\foundry2.css`（14265 行）。
 >
 > 翻到本文件的任何 AI / 开发者 / 用户，请先花 3 分钟读完本节再动手。
 > **如果你即将做「FVTT v13 模块自建 UI 面板 / 自定义 CSS 主题 / Dialog 弹窗样式」，这里写的就是全部的坑和正解。**
@@ -204,7 +204,7 @@ dlg.render(true);                        // ★ render(true) 强制渲染
 
 ## 3. 铁律（本次沉淀）
 
-1. **面板样式「不对」，先 grep FVTT 源码 `foundry2.css`**（本机路径 `<FVTT安装目录>\resources\app\public\css\foundry2.css`），锁定是不是 `body.game .app button/input { width:100% }` 这类全局规则在覆盖你，别先怀疑文件没传。
+1. **面板样式「不对」，先 grep FVTT 源码 `foundry2.css`**（本机路径 `F:\BaiduSyncdisk\FVTT\Foundry Virtual Tabletop\resources\app\public\css\foundry2.css`），锁定是不是 `body.game .app button/input { width:100% }` 这类全局规则在覆盖你，别先怀疑文件没传。
 2. **诊断 CSS 用 `getComputedStyle` 实测 computed 值**（`flex`/`width`/`height`/`display`），一条就能分清「没加载 / flex 失效 / 空间被抢」三件事，别靠 querySelector 或猜。
 3. **模块 CSS 是 `@import` 注入，不是 `<link>`**——查加载状态看 `querySelectorAll('style')` 里的 `@import`，别查 `document.styleSheets`。
 4. **模块按钮必带 `width: auto !important`**——FVTT 全局 `button{width:100%}` 特异性 (0,2,2) 压过单类选择器，不 `!important` 就等着按钮撑满、input 被挤扁。

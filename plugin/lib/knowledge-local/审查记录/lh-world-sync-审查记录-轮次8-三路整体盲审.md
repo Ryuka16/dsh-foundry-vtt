@@ -1,6 +1,6 @@
-# your-world-sync 审查记录 · 第八轮（三路整体盲审）
+# lh-world-sync 审查记录 · 第八轮（三路整体盲审）
 
-> 审查对象：`<工作目录>\Git源码\your-world-sync\`（起点 v1.3.0，2686 行 / 185,740 字节）
+> 审查对象：`C:\Users\龙华\Desktop\智能体\Git源码\lh-world-sync\`（起点 v1.3.0，2686 行 / 185,740 字节）
 > 本轮方法：**三路互不通气的独立盲审**，全部要求「从零通读，不参考任何提交历史或别人的意见」
 > 汇总结论：**三路共报出约 45 条 → 按「会不会丢数据 / 会不会永久卡死」筛选 → 修 13 处，其余全部记档**
 > 修复版本：**v1.3.1**（commit `81d1573` / release `v1.3.1`）
@@ -70,7 +70,7 @@
 
 ## 3. 三路共同排除的假警报（有源码依据，**不要再查**）
 
-- `Finding.uploadPersistent(MODULE_ID, "", file, {}, {notify:false})` 的落点 = `modules/your-world-sync/storage/`，与 `STORAGE_DIR` 一致；`module.json` 的 `persistentStorage:true` 是硬前提（`client/applications/apps/file-picker.mjs:505-513`）
+- `Finding.uploadPersistent(MODULE_ID, "", file, {}, {notify:false})` 的落点 = `modules/lh-world-sync/storage/`，与 `STORAGE_DIR` 一致；`module.json` 的 `persistentStorage:true` 是硬前提（`client/applications/apps/file-picker.mjs:505-513`）
 - `JSON.stringify(value)` 写 Setting 正确、不会双重编码（`common/data/fields.mjs:3002-3010` 的 `JSONField._cast/_validateType`）
 - `getSettingDoc(key)` = `getSetting(key, null)` 与 core 语义一致（`client/documents/collections/world-settings.mjs:35-37`）
 - 深色主题下 Dialog 底部按钮不会黑字黑底（core 的 `body.game .app.dialog .dialog-buttons button` 无 `!important`，本模块的 `.dialog-button` 带 `!important` 胜出）

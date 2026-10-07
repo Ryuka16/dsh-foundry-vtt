@@ -1,6 +1,6 @@
-# your-world-sync 审查记录 · 批次 2（v1.2.9）
+# lh-world-sync 审查记录 · 批次 2（v1.2.9）
 
-> 承接《your-world-sync-审查记录-轮次6-整体盲审.md》。
+> 承接《lh-world-sync-审查记录-轮次6-整体盲审.md》。
 > 轮次 6 的整体盲审把病根定在一句话上：**同一类事实存了多份副本** ——
 > 「上次读取成功没有」有 5 个模块级变量、「操作互斥」有 3 套实现、「哪些键该写」有 4 套判据、
 > 「失败后怎么还原」有 2 处近乎逐字重复。v1.2.8 先修了「会永久失去东西」的那几条，
@@ -93,9 +93,9 @@ async function storageRead(name) {
 - 五处版本同步：`module.json:5` / JS 头注释 / `MODULE_VERSION` / `styles/world-sync.css:2` / `README.md` 的 appVersion ×2
 - 结构自检：`withOpLock` 定义 1 处、调用 4 处；`beginOp`/`endOp` 各 2 处（1 定义 + 1 调用）；
   `acquireLock`/`releaseLock` 各 1 处（都在 `withOpLock` 内）；`storageLastError` 真实赋值 **0 处**
-- 包：`01_跑团工具\Foundry模块\your-world-sync.zip` = 80703 字节 / 5 条目
+- 包：`01_跑团工具\Foundry模块\lh-world-sync.zip` = 80703 字节 / 5 条目
   （module.json 979 / README.md 34912 / LICENSE 1059 / scripts\world-sync.js 176178 / styles\world-sync.css 13129）；
-  旧包备份为 `your-world-sync.zip.v128.bak`（78850）
+  旧包备份为 `lh-world-sync.zip.v128.bak`（78850）
 
 ---
 

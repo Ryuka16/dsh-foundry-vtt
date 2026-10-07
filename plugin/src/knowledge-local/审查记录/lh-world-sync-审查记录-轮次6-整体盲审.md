@@ -1,4 +1,4 @@
-# your-world-sync 审查记录 · 轮次 6（整体盲审）
+# lh-world-sync 审查记录 · 轮次 6（整体盲审）
 
 > 记录规则：只记能指到代码行的真问题；每条含 位置 / 触发条件 / 修法与验证 / 状态。修完更新状态，不删旧记录。
 > 本轮结论尚未落地为代码（v1.2.7 为当前已发布版本），所有条目状态 = **待修**。
@@ -56,19 +56,19 @@
 ### 实测（作者本人执行，无任何 Cookie / 凭据）
 
 ```
-HEAD http://146.56.232.12:30000/modules/your-world-sync/module.json
+HEAD http://146.56.232.12:30000/modules/lh-world-sync/module.json
   → 200  application/json  979 字节
-HEAD http://146.56.232.12:30000/modules/your-world-sync/storage/world-snapshot-master.json
+HEAD http://146.56.232.12:30000/modules/lh-world-sync/storage/world-snapshot-master.json
   → 200  application/json  9,268,088 字节   ← 8.8MB 全量 world 级设置
-HEAD http://146.56.232.12:30000/modules/your-world-sync/storage/apply-log-chushi.json
+HEAD http://146.56.232.12:30000/modules/lh-world-sync/storage/apply-log-chushi.json
   → 404（该世界暂无账本，非权限问题）
 ```
 
-### 机制（接手者查证，`<FVTT安装目录>\resources\app\`）
+### 机制（接手者查证，`F:\BaiduSyncdisk\FVTT\Foundry Virtual Tabletop\resources\app\`）
 
 `dist/server/express.mjs` 里数据目录是**整目录静态直出**：`e.use(express.static(this.paths.data,{redirect:!1}))`；它前面只有 locals、`Express.#a`（该函数只 `sessions.getOrCreate` 把 `req.user` 挂上，**不拒绝**）、CORS、扩展名黑名单（`.db`/`LOCK`/`LOG` 等）、压缩与缓存头——**没有任何登录门**。
 
-写入侧：`world-sync.js:290` `STORAGE_DIR="modules/your-world-sync/storage"` + `:480` `FilePicker.uploadPersistent(MODULE_ID,"",...)`（`client/applications/apps/file-picker.mjs:505-513` 已核对，target=`${pack.type}s/${pack.id}/storage/${path}`）；读取侧 `:517` `foundry.utils.getRoute(...)` + `fetch`。
+写入侧：`world-sync.js:290` `STORAGE_DIR="modules/lh-world-sync/storage"` + `:480` `FilePicker.uploadPersistent(MODULE_ID,"",...)`（`client/applications/apps/file-picker.mjs:505-513` 已核对，target=`${pack.type}s/${pack.id}/storage/${path}`）；读取侧 `:517` `foundry.utils.getRoute(...)` + `fetch`。
 
 ### 影响
 
@@ -160,7 +160,7 @@ HEAD http://146.56.232.12:30000/modules/your-world-sync/storage/apply-log-chushi
 - `:2253-2257`（自动提醒）与 `:1988`（面板）对「读主快照失败」用两套文案，方向一致但说法不一。
 - 版本号三处手抄（`module.json:5` / `world-sync.js:285` / CSS 头），现在一致，但无机械校验。
 - `world-sync.js:1-280` 是 12% 篇幅的变更日志块，与 README 变更记录重复成两份，且已开始互相矛盾（见 B9）。
-- **仓库根又长出了 `%SystemDrive%` 空目录树**（`Git源码\your-world-sync\%SystemDrive%`，`Test-Path` = True）→ 没进 git，但打包 zip 会带进去。发版前清掉（**需用户授权删除**）。
+- **仓库根又长出了 `%SystemDrive%` 空目录树**（`Git源码\lh-world-sync\%SystemDrive%`，`Test-Path` = True）→ 没进 git，但打包 zip 会带进去。发版前清掉（**需用户授权删除**）。
 - 玩家端会在自己的「模组设置」里看到无意义的复选框：`autoPrompt` 注册为 `scope:"client", config:true`（`:376-383`），而 README 说「玩家端不加载任何界面」。
 - `window.lhWorldSync` 对**所有用户（含玩家）**挂载（`:2386-2399`），只有写操作内部才 `assertGM`；读接口对玩家开放。README 措辞是「接口同样受限」。
 - 自动提醒会静默跳过：同标签页刚恢复过（`sessionStorage "wsync.justApplied"`，`:2244-2262`）不弹，且固定延迟 6 秒（`:2299-2302`）。
@@ -237,7 +237,7 @@ HEAD http://146.56.232.12:30000/modules/your-world-sync/storage/apply-log-chushi
 
 > 本节是**结果回填**：上面 §2–§4 里的条目，修完在这里更新；未修的保持「待修」，交给下一批。
 
-### 本批修了什么（10 处改动，文件 `<工作目录>\Git源码\your-world-sync\scripts\world-sync.js`）
+### 本批修了什么（10 处改动，文件 `C:\Users\龙华\Desktop\智能体\Git源码\lh-world-sync\scripts\world-sync.js`）
 
 | # | 条目 | 修法（可 grep 的关键点） | 状态 |
 |---|---|---|---|

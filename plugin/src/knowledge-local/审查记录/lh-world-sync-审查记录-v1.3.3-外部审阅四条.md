@@ -1,8 +1,8 @@
-# your-world-sync 审查记录 · v1.3.3（外部审阅四条）
+# lh-world-sync 审查记录 · v1.3.3（外部审阅四条）
 
 > 本轮性质：**外部审阅**（用户提供的大佬复审报告，非本机盲审 subagent）。
-> 审阅对象：`Ryuka16/your-world-sync` v1.3.1，Commit `81d1573133d71443326bc5abea1ff4e141af6cdb`。
-> 报告文件：`c:\users\user\downloads\your-world-sync-v1.3.1-four-critical-issues.md`（11.9 KB / 695 行）。
+> 审阅对象：`Ryuka16/lh-world-sync` v1.3.1，Commit `81d1573133d71443326bc5abea1ff4e141af6cdb`。
+> 报告文件：`c:\users\龙华\downloads\lh-world-sync-v1.3.1-four-critical-issues.md`（11.9 KB / 695 行）。
 > 我的处置：**逐条到代码里核实，不照抄** —— 四条全部属实，一次修完，出 v1.3.3。
 
 ---
@@ -46,12 +46,12 @@ fail closed 的代价只是「这次没做成」，用户重试即可。**这个
 - **八套测试脚本 608 项断言全绿**：v120 73 / v121 82 / v123 15 / v124 32 / v126 47 / v127 72 / v128 106 / v130 181
 - v130 新增 v1.3.3 专项块（四组行为断言，非文本断言）：
   - ① `buildSelection(snap, {mode:"custom", ns:{}, includeModuleConfig:true})` → `sel.ns` 为空、`includeModuleConfig===true`；对照 `mode:"all"` 取全 3 个 ns
-  - ② 当前 `{midi-qol:true, target-only-module:true, your-world-sync:true}` vs 快照 `{midi-qol:true}` → 不含 core.moduleConfiguration、整体 changed 为空；对照 `{midi-qol:true, extra:false}` → 报 1 条且 `to.extra===false && to["your-world-sync"]===true`、`from.extra===true`
+  - ② 当前 `{midi-qol:true, target-only-module:true, lh-world-sync:true}` vs 快照 `{midi-qol:true}` → 不含 core.moduleConfiguration、整体 changed 为空；对照 `{midi-qol:true, extra:false}` → 报 1 条且 `to.extra===false && to["lh-world-sync"]===true`、`from.extra===true`
   - ③ A 世界 `acquireLock("apply")` 拿锁 → **B 世界（不同 worldId / 不同会话）也被拒**；A 释放后 B 可拿锁；源码无 `crossWorldConflict`
   - ④ 让 `.prev` 写入失败 → `applySnapshot` 抛错且 `__backupFailed===true`、`world-sync.js` 里世界设置值未变、旧账本 `opId` 仍为 `OLD-OP`、旧撤销点仍可读到
 - 版本五处同步 1.3.3：`module.json:5` / JS 头注释 / `MODULE_VERSION` / `styles/world-sync.css:2` / README appVersion 两处
-- 包：`01_跑团工具\Foundry模块\your-world-sync.zip` = **97746 字节 / 5 条目**（module.json 979 / README.md 44906 / LICENSE 1059 / scripts\world-sync.js 210814 / styles\world-sync.css 13129）；旧包备份 `your-world-sync.zip.v132.bak`（95178）
-- 发布：commit **24400c4**（4 files, +80/−26）→ push main → tag v1.3.3 → https://github.com/Ryuka16/your-world-sync/releases/tag/v1.3.3
+- 包：`01_跑团工具\Foundry模块\lh-world-sync.zip` = **97746 字节 / 5 条目**（module.json 979 / README.md 44906 / LICENSE 1059 / scripts\world-sync.js 210814 / styles\world-sync.css 13129）；旧包备份 `lh-world-sync.zip.v132.bak`（95178）
+- 发布：commit **24400c4**（4 files, +80/−26）→ push main → tag v1.3.3 → https://github.com/Ryuka16/lh-world-sync/releases/tag/v1.3.3
 - 线上核验：manifest HTTP 200 version=1.3.3 / systems 数 0；download HTTP 200 / 97746 字节
 
 ---

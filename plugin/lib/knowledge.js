@@ -43,8 +43,10 @@ const BUILTIN_KB_DIR = join(dirname(fileURLToPath(import.meta.url)), 'knowledge-
 const BUILTIN_SAMPLES_DIR = join(dirname(fileURLToPath(import.meta.url)), 'samples');
 /**
  * 内置原样文档库（随插件包发布）：<插件包>/lib/knowledge-manuals。
- * 内容 = 模块官方文档（28 个模块）+ 飞书知识库（57 篇）的 .md 原文（不含配图）。
+ * 内容 = 模块官方文档（29 个模块，144 篇）+ 飞书知识库原文（编号版 57 篇 + Wiki 全文版 186 篇）的 .md 原文（不含配图），共 387 篇。
  * 与 knowledge-docs（提炼件）的区别：这边是原文，可 grep 到具体 API/字段的原始出处。
+ * ⚠️ 两套飞书并存是刻意的：编号版有 28 篇在全文版里找不到（掷骰数据全表 / 属性键值 / 函数签名 / DND5e v5.x.x / CPR自定义宏制作 / ATL语法 / 兼容性检查表等），
+ *    feishu-* 系列主题正指着它们，删了会让那批主题失效。
  */
 const BUILTIN_MANUALS_DIR = join(dirname(fileURLToPath(import.meta.url)), 'knowledge-manuals');
 /**
@@ -140,7 +142,7 @@ export function registerKnowledgeTools(REG, getKnowledgeDir, getSampleDir) {
     const builtinTopics = Object.keys(BUILTIN_TOPICS);
     const tool = {
         name: 'foundry_knowledge',
-        description: '按需读 FVTT 技术知识。五级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 原样文档库（topic:"manuals"，随插件发布，任何环境可用）：28 个模块的官方文档 + 57 篇飞书知识库原文——查模块 API/字段/函数签名的原始出处来这里，别猜；③ 资料库主题（topic 见下，**已随插件发布内置副本，任何环境可用**；本机 knowledgeDir 有更新版本时自动优先用它）：数据字典/怪物规格/自动化指北/宏汇编/midi 指南/CPR 宇宙/坑书/方法论等；④ topic:"local" = 内置资料库全索引（列全部文件路径，其余文件用 topic:"local", file:"<路径>" 读）；⑤ 样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"manuals"/"samples"/"local" 不带 file 参数 = 列出索引；② 带 file 参数（索引里的路径）= 读原文（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
+        description: '按需读 FVTT 技术知识。五级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 原样文档库（topic:"manuals"，随插件发布，任何环境可用）：29 个模块的官方文档（144 篇）+ 飞书知识库原文（243 篇：编号版 57 + Wiki 全文版 186），共 387 篇——查模块 API/字段/函数签名的原始出处来这里，别猜；③ 资料库主题（topic 见下，**已随插件发布内置副本，任何环境可用**；本机 knowledgeDir 有更新版本时自动优先用它）：数据字典/怪物规格/自动化指北/宏汇编/midi 指南/CPR 宇宙/坑书/方法论等；④ topic:"local" = 内置资料库全索引（列全部文件路径，其余文件用 topic:"local", file:"<路径>" 读）；⑤ 样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"manuals"/"samples"/"local" 不带 file 参数 = 列出索引；② 带 file 参数（索引里的路径）= 读原文（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
         parameters: {
             type: 'object',
             properties: {
