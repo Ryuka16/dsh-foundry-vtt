@@ -134,6 +134,106 @@ const TOPICS: Record<string, { file: string; desc: string }> = {
 }
 
 /** 默认资料库根目录（可用 config.json 的 knowledgeDir 覆盖）。 */
+/**
+ * ★★ 任务级入口表 —— foundry_howto 用它把「我要做什么」映射到「该读哪篇血泪教训 + 关键步骤」。
+ * 为什么要有这张表：实测过「文档就在包里、索引也有，AI 依然不读，直接上手猜着做」。
+ * 根因不是没文档，是没入口 —— AI 的本能是「找工具」，那就把文档入口做成工具。
+ * 新增坑书时同步加一行；keys 要覆盖口语说法（用户/AI 会怎么说这件事）。
+ */
+const HOWTO: Array<{ keys: string[]; title: string; file: string; also?: string; steps: string[] }> = [
+  {
+    keys: ['建卡', '角色卡', '建角色', '角色', '等级', '升级', '升级授予', 'advancement', '子职', '授予', 'character', 'level', 'create actor', '熟练', '技能选择'],
+    title: '建角色卡 / 改等级 / 升级授予（advancement）',
+    file: '血的教训/血的教训-建卡与升级授予篇.md',
+    also: 'LH建卡器-规格与重建说明.md',
+    steps: [
+      '等级的真实落点：挂在 actor 身上的 class item 的 system.levels —— 不是 actor 上的字段',
+      '装 class/race/background 用 actor.createEmbeddedDocuments("Item",[doc.toObject()])（安全路径）',
+      '跑 advancement 的 API：HitPoints 要【逐级】apply(L,{},{initial:true})；Trait 先 await adv.automaticApplicationValue(lv,{initial:true})，有值再 apply；ItemGrant apply(lv,{},{initial:true})；Subclass apply(3,{uuid},{})【不能带 initial】；ScaleValue 不用调（空函数）',
+      '★ 致命坑：advancement.apply() 只改内存，绕过升级向导 = 僵尸物品 —— 之后 update()/delete() 全报 Item "xxx" does not exist，而且是当场就坏。正确姿势 = 影子卡算 → 真卡 createEmbeddedDocuments(items,{keepId:true})',
+      '读 advancement 必须用 d.toObject().system.advancement（d.system.advancement 是 Collection，Object.keys 恒为 0）',
+      '验证要看【派生值】：details.level / abilities.X.proficient / traits.armorProf（SetField，读要用 Array.from）/ actor.items.size',
+      'HP 最后单独补：actor.update({"system.attributes.hp.value": max})',
+    ],
+  },
+  {
+    keys: ['批量', '跑批', '大量', '几百', 'bulk', '一次建很多', '批量改', '批量建'],
+    title: '批量建 / 批量改（一次 >20 条）',
+    file: '血的教训/血的教训-批量改模组数据篇.md',
+    steps: [
+      '逐条 await item.update() 会拖垮 relay（HTTP 408）',
+      'Item.create 一次几百条会【静默返回 0】（世界一条没写、零报错，后面几批跟着失败）',
+      '超时 ≠ 没执行 —— 先回读看数据在不在，别直接改参数重跑（会造重复）',
+      '插件已有 foundry_create_batch（内建分批 30 条 / 90ms），优先用它',
+    ],
+  },
+  {
+    keys: ['消耗', '耗用', '找不到耗用项', 'consumption', '扣次数', '充能', '限次', '次数'],
+    title: '消耗 / 目标 / 报「找不到耗用项」',
+    file: '血的教训/血的教训-CPR脱钩与消耗目标篇.md',
+    steps: [
+      'consumption.targets 写 UUID 会坏、写 identifier 能活（_remapConsumptionTarget 只在当前 actor 上找物品）',
+      '池不足抛 ConsumptionError 阻止使用，绝不静默也不扣负数',
+      '限次特性点了不扣次数 → 查 consumption.targets 是不是空数组',
+    ],
+  },
+  {
+    keys: ['运行时值', 'labels', 'dc.value', '派生值', '不生效', '探针', 'probe', '读不到', '游戏里不对'],
+    title: '读运行时值 / 卡面全对但游戏里不生效',
+    file: '血的教训/血的教训-读运行时值的五个陷阱.md',
+    steps: [
+      'labels / dc.value 是 prepareData 算出来的，GET /get 拿不到 → 用 foundry_inspect{labels:true} 或 execute_js',
+      '活动级 effects 的权威读法：it.toObject().system.activities[aid].effects（a._source.effects 不刷新、a.effects 的 _id 被隐藏）',
+      '卡面全对但不生效 → 第一动作是 foundry_reference{topic:"probe"} 拿一段 F12 探针给使用者跑，别改代码猜',
+    ],
+  },
+  {
+    keys: ['跑批', '弹框', '看门狗', '零污染', 'DialogV2', '污染', '对话框'],
+    title: '跑批零污染 / 弹框看门狗',
+    file: '血的教训/血的教训-跑批零污染六源与弹框看门狗篇.md',
+    steps: ['六源清单 / 五类框三类按钮 / 受控实验法 —— 批量作业前读一遍'],
+  },
+  {
+    keys: ['造物', '配方', 'lh-crafting', '材料', '成品', '导入包', '商店'],
+    title: '造物模块（lh-crafting）建卡 / 导入包',
+    file: 'lh-crafting/造物-建卡与导入包.md',
+    steps: [
+      '写进 game.items 不进模块！必须写世界合集包 world.lh-crafting-data',
+      '身份键是 flags.lh-crafting.splitKey，没有它就等于不存在',
+      'pack.deleteDocuments 在 Foundry v13 不存在 → 用 pack.documentClass.deleteDocuments(ids,{pack:pack.collection})',
+      'relay 黑名单绕过：game["settings"]["set"](...) 可用（字符串里没有连续的 game.settings.set）',
+    ],
+  },
+  {
+    keys: ['发版', '发布', 'release', '打包', '验证', '证据', '质疑', '你到底验证没'],
+    title: '发布校验与查证纪律',
+    file: '血的教训/血的教训-发布校验与查证纪律篇.md',
+    steps: [
+      '发布前必须【数产物】（zip 条目数、各目录文件数）并与上一版对比',
+      '被质疑时第一动作是跑命令拿证据，不是解释、不是让用户去试',
+      'zip 条目用反斜杠分隔，检查前要 -replace 归一，否则全部假阴性',
+    ],
+  },
+  {
+    keys: ['双形态', '变形武器', '多形态', '切换', '变形'],
+    title: '双形态武器与活动自动化',
+    file: '血的教训/血的教训-双形态武器与活动自动化篇.md',
+    steps: ['transform 活动是「把 actor 变成另一个 actor」，不是物品变形；双形态用两把独立物品 + 切换宏，别用单物品多活动 + 宏切活动集合'],
+  },
+  {
+    keys: ['世界同步', '多世界', '搬运', 'world-sync', '换世界'],
+    title: '世界同步装置',
+    file: '血的教训/血的教训-世界同步装置篇.md',
+    steps: [],
+  },
+  {
+    keys: ['坑', '总典', '全部坑', '还有什么坑', '十条', 'checklist'],
+    title: '踩坑总典（459 条坑 + 831 条解法）',
+    file: '血的教训/FVTT踩坑总典-血泪教训合集.md',
+    steps: ['开头的「〇 · 只读十条」是最贵的十条 —— 接手任何 FVTT 活儿之前先看这个'],
+  },
+]
+
 const DEFAULT_KNOWLEDGE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团工具\\FVTT技术资料'
 
 /** 默认样本库目录（可用 config.json 的 sampleDir 覆盖）：世界导出的真实配置实体 JSON。 */
@@ -165,13 +265,13 @@ export function registerKnowledgeTools(
   const tool: { name: string } & Record<string, unknown> = {
     name: 'foundry_knowledge',
     description:
-      '按需读 FVTT 技术知识。五级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 原样文档库（topic:"manuals"，随插件发布，任何环境可用）：29 个模块的官方文档（144 篇）+ 飞书知识库原文（243 篇，已归并为一套，含总目录/函数签名/属性键值/激活条件/ATL语法等编号篇），共 387 篇——查模块 API/字段/函数签名的原始出处来这里，别猜；③ 资料库主题（topic 见下，**已随插件发布内置副本，任何环境可用**；本机 knowledgeDir 有更新版本时自动优先用它）：数据字典/怪物规格/自动化指北/宏汇编/midi 指南/CPR 宇宙/坑书/方法论等；④ topic:"local" = 内置资料库全索引（列全部文件路径，其余文件用 topic:"local", file:"<路径>" 读）；⑤ 样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"manuals"/"samples"/"local" 不带 file 参数 = 列出索引；② 带 file 参数（索引里的路径）= 读原文（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
+      '按需读 FVTT 技术知识。六级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 原样文档库（topic:"manuals"，随插件发布，任何环境可用）：29 个模块的官方文档（144 篇）+ 飞书知识库原文（243 篇，已归并为一套，含总目录/函数签名/属性键值/激活条件/ATL语法等编号篇），共 387 篇——查模块 API/字段/函数签名的原始出处来这里，别猜；③ 资料库主题（topic 见下，**已随插件发布内置副本，任何环境可用**；本机 knowledgeDir 有更新版本时自动优先用它）：数据字典/怪物规格/自动化指北/宏汇编/midi 指南/CPR 宇宙/坑书/方法论等；④ topic:"local" = 内置资料库全索引（列全部文件路径，其余文件用 topic:"local", file:"<路径>" 读）；⑤ 样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）；⑥ ★★ topic:"all" + query = 【全库关键词检索】：跨全部内置知识库（主题文档 + 资料库 + 模块文档 + 飞书原文）搜一个词，返回一串「■ 文件路径 + L行号 + 该行原文」，**不知道要看哪一篇时就用它** —— 这是「直接问资料库」的入口，别硬猜、别凭记忆。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"manuals"/"samples"/"local" 不带 file 参数 = 列出索引；② 带 file 参数（索引里的路径）= 读原文（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
     parameters: {
       type: 'object',
       properties: {
         topic: { type: 'string', description: '知识主题。内置：' + builtinTopics.join(' / ') + '；原样文档库："manuals"（模块官方文档 + 飞书知识库原文）；资料库（随包发布内置副本，本机有则优先）：' + topics.join(' / ') + '；"local"（内置资料库全索引，列全部文件路径）；样本库："samples"（世界导出的真实配置实体，抄改首选）' },
         file: { type: 'string', description: '可选：文档/样本路径（topic 为 "manuals" / "samples" / "local" 时用，传对应索引里列出的完整路径）' },
-        query: { type: 'string', description: '可选：按行搜索关键词（如 "OverTime"/"光环"/"图标"），返回最多 40 行匹配（含行号）。大文件先 query 定位再 offset 读原文。' },
+        query: { type: 'string', description: '按行搜索关键词（如 "OverTime"/"建卡"/"光环"），返回匹配行（含行号，最多 40 行/文件）。★ 两种用法：① 带 file 时 = 在该文件内 grep（大文件先 query 定位再 offset 读原文）；② **不带 file 时 = 在范围内全库检索** —— topic:"all" 跨全部知识库、topic:"local" 只搜资料库。不知道看哪一篇时用第 ② 种。' },
         offset: { type: 'number', description: '可选：从第几个字符开始读原文（无 query 时生效，默认 0）。返回值里有 nextOffset 与 hasMore 用于翻页。' },
       },
       required: ['topic'],
@@ -330,12 +430,61 @@ export function registerKnowledgeTools(
         return { topic, file: fileName, error: '样本文件未找到：「' + fileName + '」。file 请用 samples 索引里列出的路径（内置样本带分类文件夹前缀）。' }
       }
 
+      // ★ 全库检索：topic="all" + query ⇒ 跨全部内置知识库（docs/local/manuals）关键词检索。
+      // 为什么单独做一个 topic：AI 经常「不知道要看哪一篇」——
+      // 这时它既列不出索引（太多）也没法 grep（grep 要求先给 file），就卡死了。
+      // 这个入口就是为那一刻准备的：给一个词，还它一串「文件 + 行号」。
+      if (topic === 'all' || topic === 'search') {
+        const q = args.query === undefined ? '' : String(args.query).trim()
+        if (!q) {
+          return {
+            topic,
+            error: 'topic:"all" 是【全库关键词检索】，必须带 query（例如 query:"建卡"、"OverTime"、"批量"）。' +
+              '只想列索引就用 topic:"local"；想读某一篇就用 topic + file:"<路径>"。',
+          }
+        }
+        const roots: Array<{ name: string; dir: string }> = [
+          { name: '内置主题文档（结构模板/图标地图/部署排障）', dir: BUILTIN_KB_DIR },
+          { name: '内置资料库（血的教训/审查记录/提示词库/自动化指北/数据字典）', dir: BUILTIN_LOCAL_DIR },
+          { name: '模块文档与飞书原文（29 个模块 + 飞书知识库）', dir: BUILTIN_MANUALS_DIR },
+        ]
+        const parts: string[] = []
+        let scannedTotal = 0
+        let hitTotal = 0
+        for (const r of roots) {
+          if (!existsSync(r.dir)) continue
+          const res = await searchTree(r.dir, q)
+          scannedTotal += res.scanned
+          hitTotal += res.hits.length
+          if (res.hits.length) parts.push(formatSearchResult(q, r.name, res))
+        }
+        if (!parts.length) {
+          return {
+            topic, query: q, scannedFiles: scannedTotal, matched: 0,
+            content: '【全库检索】跨全部内置知识库（扫了 ' + scannedTotal + ' 个文件）搜「' + q + '」无匹配。\n' +
+              '① 换关键词或换词根（中文、英文各试一次）；② 用 topic:"local" 列索引人工找；' +
+              '③ 先 foundry_howto{task:"<你的任务>"} 看有没有现成流程；④ 再没有就说实话缺什么，别编。',
+          }
+        }
+        return { topic, query: q, scannedFiles: scannedTotal, matched: hitTotal, content: parts.join('\n\n') }
+      }
+
       // 内置资料库总索引：topic="local"（随包发布的脱敏资料库副本，任何环境可用）
       if (topic === 'local') {
         if (!existsSync(BUILTIN_LOCAL_DIR)) {
           return { topic, error: '内置资料库副本不存在：' + BUILTIN_LOCAL_DIR + '（插件包不完整，请重装插件）' }
         }
         const fileName = args.file === undefined ? '' : String(args.file)
+        // ★ 不带 file 却有 query ⇒ 在资料库范围内全库检索，而不是傻傻只列索引。
+        // 这修掉了「文档在包里但 AI 读不到」的技术根因：以前不带 file 时 query 会被直接忽略。
+        if (!fileName && args.query !== undefined && String(args.query).trim()) {
+          const q = String(args.query).trim()
+          const res = await searchTree(BUILTIN_LOCAL_DIR, q)
+          return {
+            topic, query: q, scope: '内置资料库', scannedFiles: res.scanned, matched: res.hits.length,
+            content: formatSearchResult(q, '内置资料库', res),
+          }
+        }
         if (fileName) {
           const rootResolved = resolve(BUILTIN_LOCAL_DIR)
           const target = resolve(join(BUILTIN_LOCAL_DIR, fileName))
@@ -423,6 +572,84 @@ export function registerKnowledgeTools(
    * 插件不内置任何「物品名 → 图标」映射：映射不可能覆盖全（真源里连 longsword/warhammer/handaxe
    * 这些整词都没有），且会随真源更新而腐坏——让 AI 现查，插件只负责搜得快。
    */
+  const howtoTool: { name: string } & Record<string, unknown> = {
+    name: 'foundry_howto',
+    description:
+      '★★ 任务级入口：给一个任务关键词（如「建角色卡」「批量改」「消耗目标」「造物配方」「卡面对但不生效」），' +
+      '返回【该读哪篇血泪教训 + 关键步骤清单】。' +
+      '★ 动手做一个「本项目第一次做」的任务之前先调它 —— 血泪教训都写在文档里，猜着做会连踩 30 版。' +
+      '判据只有一句：这件事我在本项目里做过没有？没做过就查。' +
+      '返回里带 file 路径，用 foundry_knowledge{topic:"local", file:...} 读全文。',
+    parameters: {
+      type: 'object',
+      properties: {
+        task: {
+          type: 'string',
+          description: '任务关键词（口语即可），如「建角色卡」「批量改物品」「消耗目标」「造物配方」「卡面全对但游戏里不生效」「发版前检查」',
+        },
+      },
+      required: ['task'],
+      additionalProperties: true,
+    },
+    output: {
+      schema: { type: 'object', additionalProperties: true },
+      render: (_a: unknown, v: unknown): Array<{ type: 'text'; text: string }> => {
+        const o = v as
+          | { matched?: boolean; title?: string; file?: string; steps?: string[]; hint?: string; availableTasks?: string[]; error?: string }
+          | undefined
+        if (o && typeof o.error === 'string') return [{ type: 'text', text: o.error }]
+        if (!o || o.matched !== true) {
+          const list = Array.isArray(o?.availableTasks) ? o.availableTasks : []
+          return [{ type: 'text', text: '没匹配到已知任务。可选：\n- ' + list.join('\n- ') + '\n' + String(o?.hint ?? '') }]
+        }
+        const lines = ['【' + String(o.title ?? '') + '】', '必读：' + String(o.file ?? '')]
+        if (Array.isArray(o.steps) && o.steps.length) {
+          lines.push('关键步骤：')
+          for (const s of o.steps) lines.push('  · ' + s)
+        }
+        if (o.hint) lines.push(String(o.hint))
+        return [{ type: 'text', text: lines.join('\n') }]
+      },
+    },
+    async execute(args: Record<string, unknown>) {
+      const task = String(args.task ?? '')
+        .toLowerCase()
+        .trim()
+      const allTitles = HOWTO.map((h) => h.title)
+      if (!task) {
+        return { error: 'task 必填：传任务关键词（口语即可），如「建角色卡」「批量改」「消耗目标」', availableTasks: allTitles }
+      }
+      const scored = HOWTO.map((h) => ({
+        h,
+        score: h.keys.reduce((n, k) => (task.includes(k.toLowerCase()) ? n + 1 : n), 0),
+      }))
+        .filter((x) => x.score > 0)
+        .sort((a, b) => b.score - a.score)
+      if (!scored.length) {
+        return {
+          matched: false,
+          availableTasks: allTitles,
+          hint:
+            '\n换更口语的说法再试一次；或列全索引 foundry_knowledge{topic:"local"}（不带 file）；' +
+            '或直接读总典的「〇 · 只读十条」：foundry_knowledge{topic:"local", file:"血的教训/FVTT踩坑总典-血泪教训合集.md"}',
+        }
+      }
+      const top = scored[0].h
+      const readCmd = 'foundry_knowledge{topic:"local", file:"' + top.file + '"}'
+      const also = top.also ? '\n配套 API 表：foundry_knowledge{topic:"local", file:"' + top.also + '"} 第三节' : ''
+      return {
+        matched: true,
+        title: top.title,
+        file: top.file,
+        alsoFile: top.also ?? null,
+        steps: top.steps,
+        readCommand: readCmd,
+        otherMatches: scored.slice(1, 4).map((x) => x.h.title),
+        hint: '★ 下一步：先读全文再动手 —— ' + readCmd + also,
+      }
+    },
+  }
+
   const iconTool: { name: string } & Record<string, unknown> = {
     name: 'foundry_search_icon',
     description:
@@ -584,6 +811,7 @@ export function registerKnowledgeTools(
   }
   REG(tool)
   REG(iconTool)
+  REG(howtoTool)
 }
 
 /** 递归列目录下所有文件（相对路径 + 字节数）。 */
@@ -644,6 +872,77 @@ async function servePage(args: Record<string, unknown>, topic: string, fileName:
     content:
       '【' + desc + '】\n文件：' + fileName + '（共 ' + text.length + ' 字符）\n第 ' + offset + '–' + nextOffset + ' 字符' + (hasMore ? '（还有更多，传 offset=' + nextOffset + ' 继续读）' : '（已到末尾）') + '：\n' + chunk,
   }
+}
+
+/** 可在全库检索里扫的文本扩展名。 */
+const SEARCHABLE_EXT = /\.(md|txt|json|ya?ml)$/i
+/** 全库检索的三个上限：最多扫多少文件 / 每文件最多报几行 / 总命中上限。 */
+const SEARCH_MAX_FILES = 4000
+const SEARCH_PER_FILE = 6
+const SEARCH_MAX_HITS = 80
+
+interface SearchHit { file: string; line: number; text: string }
+
+/**
+ * 全库关键词检索：递归遍历 root 下所有文本文件，逐行做大小写不敏感匹配。
+ * 为什么需要：servePage 的 query 只在【已经指定 file】时才生效 ——
+ * 不知道看哪一篇的时候就查不了，这正是「文档在包里但 AI 读不到」的技术原因。
+ * 这是「直接问资料库」的兜底入口。
+ */
+async function searchTree(root: string, query: string): Promise<{ scanned: number; hits: SearchHit[]; truncated: boolean }> {
+  const q = query.toLowerCase()
+  let files: Array<{ rel: string; size: number }>
+  try {
+    files = (await walkTree(root)).sort((a, b) => a.rel.localeCompare(b.rel))
+  } catch {
+    return { scanned: 0, hits: [], truncated: false }
+  }
+  const hits: SearchHit[] = []
+  let scanned = 0
+  let truncated = false
+  for (const f of files) {
+    if (scanned >= SEARCH_MAX_FILES) { truncated = true; break }
+    if (!SEARCHABLE_EXT.test(f.rel)) continue
+    if (f.size > 3_000_000) continue
+    scanned++
+    let text: string
+    try { text = (await readFile(join(root, f.rel), 'utf8')).replace(/^\uFEFF/, '') } catch { continue }
+    const lines = text.split(/\r?\n/)
+    let n = 0
+    for (let i = 0; i < lines.length; i++) {
+      if (!lines[i].toLowerCase().includes(q)) continue
+      hits.push({ file: f.rel, line: i + 1, text: lines[i].trim().slice(0, MAX_LINE_CHARS) })
+      n++
+      if (n >= SEARCH_PER_FILE || hits.length >= SEARCH_MAX_HITS) break
+    }
+    if (hits.length >= SEARCH_MAX_HITS) { truncated = true; break }
+  }
+  return { scanned, hits, truncated }
+}
+
+/** 把全库检索结果按文件分组排版 —— 每行都给 文件 + 行号，便于下一步精读。 */
+function formatSearchResult(query: string, scope: string, r: { scanned: number; hits: SearchHit[]; truncated: boolean }): string {
+  if (!r.scanned) return '【全库检索】' + scope + '（读不到 —— 插件包可能不完整）'
+  if (!r.hits.length) {
+    return '【全库检索】范围：' + scope + '（扫了 ' + r.scanned + ' 个文件）\n「' + query + '」无匹配。\n换关键词或换词根重试（中文、英文各试一次，如「建卡」与「advancement」）；仍无结果就用 topic:"local" 列索引人工找。'
+  }
+  const byFile = new Map<string, SearchHit[]>()
+  for (const h of r.hits) {
+    if (!byFile.has(h.file)) byFile.set(h.file, [])
+    byFile.get(h.file)!.push(h)
+  }
+  const out: string[] = []
+  out.push('【全库检索】范围：' + scope + '（扫了 ' + r.scanned + ' 个文件，命中 ' + r.hits.length + ' 行，落在 ' + byFile.size + ' 个文件里）')
+  out.push('关键词：「' + query + '」')
+  out.push('')
+  for (const [file, hs] of byFile) {
+    out.push('■ ' + file)
+    for (const h of hs) out.push('   L' + h.line + ': ' + h.text)
+  }
+  out.push('')
+  out.push('下一步：挑一个 ■ 路径，用 topic + file:"<该路径>" 读全文（大文件先加 query 定位再 offset 翻页）。')
+  if (r.truncated) out.push('（命中已达上限，可能还有更多；换更精确的关键词收窄）')
+  return out.join('\n')
 }
 
 export { DEFAULT_KNOWLEDGE_DIR, DEFAULT_SAMPLE_DIR, TOPICS }

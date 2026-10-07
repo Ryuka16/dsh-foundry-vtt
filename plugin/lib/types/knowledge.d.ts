@@ -12,7 +12,6 @@ declare const TOPICS: Record<string, {
     file: string;
     desc: string;
 }>;
-/** 默认资料库根目录（可用 config.json 的 knowledgeDir 覆盖）。 */
 declare const DEFAULT_KNOWLEDGE_DIR = "C:\\Users\\\u9F99\u534E\\Desktop\\\u667A\u80FD\u4F53\\01_\u8DD1\u56E2\u5DE5\u5177\\FVTT\u6280\u672F\u8D44\u6599";
 /** 默认样本库目录（可用 config.json 的 sampleDir 覆盖）：世界导出的真实配置实体 JSON。 */
 declare const DEFAULT_SAMPLE_DIR = "C:\\Users\\\u9F99\u534E\\Desktop\\\u667A\u80FD\u4F53\\01_\u8DD1\u56E2\u5DE5\u5177\\\u602A\u7269\u4E0E\u7269\u54C1\u5361";
