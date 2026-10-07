@@ -7,8 +7,25 @@
  * 替代 foundry_search + foundry_get_entity 拉完整样本（一次省几十 KB）。
  */
 
+/** 速查卡与详情的分隔符：每个主题开头是 ≤900 字符的速查卡（一眼看懂怎么做 / 怎么排查），之后才是长文详情。 */
+const BRIEF_SEP = '\n━━━━ 以下为详情 ━━━━\n'
+
 const REFERENCE: Record<string, string> = {
-  'activity-deep': `【活动与工作流深层语义 · 2026-09-15 源码级核实（dnd5e release-5.3.3 / midi-qol v13.0.55）】
+  'activity-deep': `【活动与工作流深层语义 · 速查卡】
+★ 写自动化前必知 6 条（症状都是「不报错，但行为不是你想要的」）：
+  1. **活动键名 = 活动 _id** —— system.activities 的 key 就是活动 id（16 位随机串）。
+     要引用活动先 foundry_inspect 读键名；别硬编码 dnd5eactivity000（那是手工写法的残留，create 路径给的是随机键）。
+  2. **删活动别用 -= 写法** —— 会触发 dnd5e 的 preUpdateActivities 崩溃（它拿键名当 id 去查，查不到就炸）。
+     正确姿势：读取 activities → 过滤掉要删的 → 整段替换写回（foundry_patch_item 的 removeActivities 已这么做）。
+  3. **深拷贝活动必须换 _id** —— Collection 按 _id 建索引，5 份带同一 id 拷进去只剩最后 1 份，**零报错**。
+  4. **Object.keys(item.system.activities) 恒为空数组** —— 它是 ActivityCollection，要读就用 item.toObject().system.activities。
+     同理 a.effects 里读不到 _id，权威读法是 item.toObject().system.activities[aid].effects。
+  5. **最终扣血量看 workflow.damageList** —— 不要自己拿 damageRolls 求和（会漏抗性/易伤/临时生命）。
+     但要改伤害得改 damageRolls，不是 damageList（后者是应用后结果，改了只影响显示）。
+  6. **消费 flag 真键是 use.consumed** —— 而且写在 chatCard（聊天消息）上，不在物品上；
+     活动 uuid = item.getRelativeUUID(actor) + ".Activity." + id。
+━━━━ 以下为详情 ━━━━
+【活动与工作流深层语义 · 2026-09-15 源码级核实（dnd5e release-5.3.3 / midi-qol v13.0.55）】
 ⚠️ 2026-09-17 第十二批源码核实（活动键名 / use.consumed / damageList，均带行号）：
 【活动键名 = 活动 _id】
 - module/data/fields/activities-field.mjs L97-102：ActivityCollection 构造时 this.set(entry._id, entry)
@@ -969,7 +986,25 @@ DAE 侧 AE 宏走的是【完全不同的 args 世界】，别混用：
 铁律：① miss 判定靠 hitTargets 空——切勿用 hitTargets>0 判命中（施放时 targets 也计入，会误判）；② AE 的 origin 必填；③ 宏里勿 JSON.stringify(token)（circular 崩），打日志用 console.log(对象)；④ identifier 只能英文数字破折号下划线；⑤ 先抄用户世界金标准（磁轭手铳等），别发明。
 AI 实操：先用 foundry_create_entity{entityType:"Macro", data:{name,type:"script",command}} 建世界宏，再用 foundry_update_entity 改物品 flags；或直接 create_entity 建带完整 flags 的物品。`,
 
-  aura: `【光环效果 auraeffects · 出自用户资料库「之前踩过的坑.txt」§光环】
+  aura: `【光环效果 auraeffects · 速查卡】
+★ 光环不生效？先按这 4 条查（2026-10-07 实测：读模块源码 + 往返移动验证得出，非转述）：
+  1. **送达靠「移动 token」触发** —— 站位不动时永远算不出「谁在范围内」，会一直显示没生效。
+     测试必须真的挪位置（token.document.update({x, y}) 或 canvas 上拖），静态改数据不会重算。
+     验证姿势：读远处 → 移近 → 读盟友 AC（+N 且身上挂 fromAura 效果）→ 移远（应被移除）→ 移回（应重新送达）。
+  2. **applyToSelf 决定 changes 留在哪**（这是「自己吃不到 / 别人吃不到」的总闸）——
+     AuraActiveEffectData.prepareDerivedData() 里：applyToSelf 为 false 时执行
+     「this.stashedChanges = this.parent.changes」（顶层 changes 被清空、暂存起来，只发给别人）；
+     为 true 时 changes 留在顶层直接对自己生效。**想自己+盟友都吃到 → 用 applyToSelf:true**。
+  3. **不要手动把 changes 写进 system.stashedChanges** —— 那是模块自己算的派生值。
+     auras.mjs 全文件里**没有 "stashed" 这个词**，写了也没人读（常见误判，会浪费一整轮排查）。
+  4. **transfer 一改就把 changes 清空** —— 试 transfer:true 后顶层 changes 变 0，改回 false 也还是 0，
+     必须重新触发（重挂效果 / 移动 token）才恢复。**光环 AE 保持 transfer:false**。
+  另：applyToSelf 的真实判定点在 helpers.mjs L249（!effect.system.applyToSelf && (sourceToken === targetToken)）；
+    半径 = system.distance（由 distanceFormula 求值，单位是格数）；距离用 canvas.scene.grid.measureDistance(a, b) 拿真实尺数；
+    前置条件 = 必须有 activeGM 在线（报 AURAEFFECTS.NoActiveGM 就是没有）。
+    字段数实测 system 共 16 键（不是文档说的 14）。
+━━━━ 以下为详情 ━━━━
+【光环效果 auraeffects · 出自用户资料库「之前踩过的坑.txt」§光环】
 ⚠️⚠️ 2026-09-17 【实机实测】世界「特醇佳酿」Foundry 13.351 + dnd5e 5.3.3 + **Aura Effects 1.5.2**（用户实际装的是 1.5.2，
    下面引用的「机制」来自对方核的 1.3.4 —— **版本差两个大版本，不能直接外推**）：
   ✓ 已实证（createEmbeddedDocuments 建源 AE 后立刻读回）：
@@ -1460,7 +1495,24 @@ flags.midi-qol.optional.<NAME>.*（mode 0 自定义），NAME=唯一串（建议
 核心入口就一个：MidiQOL.Workflow.getWorkflow(<chatMessageUuid>)，上面这些字段全在 v13 的 Workflow 实例上。
 ⚠️ 这是【只读探针】：不改判定逻辑、不写任何数据，跑完可以留着直到刷新页面。`,
 
-  'activity-types': `【dnd5e 5.3.3 活动类型完整清单 · 出自 config.mjs:4403 DND5E.activityTypes · 共 12 种】
+  'activity-types': `【dnd5e 5.3.3 活动类型 · 速查卡】
+★ 12 种活动：attack / save / check / damage / heal / utility / summon / transform / enchant / cast / forward / order。
+★ 三个常见误解（踩过）：
+  1. **没有「overtime 活动」这种东西** —— OverTime 是 midi 的**效果 flag 机制**，不是活动类型。
+  2. **transform 不是「物品变形」** —— 它把 actor 变成另一个 actor（profiles[].uuid 指向 Actor）。
+     双形态武器的正解是「两把独立物品 + 切换宏」，不是拿 transform 硬套。
+  3. **cast 只用于「从另一个物品施放法术」** —— 普通法术物品不放 cast 也能正常用（DC / 法术书 / 升环都不受影响）；
+     cast 自己不结算，是中转站（它把消耗置零后把 use() 转发给目标法术）。
+★ 字段级红线（写错多半静默丢弃或整块被替换）：
+  · check **没有 roll 字段**；check.ability 是**单个字符串**不是数组；结构 = check{ability, associated, dc{calculation, formula}}。
+  · damage **没有 includeBase**（那是 attack 专有）；save / damage 走 parts。
+  · **damage 元素 = {number, denomination, bonus, types, scaling, custom}** ——
+    用 update 写 parts.0.xxx 会把**整个元素替换**（其余字段全丢、types 变空数组）。
+    要么写完整数组，要么只改非数组字段。
+  · heal 的 types 是**闭集三键**：healing / temphp / maximum —— 填伤害类型（necrotic 之类）无效。
+  · summon 的 bonuses 全是公式字符串；ac/hd/hp = OVERRIDE，attackDamage/saveDamage/healing = ADD（加进召唤物的伤害 bonus）。
+━━━━ 以下为详情 ━━━━
+【dnd5e 5.3.3 活动类型完整清单 · 出自 config.mjs:4403 DND5E.activityTypes · 共 12 种】
 ⚠️ 2026-09-17 第十一批补：cast 到底要不要用 + summon 运行时
 
 ▸ 【spell 不放 cast 行不行】—— 行，且我们的工具就是这么建的（主活动 = damage/save/attack），已确认正确：
@@ -1768,7 +1820,24 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
   物品级 AE = { transfer:false, statuses:[...], changes:[{key:'flags.midi-qol.OverTime', mode:0, priority:20, value:'turn=start,...'}] }
   持续伤害的结束由 OverTime 的 saveCount=1- 负责，**duration 留全 null（永久）** 才是正确做法 —— 见 midi-over-time 主题。`,
 
-  'fx-anim': `【特效与动画三件套 · AA / Sequencer / TokenMagic · 2026-09-17 补齐 AA 完整外壳与 sound 7 字段（世界实测）】
+  'fx-anim': `【特效与动画 · 速查卡】
+★ 三件套分工：AA 管「物品/活动播什么」｜Sequencer 管「宏里临时播」｜TokenMagic 管「token 上的持续滤镜」。
+★ **AA（flags.autoanimations）—— 最常用**：
+  · 判定链：**活动级 isCustomized > 物品级 isCustomized > 名字匹配**（item.name / activity.name）。
+    ★ 只挂一份物品级 flags ⇒ **该物品所有活动播同一个动画**；要各播各的，必须给每个活动单独挂。
+  · **sound 7 个字段要写全**：enable / file / volume / delay / startTime / repeat / repeatDelay。
+    只写 {enable:false} 等于**根本没配声音**（这是最常见的「动画对了但没声」原因）。
+  · 现成模板直接抄：game.settings.get("autoanimations","aaAutorec-melee")（120 条）/ "aaAutorec-range"（159 条，158 条带声音）。
+    可写数据库路径（psfx.xxx / jb2a.xxx）或直接文件路径（modules/.../x.webm），也支持通配符 *。
+  · options 实测 **13 键**（键名是 **saturate** 不是 saturation；**repeatDelay 默认 250**）；
+    菜单五层 dbSection→menuType→animation→variant→color，**填错是静默不播、不报错**。
+  · **AA 音效与 Sequencer 音效会同时播、无互斥机制** —— 铁律：一个特效只在**一处**配声音。
+★ **Sequencer**：链是 .effect().file().atLocation().spriteScale().duration().play()。
+  ★**是 .spriteScale() 不是 .scale()**；路径 404 只 console.warn、不抛错；宏里 await play() 会拖住整个 workflow。
+★ **TokenMagic**：flags.tokenmagic.filters 挂 **token**；46 种 filterType 里**没有 poisoned/burning 这类 DND 状态名**
+  —— 中毒变绿用 ddTint、灼烧用 fire/xfire、麻痹用 electric；删滤镜 = TokenMagic.deleteFilters(token, filterId, filterType)。
+━━━━ 以下为详情 ━━━━
+【特效与动画三件套 · AA / Sequencer / TokenMagic · 2026-09-17 补齐 AA 完整外壳与 sound 7 字段（世界实测）】
 ⚠️ 2026-09-17 第十二批源码核实（AA 6.8.1 / TokenMagic 0.7.6.3）：
 【一个物品多个活动，各播各的动画与声音】
 - 两处都能挂 flags.autoanimations，【活动级优先】。读取点 aa-dnd5e.js 监听 dnd5e.rollAttackV2 / rollDamageV2 / postUseActivity，
@@ -2098,7 +2167,23 @@ flags.dae.dontApply:true → DAE 施加时直接过滤掉该效果（GMAction.ts
   execute_js 里逐条 await item.update() 会把 relay 拖死（408）⇒ 分批（另见 bulk 主题）。
   一次 create 几百条会静默返回 0（世界内 Item.create 的已知行为）⇒ 分批 + 每批回报数量。
 `,
-  'cpr': `【CPR（Cauldron of Plentiful Resources）· 模块 id chris-premades · 原名 Chris's Premades】
+  'cpr': `【CPR（chris-premades）· 速查卡】
+★ 三条接入途径，**先分清是走哪条再动手**：
+  1. **通用特性（44 条现成的）** —— 只写 flags、不配活动：
+     { "chris-premades": { config: { generic: { "<id>": { applied: true, ...字段 } } }, macros: { midi: { item: ["<id>"] } } } }
+  2. **自定义宏** —— 把 CPR 源码里的 export let 改成 return、加 identifier + rules，写进宏合集包，再绑物品：
+     { info: { identifier, rules }, macros: { midi: { item: ["<identifier>"] } }, equipment: { identifier } }
+  3. **嵌入式宏（就地写 JS，不用建宏合集包）** —— 存 flags.chris-premades.embeddedMacros **数组**；
+     Activity 级存父 item 的 embeddedActivityMacros.<activityId>；元素 = { name, type, pass, macro }（macro 是 JS 代码串）。
+★ **API 入口是 window.chrisPremades** —— game.modules.get("chris-premades").api 是**空对象**，别从那拿。
+★ 事件 **17 类**：check/save/aura/combat/item/death/effect/**midi-item**/**midi-actor**/movement/region/rest/skill/template/toolCheck/d20/time。
+★ 最常用 pass：midi-item 的 **rollFinished**（575 个内置宏里占 283）；combat 的 turnStart / turnEnd。
+★ **flags.macros.midi.item 是「宏名字符串数组」**，而 {pass, macro, priority} 是**宏对象内部**的结构 —— 两者别混。
+★ 官方写入函数：macroUtils.addEmbeddedMacro(doc, { name, type, pass, priority, macro })（Activity 会自动写到父 item）。
+★ 宏体内可直接裸用 utils（无需解构）：effectUtils / rollUtils / workflowUtils / itemUtils / macroUtils / dialogUtils / tokenUtils …
+  midi-item 额外拿到 { trigger, workflow, ditem }；combat 拿到 { trigger }（trigger.entity = 效果本身）。
+━━━━ 以下为详情 ━━━━
+【CPR（Cauldron of Plentiful Resources）· 模块 id chris-premades · 原名 Chris's Premades】
 ⚠️ 2026-09-17 实机验证通过（CPR 1.5.15 / foundry 13.351 / dnd5e 5.3.3），四条实测结论：
 
 ■ API 真入口 = window.chrisPremades（【不是】game.modules.get("chris-premades").api —— 那个是空对象）
@@ -2298,6 +2383,12 @@ export function registerReferenceTools(REG: (t: { name: string }) => void) {
       type: 'object',
       properties: {
         topic: { type: 'string', enum: topics, description: '要查的模板主题：' + topics.join(' / ') },
+        brief: {
+          type: 'boolean',
+          description:
+            'true = 只返回该主题开头的【速查卡】（约 600-900 字符），适合先看结论、排查故障；默认 false 返回全文。' +
+            '**主题越长越该先用 brief 看一眼** —— 如 activity-deep 全文 2.3 万字符（约 1.5 万 token），速查卡只要几百字符。',
+        },
       },
       required: ['topic'],
       additionalProperties: true,
@@ -2316,7 +2407,13 @@ export function registerReferenceTools(REG: (t: { name: string }) => void) {
       if (!topic || !REFERENCE[topic]) {
         return { topic, error: '未知主题「' + topic + '」。可用主题：' + topics.join(', ') }
       }
-      return { topic, template: REFERENCE[topic] }
+      const full = REFERENCE[topic]
+      if (args.brief === true) {
+        const cut = full.indexOf(BRIEF_SEP)
+        if (cut > 0) return { topic, brief: true, chars: cut, template: full.slice(0, cut) }
+        return { topic, brief: true, note: '该主题暂无速查卡，已返回全文', template: full }
+      }
+      return { topic, template: full }
     },
   }
   REG(tool)

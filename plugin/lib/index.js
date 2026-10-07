@@ -122,6 +122,7 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 ⚠️ **本表不全**。遇到没列到的任务类型，先 **foundry_howto{task:"关键词"}** —— 它返回该读哪篇 + 关键步骤；
 查不到、或只知道一个词而不知道看哪篇时，用 **foundry_knowledge{topic:"all", query:"关键词"}** 做全库检索（跨 主题文档+资料库+模块文档+飞书原文，返回「■ 文件 + L行号 + 原文」清单）—— **这是「直接问资料库」的入口，别硬猜**；再用 topic:"local" 列全索引，或读 file:"血的教训/FVTT踩坑总典-血泪教训合集.md" 的「〇 · 只读十条」（459 条坑里最贵的十条）。
 ⚠️ 索引 _索引.md 的「一、怎么用」第一节是**按任务**列的入口表，先扫它比扫全目录快。
+⚠️ **踩了新坑、并且【实测确认】了正确解法 → 立刻用 foundry_learn 记一条**（同一个坑连踩两次是在烧用户的钱；没验证过的猜测不要记）。动手前也可以先 foundry_knowledge{topic:"learned"} 看一眼 —— 那是这台机器上以前的 AI 踩过的坑，能省一整轮。
 
 0. **默认先给用户过目；他说不用看，就直接建**：
 - 建东西前**默认先出一版预览**（创建类工具不带 confirmToken 即预览，不写进世界），把**名称 / 数值 / 描述文案原文 / 机制**讲给用户听。这是默认动作，不是每次都要请示。
@@ -129,7 +130,7 @@ const WORKFLOW_PROMPT = `## FVTT 工作铁律（写任何 FVTT 内容前必须�
 - 用户说「改一下」就改参数、重出预览；**不要把「用户同意过任务」理解成「我可以随便改」**。
 - 落库后回报要具体：uuid + 实际落库的关键值，不是「已完成」三个字。
 1. 先查后写，严禁凭记忆手搓 dnd5e JSON：
-- 结构模板 → foundry_reference（主题：weapon/roll-data/save-activity/effect/creature/feat/spell/status-list/bonuses/midi-over-time/midi-flags/other-activity/activity-types/midi-properties/daelink/probe/item-macro/aura/dae/conditions/enchant/optional/trigger/overtime-activity/iron-rules/pitfalls），模板秒回，照抄改数值。**写任何公式/DC/加值字段前先看 roll-data**；写多活动物品前看 other-activity + activity-types；**卡面全对但游戏里不生效，第一动作是 foundry_reference{topic:"probe"} 拿一段 F12 探针给使用者跑，别改代码猜**；**「命中 → 豁免 → 中毒」不生效先看 daelink**（最常见原因：没装 DAE 模块，midi 里 hasActivityEffects = hasDAE(this) && ... 整段跳过）。
+- 结构模板 → foundry_reference（主题：weapon/roll-data/save-activity/effect/creature/feat/spell/status-list/bonuses/midi-over-time/midi-flags/other-activity/activity-types/midi-properties/daelink/probe/item-macro/aura/dae/conditions/enchant/optional/trigger/overtime-activity/iron-rules/pitfalls），模板秒回，照抄改数值。**主题越长越要先加 brief:true 只取速查卡**（省 90% token：activity-deep 全文 2.4 万字符≈1.5 万 token，速查卡仅 900 字符；aura/fx-anim/cpr/activity-types 同样带速查卡），不够再看全文。**写任何公式/DC/加值字段前先看 roll-data**；写多活动物品前看 other-activity + activity-types；**卡面全对但游戏里不生效，第一动作是 foundry_reference{topic:"probe"} 拿一段 F12 探针给使用者跑，别改代码猜**；**「命中 → 豁免 → 中毒」不生效先看 daelink**（最常见原因：没装 DAE 模块，midi 里 hasActivityEffects = hasDAE(this) && ... 整段跳过）。
 - 真实样本 → foundry_knowledge topic:"samples" 列索引找同类实体（怪物卡/武器/状态与中毒/持续伤害OverTime/光环/物品宏/DAE特殊时长/法术特性/装备/奇物），file 读样本（大文件先 query 关键词再 offset 翻页）。0 实例的键名禁止写进文档。
 - 图标路径 → **做物品/效果/token 前，先 foundry_search_icon{keyword:"sword"} 检索，把返回的候选列表看一遍，自己挑一张最贴的填进 img / effectImg**（这是你的活，别指望插件替你选）。可加 dir:"weapons/polearms" 收窄、一次最多 200 条。搜不到就换词根（longsword → sword、warhammer → hammer、handaxe → axe、quarterstaff → staff —— 这些整词在真源里不存在），或 foundry_file_system{source:"public", path:"icons/weapons"} 翻真实目录看实物；要分类全貌时读 topic:"icon-map"（13 大类 + 效果图标对照表）。6560 条真源随插件发布，任何环境可用。**一律用 webp（真源 6248 条实物图），禁止用 icons/svg/ 那 118 条抽象方块图（aura.svg/circle.svg 之类），也不要用 systems/dnd5e/icons/svg/ 那 237 条系统 UI 图标**。禁止猜路径，猜错 = 卡面裂图。
 - **模块 API / 标志名 / 函数签名** → 先 foundry_knowledge topic:"manuals" 不带 file 列索引（28 个模块官方文档 + 57 篇飞书原文，随插件发布），再 file 读原文、query grep 定位。**要写具体模块的东西时必查**：Sequencer 特效、midi-qol flags、DAE 键名、AC5E、TokenMagic、Rest Recovery、Automated Animations、CPR 宏。**纯 dnd5e 结构不用查**（走上面第 1、2 行就够）。

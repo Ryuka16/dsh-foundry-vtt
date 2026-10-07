@@ -8,10 +8,11 @@
  * - offset 分页：每页 ≤ PAGE_SIZE 字符，避免大文件整份灌进上下文。
  */
 
-import { readFile, readdir } from 'node:fs/promises'
+import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { basename, join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { homedir } from 'node:os'
 
 const PAGE_SIZE = 4000
 const MAX_GREP_LINES = 40
@@ -236,6 +237,95 @@ const HOWTO: Array<{ keys: string[]; title: string; file: string; also?: string;
 
 const DEFAULT_KNOWLEDGE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团工具\\FVTT技术资料'
 
+/**
+ * 实战坑表 —— AI 自己记的（由 foundry_learn 工具维护）。
+ *
+ * 存本机 `~/.dsh/dsh-foundry-vtt/learned.md`：**不进 git、不污染别人的包、换世界也不丢**。
+ * 设计意图：AI 现场踩到的坑（必须带验证过的正确解法）写下来，下一个 AI 开局读
+ * foundry_knowledge{topic:"learned"} 就能拿到 —— 同一个坑不踩第二次，越用越快。
+ */
+const LEARNED_DIR = join(homedir(), '.dsh', 'dsh-foundry-vtt')
+const LEARNED_FILE = join(LEARNED_DIR, 'learned.md')
+
+interface LearnedEntry {
+  id: string
+  title: string
+  time: string
+  tags: string[]
+  symptom: string
+  cause: string
+  fix: string
+}
+
+/** 解析 learned.md：按 `## [Lxxx] 标题` 切块，取五个字段。文件不存在/格式乱都返回已解析到的部分。 */
+function parseLearned(text: string): LearnedEntry[] {
+  const out: LearnedEntry[] = []
+  const blocks = text.split('\n## [')
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i]
+    const m = /^(L\d+)\]\s*(.*)$/.exec(b.slice(0, b.indexOf('\n') < 0 ? b.length : b.indexOf('\n')))
+    if (!m) continue
+    const nl = b.indexOf('\n')
+    const body = nl < 0 ? '' : b.slice(nl + 1)
+    const pick = (label: string): string => {
+      const mm = new RegExp('- \\*\\*' + label + '\\*\\*: ?([^\\n]*)').exec(body)
+      return mm ? mm[1].trim() : ''
+    }
+    out.push({
+      id: m[1],
+      title: m[2].trim(),
+      time: pick('时间'),
+      tags: pick('标签')
+        .split(/[,，\s]+/)
+        .filter(Boolean),
+      symptom: pick('现象'),
+      cause: pick('根因'),
+      fix: pick('正确做法'),
+    })
+  }
+  return out
+}
+
+/** 渲染 learned.md（AI 可读、人也可读）。 */
+function renderLearned(entries: LearnedEntry[]): string {
+  const parts: string[] = [
+    '# 实战坑表（AI 自己记的）',
+    '',
+    '> 由 foundry_learn 工具维护：动手时踩到的坑 + **验证过的**正确解法。',
+    '> 下一个 AI 开局读 foundry_knowledge{topic:"learned"} 就能拿到，同一个坑不踩第二次。',
+    '',
+  ]
+  for (const e of entries) {
+    parts.push('## [' + e.id + '] ' + e.title)
+    parts.push('- **时间**: ' + e.time)
+    if (e.tags.length) parts.push('- **标签**: ' + e.tags.join(', '))
+    parts.push('- **现象**: ' + e.symptom)
+    parts.push('- **根因**: ' + e.cause)
+    parts.push('- **正确做法**: ' + e.fix)
+    parts.push('')
+  }
+  return parts.join('\n')
+}
+
+async function readLearned(): Promise<LearnedEntry[]> {
+  try {
+    if (!existsSync(LEARNED_FILE)) return []
+    return parseLearned((await readFile(LEARNED_FILE, 'utf8')).replace(/^\uFEFF/, ''))
+  } catch {
+    return []
+  }
+}
+
+async function writeLearned(entries: LearnedEntry[]): Promise<void> {
+  await mkdir(LEARNED_DIR, { recursive: true })
+  await writeFile(LEARNED_FILE, renderLearned(entries), 'utf8')
+}
+
+/** 本地日期 yyyy-mm-dd（不用 toISOString，那是 UTC，东八区会差一天）。 */
+function todayLocal(): string {
+  return new Date().toLocaleDateString('sv-SE')
+}
+
 /** 默认样本库目录（可用 config.json 的 sampleDir 覆盖）：世界导出的真实配置实体 JSON。 */
 const DEFAULT_SAMPLE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团工具\\怪物与物品卡'
 
@@ -265,14 +355,15 @@ export function registerKnowledgeTools(
   const tool: { name: string } & Record<string, unknown> = {
     name: 'foundry_knowledge',
     description:
-      '按需读 FVTT 技术知识。六级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 原样文档库（topic:"manuals"，随插件发布，任何环境可用）：29 个模块的官方文档（144 篇）+ 飞书知识库原文（243 篇，已归并为一套，含总目录/函数签名/属性键值/激活条件/ATL语法等编号篇），共 387 篇——查模块 API/字段/函数签名的原始出处来这里，别猜；③ 资料库主题（topic 见下，**已随插件发布内置副本，任何环境可用**；本机 knowledgeDir 有更新版本时自动优先用它）：数据字典/怪物规格/自动化指北/宏汇编/midi 指南/CPR 宇宙/坑书/方法论等；④ topic:"local" = 内置资料库全索引（列全部文件路径，其余文件用 topic:"local", file:"<路径>" 读）；⑤ 样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）；⑥ ★★ topic:"all" + query = 【全库关键词检索】：跨全部内置知识库（主题文档 + 资料库 + 模块文档 + 飞书原文）搜一个词，返回一串「■ 文件路径 + L行号 + 该行原文」，**不知道要看哪一篇时就用它** —— 这是「直接问资料库」的入口，别硬猜、别凭记忆。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"manuals"/"samples"/"local" 不带 file 参数 = 列出索引；② 带 file 参数（索引里的路径）= 读原文（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
+      '按需读 FVTT 技术知识。七级：① 内置知识主题（随插件发布，任何环境可用，优先）：' + builtinTopics.join('/') + '；② 原样文档库（topic:"manuals"，随插件发布，任何环境可用）：29 个模块的官方文档（144 篇）+ 飞书知识库原文（243 篇，已归并为一套，含总目录/函数签名/属性键值/激活条件/ATL语法等编号篇），共 387 篇——查模块 API/字段/函数签名的原始出处来这里，别猜；③ 资料库主题（topic 见下，**已随插件发布内置副本，任何环境可用**；本机 knowledgeDir 有更新版本时自动优先用它）：数据字典/怪物规格/自动化指北/宏汇编/midi 指南/CPR 宇宙/坑书/方法论等；④ topic:"local" = 内置资料库全索引（列全部文件路径，其余文件用 topic:"local", file:"<路径>" 读）；⑤ 样本库（topic:"samples"，世界导出的真实配置实体 JSON——建物品/怪/自动化前先来这找同类真实样本，照抄结构改数值，一次过）；⑥ ★★ topic:"all" + query = 【全库关键词检索】：跨全部内置知识库（主题文档 + 资料库 + 模块文档 + 飞书原文）搜一个词，返回一串「■ 文件路径 + L行号 + 该行原文」，**不知道要看哪一篇时就用它** —— 这是「直接问资料库」的入口，别硬猜、别凭记忆。；⑦ topic:"learned" = 【实战坑表】—— AI 自己记的坑与验证过的解法（由 foundry_learn 写入，存本机，跨会话跨世界累积）。**动手前顺手看一眼**，能避开已经踩过的坑；自己踩到新坑、确认解法之后用 foundry_learn 补一条，下一个 AI 就省一次。**碰到 foundry_reference 内置模板没覆盖的深层问题（复杂 flags/宏/陷阱/光环/图标路径）先查这里，0 实例的键名禁用。** 用法：① topic:"manuals"/"samples"/"local" 不带 file 参数 = 列出索引；② 带 file 参数（索引里的路径）= 读原文（大文件先传 query 关键词 grep 定位，再传 offset 翻页，每页 ' + PAGE_SIZE + ' 字符）；③ 资料库/内置主题同理：大文件先 query 定位再 offset 读原文。',
     parameters: {
       type: 'object',
       properties: {
-        topic: { type: 'string', description: '知识主题。内置：' + builtinTopics.join(' / ') + '；原样文档库："manuals"（模块官方文档 + 飞书知识库原文）；资料库（随包发布内置副本，本机有则优先）：' + topics.join(' / ') + '；"local"（内置资料库全索引，列全部文件路径）；样本库："samples"（世界导出的真实配置实体，抄改首选）' },
+        topic: { type: 'string', description: '知识主题。内置：' + builtinTopics.join(' / ') + '；原样文档库："manuals"（模块官方文档 + 飞书知识库原文）；资料库（随包发布内置副本，本机有则优先）：' + topics.join(' / ') + '；"local"（内置资料库全索引，列全部文件路径）；样本库："samples"（世界导出的真实配置实体，抄改首选）；"learned"（实战坑表：AI 自己记的坑与正确解法，跨会话累积）' },
         file: { type: 'string', description: '可选：文档/样本路径（topic 为 "manuals" / "samples" / "local" 时用，传对应索引里列出的完整路径）' },
         query: { type: 'string', description: '按行搜索关键词（如 "OverTime"/"建卡"/"光环"），返回匹配行（含行号，最多 40 行/文件）。★ 两种用法：① 带 file 时 = 在该文件内 grep（大文件先 query 定位再 offset 读原文）；② **不带 file 时 = 在范围内全库检索** —— topic:"all" 跨全部知识库、topic:"local" 只搜资料库。不知道看哪一篇时用第 ② 种。' },
         offset: { type: 'number', description: '可选：从第几个字符开始读原文（无 query 时生效，默认 0）。返回值里有 nextOffset 与 hasMore 用于翻页。' },
+        group: { type: 'string', description: '可选：只列 manuals 里某一组的文件（组名子串匹配，如 "midi-qol" / "CPR" / "Sequencer" / "飞书知识库"）。★ 不传 group 时只返回分组概览（组名 + 篇数），想看某组有哪些文件再传它 —— 这样省大量 token。分组名写错时会返回全部可用组名。' },
       },
       required: ['topic'],
       additionalProperties: true,
@@ -288,6 +379,36 @@ export function registerKnowledgeTools(
     },
     async execute(args: Record<string, unknown>) {
       const topic = String(args.topic)
+
+      // 实战坑表：AI 自己记的（foundry_learn 写入，存本机 ~/.dsh/dsh-foundry-vtt/learned.md）
+      if (topic === 'learned') {
+        const entries = await readLearned()
+        if (!entries.length) {
+          return {
+            topic,
+            total: 0,
+            content:
+              '还没有记录。\n动手时踩到坑、并且**确认了正确解法之后**，用 foundry_learn{action:"add", title, symptom, cause, fix, tags} 记下来 ——\n下一个 AI 开局就能读到，同一个坑不踩第二次。',
+          }
+        }
+        const q = args.query === undefined ? '' : String(args.query).trim()
+        if (q) {
+          const low = q.toLowerCase()
+          const hit = entries.filter((e) =>
+            (e.id + ' ' + e.title + ' ' + e.tags.join(' ') + ' ' + e.symptom + ' ' + e.cause + ' ' + e.fix).toLowerCase().includes(low)
+          )
+          return {
+            topic,
+            query: q,
+            total: entries.length,
+            matched: hit.length,
+            content: hit.length
+              ? renderLearned(hit)
+              : '没有匹配「' + q + '」的记录。现有条目：' + entries.map((e) => e.id + ' ' + e.title).join(' | '),
+          }
+        }
+        return { topic, total: entries.length, content: renderLearned(entries) }
+      }
 
       // 内置主题：读插件包自带 knowledge-docs（任何环境可用）
       if (BUILTIN_TOPICS[topic]) {
@@ -311,6 +432,7 @@ export function registerKnowledgeTools(
           return { topic, error: '原样文档库不可用：内置目录不存在（' + BUILTIN_MANUALS_DIR + '）。' }
         }
         const fileName = args.file === undefined ? '' : String(args.file)
+        const groupArg = args.group === undefined ? '' : String(args.group).trim()
         if (!fileName) {
           let files: Array<{ rel: string; size: number }>
           try {
@@ -329,18 +451,52 @@ export function registerKnowledgeTools(
             if (!tree.has(group)) tree.set(group, [])
             tree.get(group)!.push(f.rel + '（' + Math.max(1, Math.round(f.size / 1024)) + 'KB）')
           }
-          const lines: string[] = []
-          for (const [group, items] of tree) {
-            lines.push('  ' + group + '（' + items.length + ' 篇）')
-            for (const it of items.slice().sort()) lines.push('    ' + it)
+          const groupNames = Array.from(tree.keys()).sort()
+          // 给了 group：只列这一组（单组超过 GROUP_MAX 篇就截断并提示改用 query）
+          if (groupArg) {
+            const want = groupArg.toLowerCase()
+            const hit = groupNames.filter((g) => g.toLowerCase().includes(want))
+            if (!hit.length) {
+              return {
+                topic,
+                group: groupArg,
+                error: '没有匹配的分组。可用分组名（共 ' + groupNames.length + ' 个）：' + groupNames.join(' | '),
+              }
+            }
+            const lines: string[] = []
+            for (const g of hit) {
+              const items = (tree.get(g) || []).slice().sort()
+              lines.push('  ' + g + '（' + items.length + ' 篇）')
+              for (const it of items.slice(0, GROUP_MAX)) lines.push('    ' + it)
+              if (items.length > GROUP_MAX) {
+                lines.push('    …还有 ' + (items.length - GROUP_MAX) + ' 篇未列出 —— 这个组太大，改用 topic:"all" + query:"关键词" 检索更快')
+              }
+            }
+            return {
+              topic,
+              group: groupArg,
+              matchedGroups: hit,
+              total: files.length,
+              content:
+                '【原样文档库 · 分组 ' + hit.join(' / ') + '】\n' +
+                lines.join('\n') +
+                '\n\n用法：foundry_knowledge{topic:"manuals", file:"<上面缩进行里的完整路径，直接照抄>"}。大文件（>20KB）先加 query 关键词 grep 定位（如 "onUseMacroName"/"flags"/"workflow"），再传 offset 翻页（每页 ' + PAGE_SIZE + ' 字符）。',
+            }
           }
+          // 没给 group：只列**分组概览**（原来是 378 篇全列，一次要 1.5 万字符 ≈ 1 万 token）
+          const ov: string[] = []
+          for (const g of groupNames) ov.push('  ' + g + '（' + (tree.get(g) || []).length + ' 篇）')
           return {
             topic,
             total: files.length,
+            groups: groupNames.length,
             content:
-              '【原样文档库索引】共 ' + files.length + ' 篇（模块官方文档 + 飞书知识库原文，随 git 发布，任何环境可用）：\n' +
-              lines.join('\n') +
-              '\n\n用法：foundry_knowledge{topic:"manuals", file:"<下面缩进行里的完整路径，直接照抄>"}。大文件（>20KB）先加 query 关键词 grep 定位（如 "onUseMacroName"/"flags"/"workflow"），再传 offset 翻页（每页 ' + PAGE_SIZE + ' 字符）。查模块 API 原始出处、字段名、函数签名时来这里，别猜。',
+              '【原样文档库索引】共 ' + files.length + ' 篇 / ' + groupNames.length + ' 个分组（模块官方文档 + 飞书知识库原文，随 git 发布，任何环境可用）：\n' +
+              ov.join('\n') +
+              '\n\n怎么往下查（按省 token 排序）：\n' +
+              '★ 想找某个主题的内容 → topic:"all" + query:"关键词"（跨全部知识库检索，比翻目录快得多）\n' +
+              '★ 想看某一组里有哪些文件 → 再传 group:"<组名>"（如 group:"midi-qol"、group:"CPR"、group:"飞书知识库"）\n' +
+              '★ 已经知道文件路径 → file:"<完整路径>" 直接读；大文件先加 query 关键词 grep，再传 offset 翻页（每页 ' + PAGE_SIZE + ' 字符）',
           }
         }
         // 有 file：读文档，防目录逃逸
@@ -572,6 +728,137 @@ export function registerKnowledgeTools(
    * 插件不内置任何「物品名 → 图标」映射：映射不可能覆盖全（真源里连 longsword/warhammer/handaxe
    * 这些整词都没有），且会随真源更新而腐坏——让 AI 现查，插件只负责搜得快。
    */
+  const learnTool: { name: string } & Record<string, unknown> = {
+    name: 'foundry_learn',
+    description:
+      '★ 实战坑表：把这次动手踩到的坑 + **验证过的**正确解法记下来，下一个 AI 开局就能读到。' +
+      '铁律：**同一个坑连踩两次是在烧用户的钱** —— 确认了正确解法之后（实测过的，不是猜的）立刻记。' +
+      '记什么：现象（报错原文 / 数值没变 / 卡面不对）+ 根因（查证过的机制）+ 正确做法（能 work 的具体写法或命令）+ 标签。' +
+      '写在哪：本机 ~/.dsh/dsh-foundry-vtt/learned.md —— 不进 git、不污染别人的包、换世界也不丢。' +
+      '用法：action:"add"（默认）新增 / "list" 看全部 / "update" 按 id 改 / "remove" 按 id 删。' +
+      '读回来：foundry_knowledge{topic:"learned"}（可用 query 关键词筛）。' +
+      '找不到参考、自己试出来的东西，更应该记 —— 那正是别人会重复踩的坑。',
+    parameters: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['add', 'list', 'update', 'remove'], description: '默认 add。' },
+        id: { type: 'string', description: 'update / remove 时必填，形如 "L003"。' },
+        title: { type: 'string', description: '一句话说清是什么坑（如「光环改了效果不生效」）。' },
+        symptom: { type: 'string', description: '现象：你看到什么（报错原文 / 数值没变 / 卡面不对）。' },
+        cause: { type: 'string', description: '根因：为什么（查证过的机制，不是猜的）。' },
+        fix: { type: 'string', description: '正确做法：验证过能 work 的具体写法/命令/字段。' },
+        tags: { type: 'array', items: { type: 'string' }, description: '标签（如 ["aura","auraeffects"]），方便下次检索。' },
+      },
+      required: [],
+      additionalProperties: true,
+    },
+    output: {
+      schema: { type: 'object', additionalProperties: true },
+      render: (_a: unknown, v: unknown): Array<{ type: 'text'; text: string }> => {
+        const o = v as Record<string, unknown> | undefined
+        if (o && typeof o.error === 'string') return [{ type: 'text', text: String(o.error) }]
+        if (o && o.action === 'list') {
+          const es = Array.isArray(o.entries) ? (o.entries as Array<Record<string, unknown>>) : []
+          const lines = ['【实战坑表】共 ' + String(o.total ?? 0) + ' 条']
+          for (const e of es) {
+            const tg = Array.isArray(e.tags) && e.tags.length ? '   #' + (e.tags as string[]).join(' #') : ''
+            lines.push('  [' + String(e.id) + '] ' + String(e.title) + tg)
+          }
+          if (o.note) lines.push(String(o.note))
+          return [{ type: 'text', text: lines.join('\n') }]
+        }
+        if (o && o.added) {
+          const en = (o.entry ?? {}) as Record<string, unknown>
+          return [{ type: 'text', text: '已记下 [' + String(o.added) + '] ' + String(en.title ?? '') + '（共 ' + String(o.total ?? '') + ' 条）\n' + String(o.note ?? '') }]
+        }
+        if (o && o.updated) return [{ type: 'text', text: '已更新 [' + String(o.updated) + ']' }]
+        if (o && o.removed) return [{ type: 'text', text: '已删除 [' + String(o.removed) + ']，剩 ' + String(o.remaining ?? '') + ' 条' }]
+        return [{ type: 'text', text: JSON.stringify(v, null, 2) }]
+      },
+    },
+    async execute(args: Record<string, unknown>) {
+      const action = String(args.action ?? 'add').toLowerCase()
+      const entries = await readLearned()
+
+      if (action === 'list') {
+        return {
+          action,
+          total: entries.length,
+          file: LEARNED_FILE,
+          entries: entries.map((e) => ({ id: e.id, title: e.title, time: e.time, tags: e.tags })),
+          note: entries.length
+            ? '读全文：foundry_knowledge{topic:"learned"}；按关键词筛：topic:"learned" + query:"关键词"。'
+            : '还没有记录。',
+        }
+      }
+
+      if (action === 'remove') {
+        const id = String(args.id ?? '').toUpperCase().trim()
+        if (!id) return { action, error: 'remove 需要传 id（如 "L003"）。当前有 ' + entries.length + ' 条：' + entries.map((e) => e.id).join(', ') }
+        const left = entries.filter((e) => e.id !== id)
+        if (left.length === entries.length) {
+          return { action, error: '没有 id = ' + id + ' 的记录。现有：' + entries.map((e) => e.id).join(', ') }
+        }
+        await writeLearned(left)
+        return { action, removed: id, remaining: left.length, file: LEARNED_FILE }
+      }
+
+      if (action === 'update') {
+        const id = String(args.id ?? '').toUpperCase().trim()
+        const idx = entries.findIndex((e) => e.id === id)
+        if (idx < 0) {
+          return { action, error: '没有 id = ' + id + ' 的记录。现有：' + entries.map((e) => e.id).join(', ') }
+        }
+        const old = entries[idx]
+        const g = (k: string, d: string): string =>
+          typeof args[k] === 'string' && String(args[k]).trim() ? String(args[k]).trim() : d
+        entries[idx] = {
+          ...old,
+          title: g('title', old.title),
+          symptom: g('symptom', old.symptom),
+          cause: g('cause', old.cause),
+          fix: g('fix', old.fix),
+          tags: Array.isArray(args.tags) ? (args.tags as unknown[]).map(String) : old.tags,
+          time: todayLocal(),
+        }
+        await writeLearned(entries)
+        return { action, updated: id, total: entries.length, file: LEARNED_FILE, entry: entries[idx] }
+      }
+
+      // add（默认）
+      const title = String(args.title ?? '').trim()
+      if (!title) {
+        return {
+          action,
+          error:
+            'add 需要 title（一句话说清是什么坑）。当前有 ' + entries.length + ' 条。' +
+            '建议一并给 symptom / cause / fix —— 只记标题的话下次还是不知道怎么办。',
+        }
+      }
+      const nums = entries.map((e) => parseInt(e.id.slice(1), 10)).filter((n) => Number.isFinite(n))
+      const next = 'L' + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(3, '0')
+      const entry: LearnedEntry = {
+        id: next,
+        title,
+        time: todayLocal(),
+        tags: Array.isArray(args.tags) ? (args.tags as unknown[]).map(String) : [],
+        symptom: String(args.symptom ?? '').trim(),
+        cause: String(args.cause ?? '').trim(),
+        fix: String(args.fix ?? '').trim(),
+      }
+      entries.push(entry)
+      await writeLearned(entries)
+      return {
+        action,
+        added: next,
+        total: entries.length,
+        file: LEARNED_FILE,
+        entry,
+        note: '下次（以及下一个 AI）用 foundry_knowledge{topic:"learned"} 读回来。',
+      }
+    },
+  }
+
   const howtoTool: { name: string } & Record<string, unknown> = {
     name: 'foundry_howto',
     description:
@@ -810,6 +1097,7 @@ export function registerKnowledgeTools(
     },
   }
   REG(tool)
+  REG(learnTool)
   REG(iconTool)
   REG(howtoTool)
 }
@@ -880,6 +1168,8 @@ const SEARCHABLE_EXT = /\.(md|txt|json|ya?ml)$/i
 const SEARCH_MAX_FILES = 4000
 const SEARCH_PER_FILE = 6
 const SEARCH_MAX_HITS = 80
+// manuals 分组索引里单组最多列多少篇（超过就截断并提示改用 query 检索）
+const GROUP_MAX = 60
 
 interface SearchHit { file: string; line: number; text: string }
 
