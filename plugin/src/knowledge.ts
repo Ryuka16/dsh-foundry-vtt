@@ -233,6 +233,48 @@ const HOWTO: Array<{ keys: string[]; title: string; file: string; also?: string;
     file: '血的教训/FVTT踩坑总典-血泪教训合集.md',
     steps: ['开头的「〇 · 只读十条」是最贵的十条 —— 接手任何 FVTT 活儿之前先看这个'],
   },
+  {
+    keys: ['接手', '接过', '别人改过', '半成品', '接手别人的包', '接手包', '交接', 'onboard'],
+    title: '接手一个别人改过的 compendium 项目',
+    file: 'dnd5e_classpack/接手包/README.md',
+    also: 'dnd5e_classpack/接手包/01-我犯过的错.md（最贵的一篇）、dnd5e_classpack/接手包/06-没做完的事.md',
+    steps: [
+      '三条硬约束：**改包不改卡**（不碰玩家角色卡）· **不动 PL 卡** · **删除前先请示**',
+      '先读 01-我犯过的错.md：判断类 7 / 技术类 15 / 流程类 4，每条含现象→根因→代价→正确做法',
+      '再读 03-怎么查一件东西对不对.md 拿判据表（🟢能用 / 🟡需并集 / 🔴禁用三档）',
+      '改数据前读 04-怎么改-compendium写入手册.md（三道闸：勘察闸 → 因果闸 → 备份闸）',
+    ],
+  },
+  {
+    keys: ['全库结构', '金表', '有多少结构', '库里有什么', '结构总表', '多少文档'],
+    title: '全库结构金表（有多少结构、怎么查）',
+    file: 'dnd5e_classpack/接手包/00-全库结构金表.md',
+    steps: [
+      '全库 326 包 / 36,786 文档 / 214 模块一次摊开',
+      '三层 flags 的位置与分工：顶层 doc.flags / 效果层 doc.effects[i].flags / 活动层 doc.system.activities.<key>.flags —— **三者是独立空间，只扫两层必漏**',
+      '含 133 个载体族全表 + 66 个「模块不在当前列表」的惯性标记警告（看着像有自动化其实是死数据）',
+    ],
+  },
+  {
+    keys: ['查一件东西对不对', '校验', '怎么验', '判据', '验证一件东西', '对不对', '假的', '效果没生效'],
+    title: '怎么查一件东西对不对（校验与修复总纲）',
+    file: '血的教训/血的教训-怎么查一件东西对不对-校验与修复总纲.md',
+    steps: [
+      '判据三档：🟢 能用 = 官方包逐字段对照 ｜ 🟡 需并集 = 判「有没有自动化」必须五形态取并集（item.effects / flags["your-feats"].options / CPR embeddedMacros / flags.ActiveAuras / dnd5e 原生 flag）｜ 🔴 禁用 = 中文自然语言→程序结构的静态判据',
+      '查八步：摸库 → 五形态并集判有无 → 官方包/规则书拿锚点 → 逐句读描述四问「对象/方向/数值/时机」→ 计时长 → 运行时实测 → 修 → 验证复扫',
+      '验三件：读回 diff（mismatched 非空不算交付）＋ 装件实测（魔法物品必须 equipped=true + attunement="attuned"，并做**假钥空白对照**）＋ 全库复扫',
+    ],
+  },
+  {
+    keys: ['实战坑表', '记的坑', '种子坑表', '47 条', '别人踩过的坑'],
+    title: '实战坑表 · 47 条实战验证（种子）',
+    file: '实战坑表-47条实战验证.md',
+    steps: [
+      '作者在真实项目里踩出来的 47 条，每条含【现象 / 根因 / 正确做法】，带源码行号与实测证据',
+      '动手前扫一眼标签与标题，能省掉大量重复踩坑',
+      '★ 你自己的坑用 foundry_learn 记（本机），这份只是种子',
+    ],
+  },
 ]
 
 const DEFAULT_KNOWLEDGE_DIR = 'C:\\Users\\龙华\\Desktop\\智能体\\01_跑团工具\\FVTT技术资料'
@@ -388,7 +430,11 @@ export function registerKnowledgeTools(
             topic,
             total: 0,
             content:
-              '还没有记录。\n动手时踩到坑、并且**确认了正确解法之后**，用 foundry_learn{action:"add", title, symptom, cause, fix, tags} 记下来 ——\n下一个 AI 开局就能读到，同一个坑不踩第二次。',
+              '本机坑表还是空的（这份是你自己的积累，随 foundry_learn 增长）。\n' +
+              '★ **包内另有一份【47 条实战验证的种子坑表】**，动手前值得先扫一遍标签与标题：\n' +
+              '  foundry_knowledge{topic:"local", file:"实战坑表-47条实战验证.md"}\n' +
+              '  （或直接全库搜：foundry_knowledge{topic:"all", query:"关键词"}）\n' +
+              '动手时踩到坑、并且**确认了正确解法之后**，用 foundry_learn{action:"add", title, symptom, cause, fix, tags} 记下来 ——\n下一个 AI 开局就能读到，同一个坑不踩第二次。',
           }
         }
         const q = args.query === undefined ? '' : String(args.query).trim()
@@ -909,9 +955,12 @@ export function registerKnowledgeTools(
       const scored = HOWTO.map((h) => ({
         h,
         score: h.keys.reduce((n, k) => (task.includes(k.toLowerCase()) ? n + 1 : n), 0),
+        // 命中 key 的总字符长度：key 越长越具体。
+        // 否则「坑」这种单字 key 会让「踩坑总典」盖过更精确的「实战坑表」。
+        weight: h.keys.reduce((n, k) => (task.includes(k.toLowerCase()) ? n + k.length : n), 0),
       }))
         .filter((x) => x.score > 0)
-        .sort((a, b) => b.score - a.score)
+        .sort((a, b) => b.score - a.score || b.weight - a.weight)
       if (!scored.length) {
         return {
           matched: false,
