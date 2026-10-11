@@ -13,6 +13,7 @@ import { existsSync } from 'node:fs'
 import { basename, join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { homedir } from 'node:os'
+import { noteResearch } from './research-log.js'
 
 const PAGE_SIZE = 4000
 const MAX_GREP_LINES = 40
@@ -421,6 +422,7 @@ export function registerKnowledgeTools(
     },
     async execute(args: Record<string, unknown>) {
       const topic = String(args.topic)
+      noteResearch('kb:' + topic)
 
       // 实战坑表：AI 自己记的（foundry_learn 写入，存本机 ~/.dsh/dsh-foundry-vtt/learned.md）
       if (topic === 'learned') {
@@ -948,6 +950,7 @@ export function registerKnowledgeTools(
       const task = String(args.task ?? '')
         .toLowerCase()
         .trim()
+      noteResearch('howto:' + task)
       const allTitles = HOWTO.map((h) => h.title)
       if (!task) {
         return { error: 'task 必填：传任务关键词（口语即可），如「建角色卡」「批量改」「消耗目标」', availableTasks: allTitles }

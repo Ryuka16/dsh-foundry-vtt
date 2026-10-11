@@ -6,6 +6,7 @@
  * AI 需要结构模板时用 foundry_reference{topic} 一次本地调用拿到，
  * 替代 foundry_search + foundry_get_entity 拉完整样本（一次省几十 KB）。
  */
+import { noteResearch } from './research-log.js';
 /** 速查卡与详情的分隔符：每个主题开头是 ≤900 字符的速查卡（一眼看懂怎么做 / 怎么排查），之后才是长文详情。 */
 const BRIEF_SEP = '\n━━━━ 以下为详情 ━━━━\n';
 const REFERENCE = {
@@ -2372,6 +2373,7 @@ export function registerReferenceTools(REG) {
         },
         async execute(args) {
             const topic = String(args.topic);
+            noteResearch('ref:' + topic);
             if (!topic || !REFERENCE[topic]) {
                 return { topic, error: '未知主题「' + topic + '」。可用主题：' + topics.join(', ') };
             }

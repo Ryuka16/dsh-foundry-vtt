@@ -12,6 +12,7 @@
 //   container  → **没有 system.type**，改用 system.capacity{weight:{value,units}}
 //   feat       → system.type{value:"feat",subtype:""}（特性，可挂自动化）
 import { randomBytes, createHash } from 'node:crypto';
+import { researchCheck } from './research-log.js';
 const ID16 = () => randomBytes(8).toString('hex');
 // 纯对象的深合并（数组与非对象一律直接覆盖）。
 // 用途：activityPatch 改活动字段时，必须 merge 进原活动而不是整体替换 ——
@@ -1523,6 +1524,8 @@ export function registerMinimalTools(h, reg) {
                 preview: true,
                 nothingWritten: true,
                 confirmToken: expectedToken,
+                // 预览是最好的提醒时机 —— 东西还没建，此时扫一眼现成实现成本最低。
+                researchCheck: researchCheck(),
                 wouldCreate: { name: args.name, type: itemType, img: pvImg, folder: stripFolder(args.folder) ?? null },
                 wouldUpdate: h.normalizeDocIds(pvData).doc,
                 card: {
@@ -1688,6 +1691,8 @@ export function registerMinimalTools(h, reg) {
             updated: true,
             verified: problems.length === 0,
             iconSource: iconGiven ? 'given' : 'default',
+            // 「有没有先扫现成实现」的自检结论 —— 放在返回体里，AI 每次建完都会看到。
+            researchCheck: researchCheck(),
             notes,
             verify,
             note: (problems.length ? '⚠️ 未通过校验：' + problems.join('；') + '。' : '')

@@ -20,6 +20,7 @@ import { spawn } from 'node:child_process'
 import { homedir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { registerExtraTools } from './tools-extra.js'
+import { researchCheck } from './research-log.js'
 
 /** 注入系统提示的工作铁律：强制 AI 先查模板/样本/真源，再写 JSON。每个新对话 AI 自动看到。 */
 const DESC_STYLE_PROMPT = `## FVTT 文案风格（写物品/怪物/特性/法术的描述与聊天文案时，一律照此执行）
@@ -1391,10 +1392,13 @@ export function apply(ctx: any): void {
     ['name', 'size', 'type', 'cr', 'ac', 'hp', 'abilities'],
     async (args) => {
       const { doc: npcDoc } = normalizeDocIds(buildNpcDocument(args))
-      return callRelay('POST', '/create', {
+      const out = await callRelay('POST', '/create', {
         query: targetingQuery(args),
         body: { entityType: 'Actor', data: npcDoc },
       })
+      // 「有没有先扫现成实现」的自检结论 —— 放在返回体里，AI 每次建完都会看到。
+      const rec = out && typeof out === 'object' && !Array.isArray(out) ? (out as Record<string, unknown>) : { value: out }
+      return { ...rec, researchCheck: researchCheck() }
     },
   ))
 

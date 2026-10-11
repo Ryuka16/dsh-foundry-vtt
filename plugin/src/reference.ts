@@ -7,6 +7,8 @@
  * 替代 foundry_search + foundry_get_entity 拉完整样本（一次省几十 KB）。
  */
 
+import { noteResearch } from './research-log.js'
+
 /** 速查卡与详情的分隔符：每个主题开头是 ≤900 字符的速查卡（一眼看懂怎么做 / 怎么排查），之后才是长文详情。 */
 const BRIEF_SEP = '\n━━━━ 以下为详情 ━━━━\n'
 
@@ -2404,6 +2406,7 @@ export function registerReferenceTools(REG: (t: { name: string }) => void) {
     },
     async execute(args: Record<string, unknown>) {
       const topic = String(args.topic)
+    noteResearch('ref:' + topic)
       if (!topic || !REFERENCE[topic]) {
         return { topic, error: '未知主题「' + topic + '」。可用主题：' + topics.join(', ') }
       }
