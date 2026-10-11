@@ -445,17 +445,46 @@ export function registerKnowledgeTools(
           const hit = entries.filter((e) =>
             (e.id + ' ' + e.title + ' ' + e.tags.join(' ') + ' ' + e.symptom + ' ' + e.cause + ' ' + e.fix).toLowerCase().includes(low)
           )
+          const MAX_HITS = 8
+          const shown = hit.slice(0, MAX_HITS)
           return {
             topic,
             query: q,
             total: entries.length,
             matched: hit.length,
             content: hit.length
-              ? renderLearned(hit)
+              ? renderLearned(shown) +
+                (hit.length > MAX_HITS
+                  ? '\n\n（只显示前 ' + MAX_HITS + ' 条，共命中 ' + hit.length + ' 条 —— 换个更精确的词，或直接读文件：' + LEARNED_FILE + '）'
+                  : '')
               : '没有匹配「' + q + '」的记录。现有条目：' + entries.map((e) => e.id + ' ' + e.title).join(' | '),
           }
         }
-        return { topic, total: entries.length, content: renderLearned(entries) }
+        // ⚠️ 不传 query 时【只给索引】（每条一行）—— 全文可能有几十 KB，一次吐出来会被截断、白烧 token
+        // 两道闸：最多列最近 IDX_MAX 条、tags 最多 4 个、标题最多 60 字（坑表会越攒越长，不能线性膨胀）
+        const IDX_MAX = 100
+        const recent = entries.length > IDX_MAX ? entries.slice(-IDX_MAX) : entries
+        const idx = recent.map((e) => {
+          const tags = e.tags.length ? '  [' + e.tags.slice(0, 4).join(',') + ']' : ''
+          const title = e.title.length > 60 ? e.title.slice(0, 60) + '…' : e.title
+          const when = e.time ? '  ' + e.time : ''
+          return e.id + '  ' + title + tags + when
+        })
+        const more =
+          entries.length > IDX_MAX
+            ? '\n（坑表共 ' + entries.length + ' 条，上面只列最近 ' + IDX_MAX + ' 条；找早期的用 query 关键词。）'
+            : ''
+        return {
+          topic,
+          total: entries.length,
+          shown: recent.length,
+          content:
+            '【实战坑表 · ' + entries.length + ' 条】本机累积（' + LEARNED_FILE + '）\n\n' +
+            idx.join('\n') +
+            more +
+            '\n\n看某条的全文：foundry_knowledge{topic:"learned", query:"关键词"}（只返回命中的条目）\n' +
+            '新增：foundry_learn{action:"add", title, symptom, cause, fix, tags}',
+        }
       }
 
       // 内置主题：读插件包自带 knowledge-docs（任何环境可用）
