@@ -877,7 +877,33 @@ export function apply(ctx: any): void {
   // -1. relay 守护：开 DSH 自动确保桥在跑（异步，不阻塞启动）。
   void ensureRelay()
 
-  const REG = (t: ReturnType<typeof makeTool>) => tools.register(t)
+  // 会真正改动世界数据的工具 —— 返回值统一附 researchCheck（提醒「动手前先查有没有现成实现」）。
+  // 只读工具（search / get_entity / inspect / diff / knowledge / reference / howto …）不加，免得每次调用多一段废话。
+  // 这里之所以不做成逐个工具手写：AI 可以不「建」（绕开 create_item_minimal），但它不可能不「写」——
+  // 只要它动手，就必须在返回值里看到自检结论。挂在这一层 = 覆盖 index / minimal / tools-extra 三个模块的全部写工具。
+  const MUTATING_TOOL_RE = new RegExp(
+    '^foundry_(' +
+      'execute_js|update_entity|create_entity|delete_entity|import_entity|modify_actor|' +
+      'create_item_minimal|create_creature|create_batch|patch_item|' +
+      'add_effect|remove_effect|place_token|move_token|manage_folder|' +
+      'scene_create|scene_update|scene_delete|switch_scene|' +
+      'canvas_create|canvas_update|canvas_delete|' +
+      'macro_execute|file_upload|chat_send|' +
+      'user_create|user_update|user_delete' +
+      ')$',
+  )
+  const REG = (t: ReturnType<typeof makeTool>) => {
+    if (MUTATING_TOOL_RE.test(t.name)) {
+      const inner = t.execute.bind(t)
+      t.execute = async (args: Record<string, unknown>) => {
+        const out = await inner(args)
+        return out && typeof out === 'object' && !Array.isArray(out)
+          ? { ...(out as Record<string, unknown>), researchCheck: researchCheck() }
+          : out
+      }
+    }
+    tools.register(t)
+  }
 
   // 0. 工作铁律：注入系统提示段落（每个新对话的 AI 自动看到），强制「先查模板/样本再写」。
   try {

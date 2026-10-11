@@ -70,12 +70,25 @@ export function researchCheck(): string {
     const all = notes.filter((n) => Date.now() - n.at <= RECENT_MS).map((n) => n.label)
     const recent = all.length ? '（最近查过：' + all.slice(-4).join('、') + '，但都不是现成实现类）' : ''
     return (
-      '⚠️ 没看到你扫过现成实现' + recent + ' —— 建之前先花一次调用确认有没有现成的：' +
+      '⚠️ 没看到你扫过现成实现' + recent + ' —— 建之前先花一次调用确认【这事是不是已经有人做过了】：' +
       'foundry_howto{task:"<你在做什么>"}，或 foundry_reference{topic:"cpr"|"optional"|"conditions"|"trigger"|"item-macro"}。' +
-      'CPR 通用特性 45 条 / AC5E 条件 / midi optional / GPS 里可能已经有现成做法，别重复造轮子。' +
+      '★ 可能的来源远不止 CPR，按这个顺序过一遍：' +
+      '① 官方 dnd5e 自己（活动类型 / 特性字段 / 规则动作 / enricher）｜' +
+      '② midi-qol（flags / optional / OverTime / triggeredActivity / 物品宏）｜' +
+      '③ DAE（AE changes / specialDuration / macro.execute / 条件表达式）｜' +
+      '④ AC5E 激活条件 / Effect Macro 效果触发宏 / Aura Effects 光环 / Convenient Effects｜' +
+      '⑤ CPR（45 条通用特性 + 575 个内置宏 + 内嵌法术）/ GPS / MISC —— 几百条预制自动化。' +
+      '先 foundry_reference{topic:"cpr"} 看预制自动化的全貌，再判断有没有现成的，别重复造轮子。' +
       '若你已确认过没有现成的（例如刚查过但用的是别的方式），忽略本条即可。'
     )
   }
   const top = hits.slice(-4).map((h) => h.label + (h.minutesAgo > 0 ? '（' + h.minutesAgo + ' 分钟前）' : '（刚刚）'))
-  return '✅ 已扫过现成实现：' + top.join('、') + '。若这次要做的机制与上面扫的不是同一类，建议补一次检索。'
+  return (
+    '✅ 已扫过现成实现：' + top.join('、') + '。若这次要做的机制与上面扫的不是同一类，建议补一次检索。' +
+    '⚠️ 【抗压缩提醒】上面只是「查过」的记录，具体内容在对话上下文里 —— ' +
+    '如果你这一轮被压缩过、已经不记得查到了什么，别凭模糊印象写：' +
+    '用 brief:true 重查一次（foundry_reference{topic:"cpr", brief:true} 只要 900 字符，全文是 1.4 万）。' +
+    '真正不会丢的只有两样：foundry_knowledge{topic:"learned"}（坑表，存磁盘）与 foundry_howto 的步骤清单。' +
+    '（重要结论用 foundry_learn 落盘 —— 那个压缩冲不掉，下个会话也读得到。）'
+  )
 }
